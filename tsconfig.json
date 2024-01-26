@@ -7,6 +7,9 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
+    "target": "ES6",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -21,6 +24,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "models/user.js", "migrations/20240124085644-create-user.ts", "migrations/20240125041904-create-user.js"],
   "exclude": ["node_modules"]
 }
