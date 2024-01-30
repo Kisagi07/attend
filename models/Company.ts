@@ -1,28 +1,48 @@
+import sequelize from "@/db";
 import {
+  CreationOptional,
   DataTypes,
-  Model,
   InferAttributes,
   InferCreationAttributes,
+  Model,
 } from "sequelize";
-import sequelize from "@/db";
 
 interface CompanyModel
   extends Model<
     InferAttributes<CompanyModel>,
     InferCreationAttributes<CompanyModel>
   > {
+  id: CreationOptional<number>;
   latitude: number;
   longitude: number;
 }
 
 const Company = sequelize.define<CompanyModel>(
-  "company",
+  "Company",
   {
-    latitude: DataTypes.DECIMAL,
-    longitude: DataTypes.DECIMAL,
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: false,
+      get() {
+        return +this.getDataValue("latitude");
+      },
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: false,
+      get() {
+        return +this.getDataValue("longitude");
+      },
+    },
   },
   {
     tableName: "company",
+    underscored: true,
   }
 );
 

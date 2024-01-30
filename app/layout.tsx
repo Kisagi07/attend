@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import bcrypt from "bcrypt";
-
-import sequlize from "@/db";
-import User from "@/models/User";
-import { getServerSession } from "next-auth";
 import Provider from "@/app/components/Provider";
+import { auth } from "./api/auth/[...nextauth]/route";
+import ToastProvider from "./components/ToastProvider";
+import "react-toastify/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,12 +19,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await auth();
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Provider session={session}>{children}</Provider>
+        <Provider session={session}>
+          <ToastContainer />
+          {children}
+        </Provider>
       </body>
     </html>
   );

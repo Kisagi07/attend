@@ -2,35 +2,37 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Attendance_Logs", {
+    await queryInterface.createTable("Users", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      type: {
-        type: Sequelize.ENUM("clock-in", "clock-out", "sick"),
+      name: {
+        type: Sequelize.STRING,
       },
-      time: {
-        type: Sequelize.TIME,
+      password: {
+        type: Sequelize.STRING,
       },
-      date: {
-        type: Sequelize.DATEONLY,
+      work_id: {
+        type: Sequelize.STRING,
       },
+      job_position: {
+        type: Sequelize.STRING,
+      },
+      today_shift: Sequelize.STRING,
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(),
       },
       updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: new Date(),
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Attendance_Logs");
+    await queryInterface.dropTable("Users");
   },
 };

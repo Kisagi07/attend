@@ -32,6 +32,11 @@ const LoginPage = () => {
     }
   };
 
+  const handleUppercase = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    input.value = input.value.toUpperCase();
+  };
+
   return (
     <main className="min-h-screen bg-white text-slate-500 px-4 md:bg-slate-50 py-8 flex flex-col justify-center">
       <section className="text-center md:bg-white max-w-sm mx-auto md:border-2 md:border-slate-200 md:rounded md:p-3 md:shadow-md">
@@ -48,6 +53,8 @@ const LoginPage = () => {
               placeholder="ID..."
               id="work_id"
               name="work_id"
+              maxLength={5}
+              onInput={handleUppercase}
             />
           </div>
           <div>

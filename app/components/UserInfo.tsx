@@ -13,7 +13,7 @@ const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
       <article className="grid grid-cols-[auto_10px_auto]">
         <span>Name</span>
         <span>:</span>
-        <span>{user?.name}</span>
+        <span>{user?.work_id}</span>
 
         <span>Job Position</span>
         <span>:</span>

@@ -13,6 +13,7 @@ interface ButtonDropdownProps {
   label?: string;
   className?: string;
   onClick?: (value: string) => void;
+  disabled?: boolean;
 }
 
 const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
@@ -20,6 +21,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   label,
   className,
   onClick,
+  disabled,
 }) => {
   // component error handling
   if ((!options || options.length === 0) && !label) {
@@ -61,6 +63,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   return (
     <div className="flex relative z-[1]">
       <button
+        disabled={disabled}
         onClick={handleButtonClick}
         className={`${
           optionsExists() ? options![activeOptionIndex].className : className
@@ -71,6 +74,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
       {options && options.length > 0 && (
         <>
           <button
+            disabled={disabled}
             onClick={handleDropdownClick}
             className="hover:bg-slate-200 bg-slate-100 transition-colors rounded-r px-3 py-2"
           >

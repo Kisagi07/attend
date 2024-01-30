@@ -1,54 +1,53 @@
+import sequelize from "@/db";
 import {
-  Sequelize,
+  CreationOptional,
   DataTypes,
-  Model,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
   InferAttributes,
   InferCreationAttributes,
-  CreationOptional,
-  HasManyCreateAssociationMixin,
-  HasManyHasAssociationMixin,
+  Model,
 } from "sequelize";
-import sequelize from "@/db";
+import Log, { LogModel } from "./Log";
+import bcrypt from "bcrypt";
 
-interface UserModel
+export interface UserModel
   extends Model<
     InferAttributes<UserModel>,
     InferCreationAttributes<UserModel>
   > {
+  id: CreationOptional<number>;
   name: string;
   work_id: string;
   password: string;
   job_position: string;
   today_shift: string;
-  id: CreationOptional<number>;
+
+  getLogs: HasManyGetAssociationsMixin<LogModel>;
+  createLog: HasManyCreateAssociationMixin<LogModel, "user_id">;
+  countLogs: HasManyCountAssociationsMixin;
 }
 
-const User = sequelize.define<UserModel>("User", {
-  id: {
-    primaryKey: true,
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+const User = sequelize.define<UserModel>(
+  "User",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: DataTypes.STRING,
+    work_id: DataTypes.STRING,
+    password: {
+      type: DataTypes.STRING,
+    },
+    job_position: DataTypes.STRING,
+    today_shift: DataTypes.STRING,
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  work_id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  job_position: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  today_shift: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
+  {
+    underscored: true,
+  }
+);
 
 export default User;
