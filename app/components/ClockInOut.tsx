@@ -5,6 +5,9 @@ import getCompany from "@/app/libs/getCompany";
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import postAttendance from "../libs/postAttendance";
 import { toast } from "react-toastify";
+import getAttendance from "../libs/getAttendance";
+import { LogModel } from "@/models/Log";
+import clsx from "clsx";
 
 interface Coordinate {
   latitude: number;
@@ -12,21 +15,22 @@ interface Coordinate {
 }
 
 const ClockInOut = () => {
-  const clockInOption = [
+  const [attendanceOptions, setAttendanceOptions] = useState([
     {
       label: "Clock-in",
-      className: "bg-green-400 hover:bg-green-500 text-white",
+      className:
+        "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
     },
     {
       label: "Sick",
-      className: "bg-red-400 hover:bg-red-500 text-white",
+      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
     },
-  ];
-
+  ]);
   const [navigationError, setNavigationError] = useState<string>("Loading");
   const [position, setPosition] = useState<Coordinate>();
   const [companyPosition, setCompanyPosition] = useState<Coordinate>();
   const [sendingLog, setSendingLog] = useState<boolean>(false);
+  const [doneForToday, setDoneForToday] = useState<boolean>(false);
 
   const fetchCompany = async () => {
     const res = await getCompany();
@@ -38,6 +42,47 @@ const ClockInOut = () => {
     } else {
       setNavigationError("Company Office has not been set");
     }
+  };
+
+  const fetchTodayLog = async () => {
+    const logs: LogModel[] = await getAttendance();
+    if (logs.length > 0) {
+      const sick = logs.find((log) => log.type === "sick");
+      const clockIn = logs.find((log) => log.type === "clock-in");
+      const clockOut = logs.find((log) => log.type === "clock-out");
+      if (sick) {
+        changeToRestwell();
+        return;
+      } else if (clockIn && clockOut) {
+        changeToGoodWork();
+        handleDoneToday();
+        return;
+      } else if (clockIn) {
+        changeToOut();
+        return;
+      }
+    }
+  };
+
+  const changeToOut = () => {
+    setAttendanceOptions([
+      {
+        label: "Clock-out",
+        className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
+      },
+    ]);
+  };
+
+  const changeToRestwell = () => {
+    setNavigationError("Rest Well");
+  };
+
+  const changeToGoodWork = () => [
+    setNavigationError("Thanks for your work today"),
+  ];
+
+  const handleDoneToday = () => {
+    setDoneForToday(true);
   };
 
   const haversineDistance = (
@@ -77,7 +122,7 @@ const ClockInOut = () => {
       );
       if (distance > 50) {
         setNavigationError("You are too far from the company");
-      } else {
+      } else if (!doneForToday) {
         setNavigationError("");
       }
     }
@@ -87,6 +132,7 @@ const ClockInOut = () => {
     setSendingLog(true);
 
     const dateObj = new Date();
+    const typeLower = type.toLowerCase();
 
     const hours = dateObj.getHours().toString().padStart(2, "0");
     const minutes = dateObj.getMinutes().toString().padStart(2, "0");
@@ -98,13 +144,21 @@ const ClockInOut = () => {
     const longitude = +position!.longitude.toFixed(8);
     try {
       const res = await postAttendance({
-        type: type.toLowerCase(),
+        type: typeLower,
         time,
         date,
         latitude,
         longitude,
       });
       toast.success("Attendance Log Saved.");
+      if (typeLower === "sick") {
+        changeToRestwell();
+      } else if (typeLower === "clock-in") {
+        changeToOut();
+      } else if (typeLower === "clock-out") {
+        changeToGoodWork();
+        handleDoneToday();
+      }
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -113,6 +167,7 @@ const ClockInOut = () => {
 
   useEffect(() => {
     fetchCompany();
+    fetchTodayLog();
     if ("geolocation" in navigator) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -141,28 +196,38 @@ const ClockInOut = () => {
   return navigationError ? (
     <button
       disabled
-      className="bg-slate-400 w-full text-white flex gap-x-2 items-center justify-center rounded px-3 py-2 relative"
+      className={clsx(
+        "bg-slate-400 w-full text-white flex gap-x-2 items-center justify-center rounded px-3 py-2 relative",
+        {
+          "!bg-green-400": doneForToday,
+        }
+      )}
     >
       {navigationError}
-      <FaRegCircleQuestion className="cursor-pointer peer" />
-      <div className="border border-slate-200 bottom-0 text-left peer-hover:block text-sm hidden translate-y-full text-slate-600 p-2 absolute bg-white">
-        <p>
-          If you're already in office area but still the button show "Too
-          far..."
-        </p>
-        <ul className="list-disc list-inside">
-          <li>Make sure your GPS active</li>
-          <li>Turn off then turn your GPS on again</li>
-          <li>Change your connection</li>
-        </ul>
-      </div>
+      {!doneForToday && (
+        <>
+          <FaRegCircleQuestion className="cursor-pointer peer" />
+          <div className="border border-slate-200 bottom-0 text-left peer-hover:block text-sm hidden translate-y-full text-slate-600 p-2 absolute bg-white">
+            <p>
+              If you're already in office area but still the button show "Too
+              far..."
+            </p>
+            <ul className="list-disc list-inside">
+              <li>Make sure your GPS active</li>
+              <li>Turn off then turn your GPS on again</li>
+              <li>Change your connection</li>
+            </ul>
+          </div>
+        </>
+      )}
     </button>
   ) : (
     <>
       <ButtonDropdown
         onClick={(value) => handleClockIn(value)}
+        disabled={sendingLog}
         className="bg-slate-900 hover:bg-black text-white"
-        options={clockInOption}
+        options={attendanceOptions}
       />
     </>
   );

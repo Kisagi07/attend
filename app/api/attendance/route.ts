@@ -42,3 +42,45 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json(log);
 }
+
+export async function GET(req: NextRequest) {
+  const session = await auth();
+
+  if (!session) return NextResponse.json(null);
+
+  if (!session)
+    return NextResponse.json(
+      {
+        status: 401,
+      },
+      {
+        status: 401,
+      }
+    );
+
+  const user = await User.findOne({
+    where: {
+      work_id: session.user.work_id,
+    },
+  });
+
+  if (!user)
+    return NextResponse.json(
+      {
+        status: 404,
+      },
+      {
+        status: 404,
+      }
+    );
+
+  const date = new Date().toLocaleDateString();
+
+  const logs = await user.getLogs({
+    where: {
+      date,
+    },
+  });
+
+  return NextResponse.json(logs);
+}

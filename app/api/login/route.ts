@@ -1,23 +1,35 @@
+import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { User } from "@/models";
 
 export async function POST(req: NextRequest) {
   const { work_id, password } = await req.json();
-
   const user = await User.findOne({
     where: {
       work_id,
     },
   });
+  if (!user)
+    return NextResponse.json(
+      {
+        message: "User not found",
+      },
+      {
+        status: 404,
+      }
+    );
 
-  if (!user) return NextResponse.json(null);
+  const matched = await bcrypt.compare(password, user.password);
 
-  const match = await bcrypt.compare(password, user.password);
+  if (!matched)
+    return NextResponse.json(
+      {
+        message: "Wrong Password",
+      },
+      {
+        status: 401,
+      }
+    );
 
-  if (match) {
-    return NextResponse.json(user);
-  } else {
-    return NextResponse.json(null);
-  }
+  return NextResponse.json(user);
 }

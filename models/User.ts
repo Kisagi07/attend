@@ -23,6 +23,7 @@ export interface UserModel
   password: string;
   job_position: string;
   today_shift: string;
+  role: CreationOptional<"employee" | "admin">;
 
   getLogs: HasManyGetAssociationsMixin<LogModel>;
   createLog: HasManyCreateAssociationMixin<LogModel, "user_id">;
@@ -44,6 +45,7 @@ const User = sequelize.define<UserModel>(
     },
     job_position: DataTypes.STRING,
     today_shift: DataTypes.STRING,
+    role: DataTypes.ENUM("employee", "admin"),
   },
   {
     underscored: true,

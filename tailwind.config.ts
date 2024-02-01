@@ -17,6 +17,9 @@ const config: Config = {
         "fade-up": "fade-up 150ms forwards",
         "fade-down": "fade-down 150ms forwards",
       },
+      fontFamily: {
+        sixtyfour: ["Sixtyfour", "Helvetica"],
+      },
     },
   },
   plugins: [],
