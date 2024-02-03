@@ -1,7 +1,6 @@
 "use client";
 import ButtonDropdown from "./ButtonDropdown";
 import { useEffect, useState } from "react";
-import getCompany from "@/app/libs/getCompany";
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import postAttendance from "../libs/postAttendance";
 import { toast } from "react-toastify";
@@ -33,11 +32,15 @@ const ClockInOut = () => {
   const [doneForToday, setDoneForToday] = useState<boolean>(false);
 
   const fetchCompany = async () => {
-    const res = await getCompany();
-    if (res) {
+    const res = await fetch("/api/company");
+    if (!res.ok) {
+      throw new Error("Failedn on getting company data");
+    }
+    const data = await res.json();
+    if (data) {
       setCompanyPosition({
-        latitude: +res.latitude,
-        longitude: +res.longitude,
+        latitude: +data.latitude,
+        longitude: +data.longitude,
       });
     } else {
       setNavigationError("Company Office has not been set");

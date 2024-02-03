@@ -3,8 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 export async function POST(req: NextRequest) {
-  const { work_id, password, name, job_position, today_shift } =
-    await req.json();
+  const {
+    work_id,
+    password,
+    name,
+    job_position,
+    today_shift,
+    role = "employee",
+  } = await req.json();
 
   const user = await User.create({
     work_id,
@@ -12,6 +18,7 @@ export async function POST(req: NextRequest) {
     name,
     job_position,
     today_shift,
+    role,
   });
 
   return NextResponse.json(user);

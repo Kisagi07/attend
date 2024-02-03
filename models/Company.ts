@@ -7,7 +7,7 @@ import {
   Model,
 } from "sequelize";
 
-interface CompanyModel
+export interface CompanyModel
   extends Model<
     InferAttributes<CompanyModel>,
     InferCreationAttributes<CompanyModel>

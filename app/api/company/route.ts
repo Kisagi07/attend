@@ -17,3 +17,16 @@ export async function POST(req: NextRequest) {
   });
   return NextResponse.json(coordinate);
 }
+
+export async function PUT(req: NextRequest) {
+  const { latitude, longitude }: { latitude: number; longitude: number } =
+    await req.json();
+  const company = await Company.findOne();
+  if (!company) {
+    const newCompany = await Company.create({ latitude, longitude });
+    return NextResponse.json(newCompany);
+  } else {
+    await company.update({ latitude, longitude });
+    return NextResponse.json(company);
+  }
+}

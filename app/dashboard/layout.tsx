@@ -83,6 +83,27 @@ const Layout: React.FC<Layout> = ({ children }) => {
               Employee
             </Link>
           </li>
+          <li>
+            <Link
+              onClick={() => setSidebarOpen(false)}
+              href="/dashboard/settings"
+              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
+                "bg-slate-100": pathname === "/dashboard/settings",
+              })}
+            >
+              Settings
+            </Link>
+          </li>
+          <hr className="!mt-8" />
+          <li>
+            <Link
+              // onClick={}
+              href="#"
+              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block")}
+            >
+              Logouts
+            </Link>
+          </li>
         </ul>
       </aside>
 

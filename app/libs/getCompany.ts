@@ -1,5 +1,5 @@
 export default async function getCompany() {
-  const res = await fetch(`/api/company`);
+  const res = await fetch(`${process.env.APP_URL}/api/company`);
   if (!res.ok) {
     throw new Error("Failed on retrieving company office");
   }

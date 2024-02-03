@@ -17,6 +17,8 @@ module.exports = {
       {
         latitude: -7.65944796,
         longitude: 112.79746217,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
   },

@@ -14,11 +14,24 @@ module.exports = {
      */
     await queryInterface.bulkInsert("users", [
       {
-        name: "Emily Watson",
+        name: "Kizuke",
         work_id: "ID001",
         password: await bcrypt.hash("yut6gb23", 10),
         job_position: "Manager",
         today_shift: "08:00 - 16:00",
+        role: "admin",
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        name: "Tane",
+        work_id: "ID002",
+        password: await bcrypt.hash("yut6gb23", 10),
+        job_position: "Designer",
+        today_shift: "08:00 - 16:00",
+        role: "employee",
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     ]);
   },
