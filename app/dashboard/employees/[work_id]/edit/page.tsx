@@ -1,15 +1,16 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import Select from "@/app/components/Select";
 import { toast } from "react-toastify";
 import clsx from "clsx";
+import { UserModel } from "@/models/User";
+import { useRouter } from "next/navigation";
 interface Option {
   label: string;
   value: string;
 }
-const CreateEmployee = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [jobOptions, setJobOptions] = useState<Option[]>([
     {
@@ -42,20 +43,38 @@ const CreateEmployee = () => {
   const [jobPosition, setJobPosition] = useState<Option>();
   const [todayShift, setTodayShift] = useState<Option>();
   const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [workId, setWorkId] = useState<string>("Loading...");
+  const [user, setUser] = useState<UserModel>();
   const [validation, setValidation] = useState<{
     [key: string]: boolean;
   }>({});
   const formRef = useRef<HTMLFormElement>(null);
-  const fetchRegisterData = async () => {
-    const res = await fetch(`/api/register`);
+  const fetchUserData = async () => {
+    const res = await fetch(`/api/users/${params.work_id}`, {
+      cache: "no-cache",
+    });
+
     if (!res.ok) {
-      throw new Error("Failed on getting register additional data");
+      toast.error("Something went wrong!");
+      throw new Error("Failed on fetching employee data");
     }
 
-    const data = await res.json();
-    setWorkId(data);
+    const data: UserModel = await res.json();
+    setUser(data);
+    setWorkId(data.work_id);
+    setName(data.name);
+    const defaultPosition = jobOptions.find(
+      (option) => option.value === data.job_position
+    );
+    if (defaultPosition) {
+      setJobPosition(defaultPosition);
+    }
+    const defaultShift = shiftOptions.find(
+      (option) => option.value === data.today_shift
+    );
+    if (defaultShift) {
+      setTodayShift(defaultShift);
+    }
   };
   const validateForm = () => {
     const success: { [key: string]: boolean } = {};
@@ -64,11 +83,6 @@ const CreateEmployee = () => {
       success.name = true;
     } else {
       failed.name = true;
-    }
-    if (password?.length > 0) {
-      success.password = true;
-    } else {
-      failed.password = true;
     }
     if (workId?.length > 0 && workId !== "Loading...") {
       success.work_id = true;
@@ -97,70 +111,67 @@ const CreateEmployee = () => {
       failed,
     };
   };
-  const resetForm = () => {
-    setName("");
-    setPassword("");
-    setWorkId("");
-    setJobPosition(undefined);
-    setTodayShift(undefined);
-    formRef.current!.reset();
-  };
-  const sendRegister = async () => {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        password,
-        work_id: workId,
-        job_position: jobPosition!.value,
-        today_shift: todayShift!.value,
-      }),
-      headers: {
-        "Content-Type": "application/json",
+  const handleUpdate = async () => {
+    const sendUpdate = async () => {
+      const res = await fetch(`/api/users/${params.work_id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name,
+          work_id: workId,
+          job_position: jobPosition!.value,
+          today_shift: todayShift!.value,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    };
+    toast.promise(sendUpdate, {
+      pending: "Updating",
+      success: {
+        render() {
+          router.push("/dashboard/employees");
+          return "User Updated";
+        },
       },
+      error: "Failed on updating user",
     });
-    if (!res.ok) {
-      toast.error("Failed Registering Employee");
-    } else {
-      toast.success("Employee Registered");
-    }
-    const data = await res.json();
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validated = validateForm();
     setValidation({});
+    console.log(validated);
     if (!validated.validated) {
       setValidation(validated.failed);
       return;
     } else {
       setSubmitting(true);
 
-      await sendRegister();
+      await handleUpdate();
 
-      resetForm();
-      fetchRegisterData();
       setSubmitting(false);
     }
   };
   useEffect(() => {
-    fetchRegisterData();
+    fetchUserData();
   }, []);
 
   return (
     <section className="space-y-2">
-      <h1 className="text-lg uppercase font-semibold">Add Employee</h1>
+      <h1 className="text-lg uppercase font-semibold">Edit Employee</h1>
       <hr />
       <form
         ref={formRef}
         onSubmit={handleSubmit}
         className="space-y-4 md:grid md:grid-cols-2 md:space-y-0 md:gap-4"
       >
-        <div>
+        <div className="md:col-span-2">
           <label htmlFor="name">
             Name<span className="text-red-500">*</span> :{" "}
           </label>
           <input
+            defaultValue={user?.name}
             type="text"
             onChange={({ currentTarget }) => setName(currentTarget.value)}
             className={clsx(
@@ -172,8 +183,8 @@ const CreateEmployee = () => {
           />
         </div>
 
-        <div>
-          <label htmlFor="name">
+        {/* <div>
+          <label htmlFor="password">
             Password<span className="text-red-500">*</span> :{" "}
           </label>
           <div className="relative">
@@ -183,7 +194,7 @@ const CreateEmployee = () => {
               className={clsx(
                 "w-full rounded outline-none border border-slate-200 p-2",
                 {
-                  "!border-red-500": validation["password"],
+                  "border-red-500": validation["password"],
                 }
               )}
             />
@@ -195,18 +206,18 @@ const CreateEmployee = () => {
               )}
             </span>
           </div>
-        </div>
+        </div> */}
         <div className="md:col-span-2">
-          <label htmlFor="name">
+          <label htmlFor="work_id">
             Work ID<span className="text-red-500">*</span> :{" "}
           </label>
           <input
             readOnly
             type="text"
             className={clsx(
-              "w-full rounded outline-none border border-slate-200 p-2",
+              "w-full rounded outline-none border bg-slate-100 border-slate-200 p-2",
               {
-                "!border-red-500": validation["work_id"],
+                "border-red-500": validation["work_id"],
               }
             )}
             value={workId}
@@ -238,7 +249,7 @@ const CreateEmployee = () => {
           )}
           type="submit"
         >
-          {submitting ? "Registering" : "Register Employee"}
+          {submitting ? "Updating" : "Update Employee"}
         </button>
       </form>
     </section>

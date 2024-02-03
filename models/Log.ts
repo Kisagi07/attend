@@ -6,6 +6,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 import { UserModel } from "./User";
 import User from "./User";
@@ -21,6 +22,8 @@ export interface LogModel
   longitude: number;
 
   getUser: BelongsToGetAssociationMixin<UserModel>;
+
+  user: NonAttribute<UserModel>;
 }
 
 const Log = sequelize.define<LogModel>(

@@ -66,7 +66,7 @@ const Select: FC<SelectProps> = ({
         className={clsx(
           "border bg-white w-full border-slate-200  rounded relative",
           {
-            "border-red-500": error,
+            "!border-red-500": error,
           }
         )}
       >

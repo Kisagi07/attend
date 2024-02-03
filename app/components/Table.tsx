@@ -15,15 +15,27 @@ const Table: FC<TableProps> = ({ data, columns }) => {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    defaultColumn: {
+      size: 100,
+      minSize: 50,
+      maxSize: 300,
+    },
   });
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full">
+      <table
+        className="w-full"
+        {...{ style: { minWidth: table.getCenterTotalSize() } }}
+      >
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} className="bg-slate-50">
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="p-2 text-left">
+                <th
+                  key={header.id}
+                  style={{ width: header.getSize() }}
+                  className="p-2 text-left"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(

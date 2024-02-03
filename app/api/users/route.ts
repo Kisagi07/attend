@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     where: {
       role: "employee",
     },
-    attributes: ["name", "work_id", "job_position", "today_shift"],
+    attributes: ["name", "work_id", "job_position", "today_shift", "id"],
   });
 
   return NextResponse.json(users);
