@@ -5,6 +5,7 @@ import { LuArrowLeftFromLine } from "react-icons/lu";
 import Link from "next/link";
 import { FaBars } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
+import Logout from "../components/Logout";
 
 interface Layout {
   children: React.ReactNode;
@@ -96,13 +97,7 @@ const Layout: React.FC<Layout> = ({ children }) => {
           </li>
           <hr className="!mt-8" />
           <li>
-            <Link
-              // onClick={}
-              href="#"
-              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block")}
-            >
-              Logouts
-            </Link>
+            <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />
           </li>
         </ul>
       </aside>

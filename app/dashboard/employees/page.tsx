@@ -1,11 +1,8 @@
 import { FaUserPlus } from "react-icons/fa";
 import Link from "next/link";
 import getUsers from "@/app/libs/getUsers";
-import EmployeeList from "@/app/components/EmployeeList";
-import EmployeeTableSkeleton from "@/app/skeletons/EmployeeTableSkeleton";
-import { Suspense } from "react";
+import EmployeeTable from "@/app/components/EmployeeTable";
 const EmployeePage = () => {
-  const promise = getUsers();
   return (
     <section className="space-y-4">
       <h1 className="text-xl uppercase font-semibold">Employee</h1>
@@ -18,9 +15,7 @@ const EmployeePage = () => {
           <FaUserPlus /> Add Employee
         </Link>
       </div>
-      <Suspense fallback={<EmployeeTableSkeleton />}>
-        <EmployeeList promise={promise} />
-      </Suspense>
+      <EmployeeTable />
     </section>
   );
 };

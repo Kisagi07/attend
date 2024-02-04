@@ -6,7 +6,7 @@ interface attendanceModel {
   time: string;
 }
 export default async function postAttendance(credentials: attendanceModel) {
-  const res = await fetch(`/api/attendance`, {
+  const res = await fetch(`${process.env.APP_URLC}/api/attendance`, {
     method: "POST",
     body: JSON.stringify(credentials),
     headers: {

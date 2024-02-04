@@ -67,6 +67,25 @@ const ClockInOut = () => {
     }
   };
 
+  const settingClock = (logs: LogModel[]) => {
+    if (logs.length > 0) {
+      const sick = logs.find((log) => log.type === "sick");
+      const clockIn = logs.find((log) => log.type === "clock-in");
+      const clockOut = logs.find((log) => log.type === "clock-out");
+      if (sick) {
+        changeToRestwell();
+        return;
+      } else if (clockIn && clockOut) {
+        changeToGoodWork();
+        handleDoneToday();
+        return;
+      } else if (clockIn) {
+        changeToOut();
+        return;
+      }
+    }
+  };
+
   const changeToOut = () => {
     setAttendanceOptions([
       {
@@ -146,13 +165,26 @@ const ClockInOut = () => {
     const latitude = +position!.latitude.toFixed(8);
     const longitude = +position!.longitude.toFixed(8);
     try {
-      const res = await postAttendance({
-        type: typeLower,
-        time,
-        date,
-        latitude,
-        longitude,
+      const res = await fetch(`/api/attendance`, {
+        method: "POST",
+        body: JSON.stringify({
+          type: typeLower,
+          time,
+          date,
+          latitude,
+          longitude,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-cache",
       });
+
+      if (!res.ok) {
+        throw new Error("Failed on sending attendance log");
+      }
+
+      const data = await res.json();
       toast.success("Attendance Log Saved.");
       if (typeLower === "sick") {
         changeToRestwell();
@@ -169,8 +201,36 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    fetchCompany();
-    fetchTodayLog();
+    // fetchCompany();
+    fetch("/api/company")
+      .then((response) => response.json())
+      .then((data) => {
+        setCompanyPosition({
+          latitude: +data.latitude,
+          longitude: +data.longitude,
+        });
+      });
+    // fetchTodayLog();
+    fetch("/api/attendance")
+      .then((response) => response.json())
+      .then((logs: LogModel[]) => {
+        if (logs.length > 0) {
+          const sick = logs.find((log) => log.type === "sick");
+          const clockIn = logs.find((log) => log.type === "clock-in");
+          const clockOut = logs.find((log) => log.type === "clock-out");
+          if (sick) {
+            changeToRestwell();
+            return;
+          } else if (clockIn && clockOut) {
+            changeToGoodWork();
+            handleDoneToday();
+            return;
+          } else if (clockIn) {
+            changeToOut();
+            return;
+          }
+        }
+      });
     if ("geolocation" in navigator) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -212,8 +272,8 @@ const ClockInOut = () => {
           <FaRegCircleQuestion className="cursor-pointer peer" />
           <div className="border border-slate-200 bottom-0 text-left peer-hover:block text-sm hidden translate-y-full text-slate-600 p-2 absolute bg-white">
             <p>
-              If you're already in office area but still the button show "Too
-              far..."
+              If you&apos;re already in office area but still the button show
+              &quot;Too far...&quot;
             </p>
             <ul className="list-disc list-inside">
               <li>Make sure your GPS active</li>

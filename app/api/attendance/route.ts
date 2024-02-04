@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../auth/[...nextauth]/route";
+import { auth } from "../auth/[...nextauth]/auth";
 import { User, Log } from "@/models";
 
 export async function POST(req: NextRequest) {
@@ -46,7 +46,15 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const session = await auth();
 
-  if (!session) return NextResponse.json(null);
+  if (!session)
+    return NextResponse.json(
+      {
+        message: "Unauthorized",
+      },
+      {
+        status: 401,
+      }
+    );
 
   if (!session)
     return NextResponse.json(
@@ -73,12 +81,13 @@ export async function GET(req: NextRequest) {
         status: 404,
       }
     );
-
-  const date = new Date().toLocaleDateString();
+  const timeZone = "Asia/Jakarta";
+  const jakartaDate = new Date().toLocaleString("en-ES", { timeZone });
+  const formattedDate = new Date(jakartaDate).toISOString().split("T")[0];
 
   const logs = await user.getLogs({
     where: {
-      date,
+      date: formattedDate,
     },
   });
 

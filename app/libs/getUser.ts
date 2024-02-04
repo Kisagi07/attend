@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { auth } from "../api/auth/[...nextauth]/route";
+import { auth } from "../api/auth/[...nextauth]/auth";
 import User from "@/models/User";
 
 export default async function getUser() {

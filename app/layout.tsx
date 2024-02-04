@@ -4,7 +4,7 @@ import "./globals.css";
 import "react-toastify/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Provider from "./components/Provider";
-import { auth } from "./api/auth/[...nextauth]/route";
+import { auth } from "./api/auth/[...nextauth]/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 

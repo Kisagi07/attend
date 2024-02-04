@@ -33,7 +33,6 @@ const Dashboard = () => {
       throw new Error("Failed on fetching employee data");
     }
     const data = await res.json();
-    console.log(data);
     setLogs(data);
   };
 

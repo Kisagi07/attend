@@ -1,23 +1,21 @@
 "use client";
 
 import { createColumnHelper } from "@tanstack/react-table";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Table from "./Table";
 import { FaUserAltSlash, FaUserEdit } from "react-icons/fa";
 import { UserModel } from "@/models/User";
 import Confirmation from "@/app/components/Confirmation";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
 interface UserModelEx extends UserModel {
   action: string;
 }
 const employeeColumn = createColumnHelper<UserModelEx>();
 
-interface CProps {
-  data: any[];
-}
-const EmployeeTable: FC<CProps> = ({ data }) => {
-  const [retData, setRetData] = useState<UserModel[]>(data);
+const EmployeeTable = () => {
+  const [users, setUsers] = useState<UserModel[]>([]);
   const columns = [
     employeeColumn.accessor("name", {
       header: "Name",
@@ -63,6 +61,7 @@ const EmployeeTable: FC<CProps> = ({ data }) => {
   ];
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [workIdDelete, setWorkIdDelete] = useState<string>("");
+  const [fetching, setFetching] = useState<boolean>(true);
   const handleDelete = async () => {
     const deleteIt = async () => {
       const res = await fetch(`/api/users/${workIdDelete}`, {
@@ -93,17 +92,28 @@ const EmployeeTable: FC<CProps> = ({ data }) => {
     );
   };
   const handleFilterAfterDelete = () => {
-    const filtered = retData.filter((ret) => ret.work_id !== workIdDelete);
-    setRetData(filtered);
+    const filtered = users.filter((user) => user.work_id !== workIdDelete);
+    setUsers(filtered);
   };
-  return (
+  const fetchUsers = () => {
+    fetch(`/api/users`, { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setUsers(data))
+      .finally(() => setFetching(false));
+  };
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+  return fetching ? (
+    <EmployeeTableSkeleton />
+  ) : (
     <>
       <Confirmation
         show={showConfirmation}
         onConfirm={handleDelete}
         onClose={setShowConfirmation}
       />
-      <Table data={retData} columns={columns} />
+      <Table data={users} columns={columns} />
     </>
   );
 };
