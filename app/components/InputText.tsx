@@ -4,6 +4,7 @@ interface CProps {
   defaultValue?: string;
   onChange?: (value: string) => void;
   value?: string;
+  disabled?: boolean;
 }
 const InputText = ({
   className,
@@ -11,9 +12,11 @@ const InputText = ({
   defaultValue,
   onChange,
   value,
+  disabled,
 }: CProps) => {
   return (
     <input
+      disabled={disabled}
       onChange={({ currentTarget }) =>
         onChange && onChange(currentTarget.value)
       }

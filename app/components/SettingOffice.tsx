@@ -97,7 +97,7 @@ const SettingOffice = () => {
           value={longitude}
           onChange={setLongitude}
         />
-        <div className="md:flex md:justify-end md:col-span-3">
+        <div className="flex md:justify-end md:col-span-3">
           <button
             disabled={submitting}
             onClick={() => setShowConfirm(true)}

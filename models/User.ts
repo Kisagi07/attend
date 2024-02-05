@@ -10,7 +10,6 @@ import {
   Model,
 } from "sequelize";
 import Log, { LogModel } from "./Log";
-import bcrypt from "bcrypt";
 
 export interface UserModel
   extends Model<
@@ -31,7 +30,7 @@ export interface UserModel
 }
 
 const User = sequelize.define<UserModel>(
-  "User",
+  "users",
   {
     id: {
       type: DataTypes.INTEGER,

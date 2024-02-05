@@ -15,10 +15,12 @@ export interface CompanyModel
   id: CreationOptional<number>;
   latitude: number;
   longitude: number;
+  tolerance_active: CreationOptional<boolean>;
+  tolerance_time: CreationOptional<number>;
 }
 
 const Company = sequelize.define<CompanyModel>(
-  "Company",
+  "company",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -38,6 +40,16 @@ const Company = sequelize.define<CompanyModel>(
       get() {
         return +this.getDataValue("longitude");
       },
+    },
+    tolerance_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    tolerance_time: {
+      type: DataTypes.INTEGER,
+      defaultValue: 30,
+      allowNull: false,
     },
   },
   {

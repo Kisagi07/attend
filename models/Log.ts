@@ -27,7 +27,7 @@ export interface LogModel
 }
 
 const Log = sequelize.define<LogModel>(
-  "Log",
+  "logs",
   {
     id: {
       type: DataTypes.INTEGER,

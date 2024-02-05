@@ -2,11 +2,11 @@
 import ButtonDropdown from "./ButtonDropdown";
 import { useEffect, useState } from "react";
 import { FaRegCircleQuestion } from "react-icons/fa6";
-import postAttendance from "../libs/postAttendance";
 import { toast } from "react-toastify";
-import getAttendance from "../libs/getAttendance";
 import { LogModel } from "@/models/Log";
 import clsx from "clsx";
+import { CompanyModel } from "@/models/Company";
+import { useSession } from "next-auth/react";
 
 interface Coordinate {
   latitude: number;
@@ -14,6 +14,7 @@ interface Coordinate {
 }
 
 const ClockInOut = () => {
+  const { data: session, status } = useSession();
   const [attendanceOptions, setAttendanceOptions] = useState([
     {
       label: "Clock-in",
@@ -30,61 +31,6 @@ const ClockInOut = () => {
   const [companyPosition, setCompanyPosition] = useState<Coordinate>();
   const [sendingLog, setSendingLog] = useState<boolean>(false);
   const [doneForToday, setDoneForToday] = useState<boolean>(false);
-
-  const fetchCompany = async () => {
-    const res = await fetch("/api/company");
-    if (!res.ok) {
-      throw new Error("Failedn on getting company data");
-    }
-    const data = await res.json();
-    if (data) {
-      setCompanyPosition({
-        latitude: +data.latitude,
-        longitude: +data.longitude,
-      });
-    } else {
-      setNavigationError("Company Office has not been set");
-    }
-  };
-
-  const fetchTodayLog = async () => {
-    const logs: LogModel[] = await getAttendance();
-    if (logs.length > 0) {
-      const sick = logs.find((log) => log.type === "sick");
-      const clockIn = logs.find((log) => log.type === "clock-in");
-      const clockOut = logs.find((log) => log.type === "clock-out");
-      if (sick) {
-        changeToRestwell();
-        return;
-      } else if (clockIn && clockOut) {
-        changeToGoodWork();
-        handleDoneToday();
-        return;
-      } else if (clockIn) {
-        changeToOut();
-        return;
-      }
-    }
-  };
-
-  const settingClock = (logs: LogModel[]) => {
-    if (logs.length > 0) {
-      const sick = logs.find((log) => log.type === "sick");
-      const clockIn = logs.find((log) => log.type === "clock-in");
-      const clockOut = logs.find((log) => log.type === "clock-out");
-      if (sick) {
-        changeToRestwell();
-        return;
-      } else if (clockIn && clockOut) {
-        changeToGoodWork();
-        handleDoneToday();
-        return;
-      } else if (clockIn) {
-        changeToOut();
-        return;
-      }
-    }
-  };
 
   const changeToOut = () => {
     setAttendanceOptions([
@@ -201,16 +147,17 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    // fetchCompany();
+    console.log(session);
     fetch("/api/company")
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: CompanyModel) => {
+        // set company coordinate position
         setCompanyPosition({
           latitude: +data.latitude,
           longitude: +data.longitude,
         });
+        // set tolerance setting
       });
-    // fetchTodayLog();
     fetch("/api/attendance")
       .then((response) => response.json())
       .then((logs: LogModel[]) => {

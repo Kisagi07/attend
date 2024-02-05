@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
       {
         name: "Kizuke",
         work_id: "ID001",
-        password: await bcrypt.hash("yut6gb23", 10),
+        password: await bcryptjs.hash("yut6gb23", 10),
         job_position: "Manager",
         today_shift: "08:00 - 16:00",
         role: "admin",
@@ -26,7 +26,7 @@ module.exports = {
       {
         name: "Tane",
         work_id: "ID002",
-        password: await bcrypt.hash("yut6gb23", 10),
+        password: await bcryptjs.hash("yut6gb23", 10),
         job_position: "Designer",
         today_shift: "08:00 - 16:00",
         role: "employee",

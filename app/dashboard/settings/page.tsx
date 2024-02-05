@@ -1,7 +1,5 @@
 import SettingOffice from "@/app/components/SettingOffice";
-import getCompany from "@/app/libs/getCompany";
-import { CompanyModel } from "@/models/Company";
-
+import AttendTolerance from "@/app/components/AttendTolerance";
 const SettingPage = () => {
   return (
     <>
@@ -9,6 +7,8 @@ const SettingPage = () => {
         <h1 className="text-xl uppercase font-semibold">Settings</h1>
         <hr />
         <SettingOffice />
+        <hr />
+        <AttendTolerance />
       </section>
     </>
   );

@@ -1,6 +1,6 @@
 import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   const {
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
   const user = await User.create({
     work_id,
-    password: await bcrypt.hash(password, 10),
+    password: await bcryptjs.hash(password, 10),
     name,
     job_position,
     today_shift,
