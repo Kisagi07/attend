@@ -31,6 +31,7 @@ const ClockInOut = () => {
   const [companyPosition, setCompanyPosition] = useState<Coordinate>();
   const [sendingLog, setSendingLog] = useState<boolean>(false);
   const [doneForToday, setDoneForToday] = useState<boolean>(false);
+  const [toleranceClockIn, setToleranceClockIn] = useState<string>("");
 
   const changeToOut = () => {
     setAttendanceOptions([
@@ -145,9 +146,28 @@ const ClockInOut = () => {
     }
     setSendingLog(false);
   };
+  const calculateToleratedTime = (
+    shiftStart: string,
+    tolerance: number
+  ): string => {
+    // Parse the shift start time
+    const [hours, minutes] = shiftStart.split(":").map(Number);
+
+    let toleratedHours = hours;
+    let toleratedMinutes = minutes - tolerance;
+
+    if (toleratedMinutes < 0) {
+      toleratedHours--;
+      toleratedMinutes += 60;
+    }
+
+    const toleratedTime = `${String(toleratedHours).padStart(2, "0")}:${String(
+      toleratedMinutes
+    ).padStart(2, "0")}`;
+    return toleratedTime;
+  };
 
   useEffect(() => {
-    console.log(session);
     fetch("/api/company")
       .then((response) => response.json())
       .then((data: CompanyModel) => {
@@ -156,7 +176,16 @@ const ClockInOut = () => {
           latitude: +data.latitude,
           longitude: +data.longitude,
         });
-        // set tolerance setting
+        if (data.tolerance_active) {
+          const shiftStart = session?.user.today_shift.split("-")[0];
+          if (shiftStart) {
+            const toleratedTime = calculateToleratedTime(
+              shiftStart,
+              data.tolerance_time
+            );
+            setToleranceClockIn(toleratedTime);
+          }
+        }
       });
     fetch("/api/attendance")
       .then((response) => response.json())
@@ -203,6 +232,13 @@ const ClockInOut = () => {
   useEffect(() => {
     compareDistance();
   }, [position, companyPosition]);
+  useEffect(() => {
+    if (toleranceClockIn) {
+      const date = new Date();
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+    }
+  }, [toleranceClockIn]);
   return navigationError ? (
     <button
       disabled
