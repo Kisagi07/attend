@@ -1,31 +1,14 @@
 "use client";
-import clsx from "clsx";
-import React, { useState, useEffect, useRef } from "react";
-import { LuArrowLeftFromLine } from "react-icons/lu";
-import Link from "next/link";
+import React, { useState } from "react";
 import { FaBars } from "react-icons/fa6";
-import { usePathname } from "next/navigation";
-import Logout from "../components/Logout";
+import Sidebar from "@/app/components/Sidebar";
+import Logout from "@/app/components/Logout";
 
 interface Layout {
   children: React.ReactNode;
 }
 const Layout: React.FC<Layout> = ({ children }) => {
-  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const sidebarRef = useRef<HTMLElement>(null);
-  const handleSidebarClose = (e: MouseEvent) => {
-    !sidebarRef.current!.contains(e.target as Node) && setSidebarOpen(false);
-  };
-
-  useEffect(() => {
-    if (sidebarOpen && window.innerWidth >= 768) {
-      document.addEventListener("click", handleSidebarClose);
-
-      return () => document.removeEventListener("click", handleSidebarClose);
-    }
-  }, [sidebarOpen]);
-
   return (
     <>
       <nav
@@ -44,63 +27,14 @@ const Layout: React.FC<Layout> = ({ children }) => {
         </button>
       </nav>
 
-      <aside
-        ref={sidebarRef}
-        className={clsx(
-          "fixed z-40 top-0 left-0 lg:max-w-[280px] lg:p-2 lg:min-h-[calc(100vh-56px)] lg:bottom-0 lg:top-auto  transition-all text-slate-600 overflow-x-hidden max-w-0 min-h-screen  border border-slate-100 shadow w-full bg-white",
-          {
-            "max-w-xs p-2": sidebarOpen,
-          }
-        )}
-      >
-        <button
-          onClick={() => setSidebarOpen(false)}
-          type="button"
-          className="ml-auto block hover:bg-slate-100 p-2 md:hidden"
-          title="close sidebar"
-        >
-          <LuArrowLeftFromLine className="text-xl" />
-        </button>
-        <ul className="space-y-2">
-          <li>
-            <Link
-              onClick={() => setSidebarOpen(false)}
-              href="/dashboard"
-              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-                "bg-slate-100": pathname === "/dashboard",
-              })}
-            >
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link
-              onClick={() => setSidebarOpen(false)}
-              href="/dashboard/employees"
-              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-                "bg-slate-100": pathname.startsWith("/dashboard/employees"),
-              })}
-            >
-              Employee
-            </Link>
-          </li>
-          <li>
-            <Link
-              onClick={() => setSidebarOpen(false)}
-              href="/dashboard/settings"
-              className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-                "bg-slate-100": pathname === "/dashboard/settings",
-              })}
-            >
-              Settings
-            </Link>
-          </li>
-          <hr className="!mt-8" />
-          <li>
-            <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />
-          </li>
-        </ul>
-      </aside>
+      <Sidebar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}>
+        <Sidebar.LinkItem href="/dashboard" name="Dashboard" />
+        <Sidebar.LinkItem href="/dashboard/employees" name="Employee" />
+        <Sidebar.LinkItem href="/dashboard/job-positions" name="Job Position" />
+        <Sidebar.LinkItem href="/dashboard/settings" name="Settings" />
+        <Sidebar.Divider />
+        <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />
+      </Sidebar>
 
       <main className="lg:ml-[280px] p-2">{children}</main>
     </>

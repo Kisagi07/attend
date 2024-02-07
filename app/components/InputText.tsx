@@ -1,3 +1,5 @@
+import React from "react";
+
 interface CProps {
   className?: string;
   id?: string;
@@ -5,6 +7,8 @@ interface CProps {
   onChange?: (value: string) => void;
   value?: string;
   disabled?: boolean;
+  label?: string;
+  error?: string;
 }
 const InputText = ({
   className,
@@ -13,19 +17,25 @@ const InputText = ({
   onChange,
   value,
   disabled,
+  label,
+  error,
 }: CProps) => {
   return (
-    <input
-      disabled={disabled}
-      onChange={({ currentTarget }) =>
-        onChange && onChange(currentTarget.value)
-      }
-      defaultValue={defaultValue}
-      value={value}
-      id={id}
-      type="text"
-      className={`${className} rounded w-full p-2 outline-none border border-slate-200 focus:border-slate-400`}
-    />
+    <div>
+      <small className="text-red-400 block">{error}</small>
+      <label>{label}:</label>
+      <input
+        disabled={disabled}
+        onChange={({ currentTarget }) =>
+          onChange && onChange(currentTarget.value)
+        }
+        defaultValue={defaultValue}
+        value={value}
+        id={id}
+        type="text"
+        className={`${className} rounded w-full p-2 outline-none border-2 border-slate-200 focus:border-sky-400`}
+      />
+    </div>
   );
 };
 export default InputText;

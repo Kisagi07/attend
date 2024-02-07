@@ -32,6 +32,8 @@ const ClockInOut = () => {
   const [sendingLog, setSendingLog] = useState<boolean>(false);
   const [doneForToday, setDoneForToday] = useState<boolean>(false);
   const [toleranceClockIn, setToleranceClockIn] = useState<string>("");
+  const [allowToleranceClockIn, setAllowToleranceClockIn] =
+    useState<boolean>(true);
 
   const changeToOut = () => {
     setAttendanceOptions([
@@ -79,6 +81,23 @@ const ClockInOut = () => {
     const distance = earthRadius * c;
 
     return distance;
+  };
+
+  const pastTolerance = (
+    currentTime: string,
+    toleranceTime: String
+  ): boolean => {
+    const [hours1, minutes1] = currentTime.split(":").map(Number);
+    const [hours2, minutes2] = toleranceTime.split(":").map(Number);
+
+    const totalMinutes1 = hours1 * 60 + minutes1;
+    const totalMinutes2 = hours2 * 60 + minutes2;
+
+    if (totalMinutes1 > totalMinutes2) {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   const compareDistance = () => {
@@ -233,13 +252,21 @@ const ClockInOut = () => {
     compareDistance();
   }, [position, companyPosition]);
   useEffect(() => {
-    if (toleranceClockIn) {
+    const compareTime = () => {
       const date = new Date();
       const hours = date.getHours().toString().padStart(2, "0");
       const minutes = date.getMinutes().toString().padStart(2, "0");
+
+      const time = `${hours}:${minutes}`;
+      setAllowToleranceClockIn(pastTolerance(time, toleranceClockIn));
+    };
+    if (toleranceClockIn) {
+      const intervalId = setInterval(compareTime, 1000);
+
+      return () => clearInterval(intervalId);
     }
   }, [toleranceClockIn]);
-  return navigationError ? (
+  return navigationError || !allowToleranceClockIn ? (
     <button
       disabled
       className={clsx(
@@ -249,7 +276,7 @@ const ClockInOut = () => {
         }
       )}
     >
-      {navigationError}
+      {navigationError || `You can clock in past ${toleranceClockIn}`}
       {!doneForToday && (
         <>
           <FaRegCircleQuestion className="cursor-pointer peer" />
