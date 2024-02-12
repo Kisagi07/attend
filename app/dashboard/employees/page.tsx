@@ -1,6 +1,5 @@
 import { FaUserPlus } from "react-icons/fa";
 import Link from "next/link";
-import getUsers from "@/app/libs/getUsers";
 import EmployeeTable from "@/app/components/EmployeeTable";
 const EmployeePage = () => {
   return (

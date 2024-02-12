@@ -29,8 +29,16 @@ const Layout: React.FC<Layout> = ({ children }) => {
 
       <Sidebar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}>
         <Sidebar.LinkItem href="/dashboard" name="Dashboard" />
-        <Sidebar.LinkItem href="/dashboard/employees" name="Employee" />
-        <Sidebar.LinkItem href="/dashboard/job-positions" name="Job Position" />
+        <Sidebar.LinkItem
+          href="/dashboard/employees"
+          subMatch
+          name="Employee"
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/job-positions"
+          subMatch
+          name="Job Position"
+        />
         <Sidebar.LinkItem href="/dashboard/settings" name="Settings" />
         <Sidebar.Divider />
         <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />

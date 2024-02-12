@@ -2,12 +2,14 @@
 import InputText from "@/app/components/InputText";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import WorkDayInput from "@/app/components/WorkDayInput";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
   const [shiftStart, setShiftStart] = useState<string>("");
   const [shiftEnd, setShiftEnd] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [workDay, setWorkDay] = useState<string>("");
   const storeJobPosition = async (): Promise<any> => {
     const res = await fetch("/api/job-positions", {
       method: "POST",
@@ -106,6 +108,7 @@ const JobCreatePage = () => {
             />
           </div>
         </div>
+        <WorkDayInput />
         <button
           type="submit"
           className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"

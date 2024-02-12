@@ -17,6 +17,7 @@ interface ContextProps {
 interface LinkItemProps {
   href: string;
   name: string;
+  subMatch?: boolean;
 }
 interface CProps {
   sidebarOpen: boolean;
@@ -105,7 +106,7 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
     </aside>
   );
 };
-const LinkItem: FC<LinkItemProps> = ({ href, name }) => {
+const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
   const { setSidebarOpen, pathname } = useContext(SidebarContext);
 
   return (
@@ -114,7 +115,9 @@ const LinkItem: FC<LinkItemProps> = ({ href, name }) => {
         onClick={() => setSidebarOpen(false)}
         href={href}
         className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-          "bg-slate-100": pathname === href,
+          "bg-slate-100": subMatch
+            ? pathname?.startsWith(href)
+            : pathname === href,
         })}
       >
         {name}
