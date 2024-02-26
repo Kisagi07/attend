@@ -9,14 +9,39 @@ import { IoBagRemoveSharp } from "react-icons/io5";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import Link from "next/link";
 import { Confirmation } from "@/app/components";
+import { toast } from "react-toastify";
 
 const columnHelper = createColumnHelper<JobPositionModel>();
 
 const JobPositionTable = () => {
   const [data, setData] = useState<JobPositionModel[]>([]);
   const [fetching, setFetching] = useState<boolean>(true);
-  const [workIdDelete, setWorkIdDelete] = useState<number>(-1);
+  const [idDelete, setIdDelete] = useState<number>(-1);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+
+  const deleteJobPosition = async () => {
+    const res = await fetch(`/api/job-positions/${idDelete}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error("Failed on deleting job position");
+    }
+    const data = await res.json();
+    return data;
+  };
+
+  const handleDelete = () => {
+    toast.promise(deleteJobPosition(), {
+      pending: "Deleting",
+      success: {
+        render() {
+          setData((prev) => prev.filter((pr) => pr.id !== idDelete));
+          return "Job position deleted";
+        },
+      },
+      error: "Failed on deleting job position",
+    });
+  };
 
   const columns = [
     columnHelper.accessor("name", {
@@ -73,7 +98,7 @@ const JobPositionTable = () => {
           <button
             onClick={() => {
               setShowConfirmation(true);
-              setWorkIdDelete(row.original.id);
+              setIdDelete(row.original.id);
             }}
             className="bg-red-400 hover:bg-red-500 inline-block align-middle rounded p-2"
           >
@@ -103,9 +128,11 @@ const JobPositionTable = () => {
   ) : (
     <>
       <Confirmation
-        text="You wont"
+        text="Are you sure you want to delete this job position?"
+        title="Delete Job Position"
         show={showConfirmation}
         onClose={setShowConfirmation}
+        onConfirm={handleDelete}
       />
       <div>
         <Table columns={columns} data={data} />

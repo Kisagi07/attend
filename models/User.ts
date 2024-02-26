@@ -20,9 +20,9 @@ export interface UserModel
   name: string;
   work_id: string;
   password: string;
-  job_position: string;
-  today_shift: string;
   role: CreationOptional<"employee" | "admin">;
+
+  job_position_id: CreationOptional<number>;
 
   getLogs: HasManyGetAssociationsMixin<LogModel>;
   createLog: HasManyCreateAssociationMixin<LogModel, "user_id">;
@@ -42,9 +42,16 @@ const User = sequelize.define<UserModel>(
     password: {
       type: DataTypes.STRING,
     },
-    job_position: DataTypes.STRING,
-    today_shift: DataTypes.STRING,
     role: DataTypes.ENUM("employee", "admin"),
+    job_position_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "job_positions",
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
+    },
   },
   {
     underscored: true,

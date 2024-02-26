@@ -11,4 +11,11 @@ User.hasMany(Log, {
   foreignKey: "user_id",
 });
 
+User.belongsTo(JobPosition, {
+  foreignKey: "job_position_id",
+});
+JobPosition.hasMany(User, {
+  foreignKey: "job_position_id",
+});
+
 export { User, Log, Company, JobPosition };
