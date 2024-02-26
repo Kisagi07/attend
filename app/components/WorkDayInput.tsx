@@ -5,6 +5,7 @@ import clsx from "clsx";
 interface CProps {
   name?: string;
   onChange?: (value: string) => void;
+  defaultValue?: string[];
 }
 interface WorkDay {
   monday: boolean;
@@ -16,7 +17,7 @@ interface WorkDay {
   sunday: boolean;
   [key: string]: boolean;
 }
-const WorkDayInput = ({ name, onChange }: CProps) => {
+const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
   const [workDay, setWorkDay] = useState<WorkDay>({
     monday: false,
     tuesday: false,
@@ -29,17 +30,17 @@ const WorkDayInput = ({ name, onChange }: CProps) => {
   const encodedWorkDays = () => {
     let encodedValue: number[] = [];
     const days = [
+      "sunday",
       "monday",
       "tuesday",
       "wednesday",
       "thursday",
       "friday",
       "saturday",
-      "sunday",
     ];
     days.forEach((day, index) => {
       if (workDay[day as keyof WorkDay]) {
-        encodedValue.push(index + 1);
+        encodedValue.push(index);
       }
     });
     return encodedValue.join(",");
@@ -53,6 +54,17 @@ const WorkDayInput = ({ name, onChange }: CProps) => {
   useEffect(() => {
     onChange && onChange(encodedWorkDays());
   }, [workDay]);
+
+  useEffect(() => {
+    if (defaultValue) {
+      const defaultWorkDay: { [key: string]: boolean } = {};
+      defaultValue.forEach((value) => {
+        const lowerCase = value.toLowerCase();
+        defaultWorkDay[lowerCase] = true;
+      });
+      setWorkDay((prev) => ({ ...prev, ...defaultWorkDay }));
+    }
+  }, [defaultValue]);
 
   return (
     <div className="flex gap-x-2 uppercase text-sm">

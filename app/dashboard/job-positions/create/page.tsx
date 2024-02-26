@@ -17,6 +17,7 @@ const JobCreatePage = () => {
         name,
         shift_start: shiftStart,
         shift_end: shiftEnd,
+        work_day: workDay,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -33,6 +34,7 @@ const JobCreatePage = () => {
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(workDay);
     const validated = validateForm();
     if (validated) {
       setSubmitting(true);
@@ -108,7 +110,7 @@ const JobCreatePage = () => {
             />
           </div>
         </div>
-        <WorkDayInput />
+        <WorkDayInput onChange={setWorkDay} />
         <button
           type="submit"
           className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"

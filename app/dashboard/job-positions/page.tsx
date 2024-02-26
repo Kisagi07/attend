@@ -1,5 +1,6 @@
 import { FaUserPlus } from "react-icons/fa";
 import Link from "next/link";
+import JobPositionTable from "@/app/components/JobPositionTable";
 const JobPositionPage = () => {
   return (
     <section className="space-y-4">
@@ -13,7 +14,8 @@ const JobPositionPage = () => {
           <FaUserPlus /> Job Position
         </Link>
       </div>
-      {/* <EmployeeTable /> */}
+
+      <JobPositionTable />
     </section>
   );
 };

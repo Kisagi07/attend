@@ -6,8 +6,13 @@ export async function POST(req: NextRequest) {
     name,
     shift_start,
     shift_end,
-  }: { name: string; shift_start: string; shift_end: string } =
-    await req.json();
+    work_day,
+  }: {
+    name: string;
+    shift_start: string;
+    shift_end: string;
+    work_day: string;
+  } = await req.json();
   if (
     (name.trim().length === 0 || shift_start.trim().length === 0,
     shift_end.trim().length === 0)
@@ -18,6 +23,7 @@ export async function POST(req: NextRequest) {
     name,
     shift_start,
     shift_end,
+    work_day,
   });
 
   return NextResponse.json(jobPosition);
