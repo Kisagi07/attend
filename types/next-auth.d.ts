@@ -5,8 +5,6 @@ declare module "next-auth" {
   interface User {
     name: string;
     work_id: string;
-    job_position: string;
-    today_shift: string;
     role: "admin" | "employee";
   }
 
@@ -19,7 +17,5 @@ declare module "next-auth/jwt" {
   interface JWT {
     work_id: string;
     role: "admin" | "employee";
-    today_shift: string;
-    job_position: string;
   }
 }

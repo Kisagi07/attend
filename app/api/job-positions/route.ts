@@ -7,15 +7,17 @@ export async function POST(req: NextRequest) {
     shift_start,
     shift_end,
     work_day,
+    salary,
   }: {
     name: string;
     shift_start: string;
     shift_end: string;
     work_day: string;
+    salary: number;
   } = await req.json();
   if (
     (name.trim().length === 0 || shift_start.trim().length === 0,
-    shift_end.trim().length === 0)
+    shift_end.trim().length === 0 || salary === 0)
   )
     return NextResponse.json({ message: "Need all field" }, { status: 422 });
 
@@ -24,6 +26,7 @@ export async function POST(req: NextRequest) {
     shift_start,
     shift_end,
     work_day,
+    salary,
   });
 
   return NextResponse.json(jobPosition);

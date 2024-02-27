@@ -3,8 +3,10 @@ import InputText from "@/app/components/InputText";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import WorkDayInput from "@/app/components/WorkDayInput";
+import { extractNumber } from "@/app/helper";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
+  const [salary, setSalary] = useState<string>("Rp.0");
   const [shiftStart, setShiftStart] = useState<string>("");
   const [shiftEnd, setShiftEnd] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -18,6 +20,7 @@ const JobCreatePage = () => {
         shift_start: shiftStart,
         shift_end: shiftEnd,
         work_day: workDay,
+        salary: extractNumber(salary),
       }),
       headers: {
         "Content-Type": "application/json",
@@ -29,12 +32,10 @@ const JobCreatePage = () => {
 
     const data = await res.json();
     resetForm();
-    console.log(data);
     return data;
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(workDay);
     const validated = validateForm();
     if (validated) {
       setSubmitting(true);
@@ -63,6 +64,9 @@ const JobCreatePage = () => {
     if (shiftEnd.trim().length === 0) {
       errors.shiftEnd = "Shift end is required";
     }
+    if (extractNumber(salary) === 0) {
+      errors.salary = "Salary is required";
+    }
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) {
       return false;
@@ -74,6 +78,11 @@ const JobCreatePage = () => {
     setName("");
     setShiftStart("");
     setShiftEnd("");
+  };
+  const handleSalaryChange = (value: string) => {
+    const clean: number = parseInt(value.match(/\d+/g)?.join("") || "0");
+    const format = clean.toFixed(0).replace(/\d(?=(\d{3})+$)/g, "$&.");
+    setSalary(`Rp. ${format}`);
   };
   return (
     <section className="space-y-4 p-4">
@@ -111,6 +120,12 @@ const JobCreatePage = () => {
           </div>
         </div>
         <WorkDayInput onChange={setWorkDay} />
+        <InputText
+          label="Salary (Per Hour)"
+          value={`${salary}`}
+          onChange={handleSalaryChange}
+          error={formErrors["salary"]}
+        />
         <button
           type="submit"
           className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"

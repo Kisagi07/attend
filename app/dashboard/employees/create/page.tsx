@@ -3,42 +3,18 @@ import { useState, useEffect, useRef } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import Select from "@/app/components/Select";
 import { toast } from "react-toastify";
+import { EmployeeFormSkeleton } from "@/app/skeletons";
 import clsx from "clsx";
+import { JobPositionModel } from "@/models/JobPosition";
 interface Option {
   label: string;
-  value: string;
+  value: string | number;
 }
 const CreateEmployee = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [jobOptions, setJobOptions] = useState<Option[]>([
-    {
-      label: "Developer",
-      value: "Developer",
-    },
-    {
-      label: "Designer",
-      value: "Designer",
-    },
-    {
-      label: "Manager",
-      value: "Manager",
-    },
-  ]);
-  const [shiftOptions, setShiftOptions] = useState<Option[]>([
-    {
-      label: "09:00 - 16:00",
-      value: "09:00 - 16:00",
-    },
-    {
-      label: "16:00 - 23:00",
-      value: "16:00 - 23:00",
-    },
-    {
-      label: "23:00 - 09:00",
-      value: "23:00 - 09:00",
-    },
-  ]);
+  const [fetching, setFetching] = useState<boolean>(true);
+  const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
   const [todayShift, setTodayShift] = useState<Option>();
   const [name, setName] = useState<string>("");
@@ -80,11 +56,6 @@ const CreateEmployee = () => {
     } else {
       failed.job_position = true;
     }
-    if (todayShift) {
-      success.today_shift = true;
-    } else {
-      failed.today_shift = true;
-    }
 
     let validated = false;
     if (Object.keys(failed).length === 0) {
@@ -112,8 +83,7 @@ const CreateEmployee = () => {
         name,
         password,
         work_id: workId,
-        job_position: jobPosition!.value,
-        today_shift: todayShift!.value,
+        job_position_id: jobPosition!.value,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -144,103 +114,115 @@ const CreateEmployee = () => {
     }
   };
   useEffect(() => {
-    fetchRegisterData();
+    Promise.all([
+      fetch(`/api/register`).then((res) => res.json() as Promise<string>),
+      fetch(`/api/job-positions`).then(
+        (res) => res.json() as Promise<JobPositionModel[]>
+      ),
+    ])
+      .then((data) => {
+        setWorkId(data[0]);
+        const options: Option[] = data[1].map((position) => ({
+          label: `${position.name} | ${position.shift_duration}`,
+          value: position.id,
+        }));
+        setJobOptions(options);
+      })
+      .finally(() => setFetching(false));
   }, []);
 
   return (
     <section className="space-y-2">
       <h1 className="text-lg uppercase font-semibold">Add Employee</h1>
       <hr />
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="space-y-4 md:grid md:grid-cols-2 md:space-y-0 md:gap-4"
-      >
-        <div>
-          <label htmlFor="name">
-            Name<span className="text-red-500">*</span> :{" "}
-          </label>
-          <input
-            type="text"
-            onChange={({ currentTarget }) => setName(currentTarget.value)}
-            className={clsx(
-              "w-full rounded outline-none border border-slate-200 p-2",
-              {
-                "!border-red-500": validation["name"],
-              }
-            )}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="name">
-            Password<span className="text-red-500">*</span> :{" "}
-          </label>
-          <div className="relative">
+      {fetching ? (
+        <EmployeeFormSkeleton create />
+      ) : (
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="space-y-4 md:grid md:grid-cols-2 md:space-y-0 md:gap-4"
+        >
+          <div>
+            <label htmlFor="name">
+              Name<span className="text-red-500">*</span> :{" "}
+            </label>
             <input
-              onChange={({ currentTarget }) => setPassword(currentTarget.value)}
-              type={showPassword ? "text" : "password"}
+              type="text"
+              onChange={({ currentTarget }) => setName(currentTarget.value)}
               className={clsx(
                 "w-full rounded outline-none border border-slate-200 p-2",
                 {
-                  "!border-red-500": validation["password"],
+                  "!border-red-500": validation["name"],
                 }
               )}
             />
-            <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
-              {showPassword ? (
-                <FaRegEyeSlash onClick={() => setShowPassword(false)} />
-              ) : (
-                <FaRegEye onClick={() => setShowPassword(true)} />
-              )}
-            </span>
           </div>
-        </div>
-        <div className="md:col-span-2">
-          <label htmlFor="name">
-            Work ID<span className="text-red-500">*</span> :{" "}
-          </label>
-          <input
-            readOnly
-            type="text"
+
+          <div>
+            <label htmlFor="name">
+              Password<span className="text-red-500">*</span> :{" "}
+            </label>
+            <div className="relative">
+              <input
+                onChange={({ currentTarget }) =>
+                  setPassword(currentTarget.value)
+                }
+                type={showPassword ? "text" : "password"}
+                className={clsx(
+                  "w-full rounded outline-none border border-slate-200 p-2",
+                  {
+                    "!border-red-500": validation["password"],
+                  }
+                )}
+              />
+              <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
+                {showPassword ? (
+                  <FaRegEyeSlash onClick={() => setShowPassword(false)} />
+                ) : (
+                  <FaRegEye onClick={() => setShowPassword(true)} />
+                )}
+              </span>
+            </div>
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="name">
+              Work ID<span className="text-red-500">*</span> :{" "}
+            </label>
+            <input
+              readOnly
+              type="text"
+              className={clsx(
+                "w-full rounded outline-none border border-slate-200 p-2",
+                {
+                  "!border-red-500": validation["work_id"],
+                }
+              )}
+              value={workId}
+            />
+          </div>
+          <Select
+            value={jobPosition}
+            label="Job Position"
+            options={jobOptions}
+            onChange={setJobPosition}
+            error={validation["job_position"]}
+            required
+          />
+          <button
+            disabled={submitting}
             className={clsx(
-              "w-full rounded outline-none border border-slate-200 p-2",
+              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
               {
-                "!border-red-500": validation["work_id"],
+                "!bg-slate-700": submitting,
               }
             )}
-            value={workId}
-          />
-        </div>
-        <Select
-          value={jobPosition}
-          label="Job Position"
-          options={jobOptions}
-          onChange={setJobPosition}
-          error={validation["job_position"]}
-          required
-        />
-        <Select
-          value={todayShift}
-          label="Shift"
-          error={validation["today_shift"]}
-          options={shiftOptions}
-          onChange={setTodayShift}
-          required
-        />
-        <button
-          disabled={submitting}
-          className={clsx(
-            "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
-            {
-              "!bg-slate-700": submitting,
-            }
-          )}
-          type="submit"
-        >
-          {submitting ? "Registering" : "Register Employee"}
-        </button>
-      </form>
+            type="submit"
+          >
+            {submitting ? "Registering" : "Register Employee"}
+          </button>
+        </form>
+      )}
     </section>
   );
 };

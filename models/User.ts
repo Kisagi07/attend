@@ -8,8 +8,10 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 import Log, { LogModel } from "./Log";
+import { JobPositionModel } from "./JobPosition";
 
 export interface UserModel
   extends Model<
@@ -27,6 +29,8 @@ export interface UserModel
   getLogs: HasManyGetAssociationsMixin<LogModel>;
   createLog: HasManyCreateAssociationMixin<LogModel, "user_id">;
   countLogs: HasManyCountAssociationsMixin;
+
+  job_position?: NonAttribute<JobPositionModel>;
 }
 
 const User = sequelize.define<UserModel>(

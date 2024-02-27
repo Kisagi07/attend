@@ -5,6 +5,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 
 export interface JobPositionModel
@@ -17,6 +18,9 @@ export interface JobPositionModel
   shift_start: string;
   shift_end: string;
   work_day: CreationOptional<string>;
+  salary: number;
+
+  shift_duration: CreationOptional<string>;
 }
 
 const JobPosition = sequelize.define<JobPositionModel>(
@@ -63,6 +67,16 @@ const JobPosition = sequelize.define<JobPositionModel>(
         });
         return fullWordDay;
       },
+    },
+    shift_duration: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return `${this.shift_start} - ${this.shift_end}`;
+      },
+    },
+    salary: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {

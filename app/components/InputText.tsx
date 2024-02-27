@@ -23,7 +23,7 @@ const InputText = ({
   return (
     <div>
       <small className="text-red-400 block">{error}</small>
-      <label>{label}:</label>
+      {label && <label>{label}:</label>}
       <input
         disabled={disabled}
         onChange={({ currentTarget }) =>

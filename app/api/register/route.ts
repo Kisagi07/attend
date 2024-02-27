@@ -7,8 +7,7 @@ export async function POST(req: NextRequest) {
     work_id,
     password,
     name,
-    job_position,
-    today_shift,
+    job_position_id,
     role = "employee",
   } = await req.json();
 
@@ -16,8 +15,7 @@ export async function POST(req: NextRequest) {
     work_id,
     password: await bcryptjs.hash(password, 10),
     name,
-    job_position,
-    today_shift,
+    job_position_id,
     role,
   });
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
+import { User, JobPosition } from "@/models";
 import sequelize from "@/db";
 
 export async function GET(
@@ -10,6 +10,11 @@ export async function GET(
     where: {
       work_id: params.work_id,
     },
+    include: [
+      {
+        model: JobPosition,
+      },
+    ],
   });
 
   if (!user) return NextResponse.json(null);
@@ -42,7 +47,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { work_id: string } }
 ) {
-  const { name, job_position, today_shift } = await req.json();
+  const { name, job_position_id } = await req.json();
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
@@ -52,8 +57,7 @@ export async function PUT(
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   const updateUser = await user.update({
     name,
-    job_position,
-    today_shift,
+    job_position_id,
   });
 
   return NextResponse.json(updateUser);

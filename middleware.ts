@@ -8,7 +8,7 @@ export default withAuth(function middleware(req) {
   ) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   } else if (
-    req.nextUrl.pathname === "/dashboard" &&
+    req.nextUrl.pathname.startsWith("/dashboard") &&
     req.nextauth.token?.role === "employee"
   ) {
     return NextResponse.redirect(new URL("/home", req.url));

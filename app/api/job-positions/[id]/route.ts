@@ -44,7 +44,6 @@ export async function GET(
   { params }: { params: { id: number } }
 ) {
   const session = await auth();
-  console.log(session);
   if (!session) {
     return NextResponse.json("Unauthorized", { status: 401 });
   }

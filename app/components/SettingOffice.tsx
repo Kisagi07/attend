@@ -84,19 +84,13 @@ const SettingOffice = () => {
       <article className="space-y-4 grid grid-cols-3 items-center">
         <h2 className="text-lg font-semibold col-span-3">Office Location</h2>
         <label htmlFor="latitude">Latitude :</label>
-        <InputText
-          className="col-span-2"
-          id="latitude"
-          value={latitude}
-          onChange={setLatitude}
-        />
+        <div className="col-span-2">
+          <InputText id="latitude" value={latitude} onChange={setLatitude} />
+        </div>
         <label htmlFor="longitude">Longitude :</label>
-        <InputText
-          className="col-span-2"
-          id="longitude"
-          value={longitude}
-          onChange={setLongitude}
-        />
+        <div className="col-span-2">
+          <InputText id="longitude" value={longitude} onChange={setLongitude} />
+        </div>
         <div className="flex md:justify-end md:col-span-3">
           <button
             disabled={submitting}

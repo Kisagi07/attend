@@ -5,11 +5,13 @@ import { toast } from "react-toastify";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import JobFormSkeleton from "@/app/skeletons/JobFormSkeleton";
 import { useRouter } from "next/navigation";
+import { extractNumber, formatRupiah } from "@/app/helper";
 const JobEditPage = ({ params }: { params: { id: number } }) => {
   const router = useRouter();
   const [name, setName] = useState<string>("");
   const [shiftStart, setShiftStart] = useState<string>("");
   const [shiftEnd, setShiftEnd] = useState<string>("");
+  const [salary, setSalary] = useState<string>("Rp.0");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [workDay, setWorkDay] = useState<string>("");
@@ -23,6 +25,7 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
         shift_start: shiftStart,
         shift_end: shiftEnd,
         work_day: workDay,
+        salary: extractNumber(salary),
       }),
       headers: {
         "Content-Type": "application/json",
@@ -38,7 +41,6 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(workDay);
     const validated = validateForm();
     if (validated) {
       setSubmitting(true);
@@ -72,6 +74,9 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
     if (shiftEnd.trim().length === 0) {
       errors.shiftEnd = "Shift end is required";
     }
+    if (extractNumber(salary) === 0) {
+      errors.salary = "Salary is required";
+    }
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) {
       return false;
@@ -84,6 +89,11 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
     setShiftStart("");
     setShiftEnd("");
   };
+  const handleSalaryChange = (value: string) => {
+    const clean: number = parseInt(value.match(/\d+/g)?.join("") || "0");
+    const format = clean.toFixed(0).replace(/\d(?=(\d{3})+$)/g, "$&.");
+    setSalary(`Rp. ${format}`);
+  };
 
   useEffect(() => {
     fetch(`/api/job-positions/${params.id}`)
@@ -93,6 +103,7 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
         setShiftStart(data.shift_start);
         setShiftEnd(data.shift_end);
         setDefaultWorkDay(data.work_day);
+        setSalary(formatRupiah(data.salary));
       })
       .finally(() => setFetching(false));
   }, []);
@@ -140,6 +151,12 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
             </div>
           </div>
           <WorkDayInput defaultValue={defaultWorkDay} onChange={setWorkDay} />
+          <InputText
+            label="Salary (Per Hour)"
+            value={`${salary}`}
+            onChange={handleSalaryChange}
+            error={formErrors["salary"]}
+          />
           <button
             type="submit"
             className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"

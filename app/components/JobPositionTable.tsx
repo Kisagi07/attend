@@ -49,13 +49,8 @@ const JobPositionTable = () => {
       cell: (info) => info.getValue(),
       minSize: 200,
     }),
-    columnHelper.accessor("shift_start", {
-      header: "Shift Start",
-      cell: (info) => info.getValue(),
-      minSize: 150,
-    }),
-    columnHelper.accessor("shift_end", {
-      header: "Shift End",
+    columnHelper.accessor("shift_duration", {
+      header: "Shift Duration",
       cell: (info) => info.getValue(),
       minSize: 150,
     }),

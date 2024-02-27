@@ -20,6 +20,9 @@ const JobFormSkeleton = () => {
         <div className="w-[26px] h-[38px] bg-gray-200"></div>
       </div>
 
+      <div className="mb-1 h-5 w-[113px] bg-gray-200"></div>
+      <div className="h-11 bg-gray-200 mb-4"></div>
+
       <div className="bg-gray-200 w-full h-[40px]"></div>
     </div>
   );

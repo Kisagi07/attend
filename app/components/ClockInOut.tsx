@@ -7,6 +7,8 @@ import { LogModel } from "@/models/Log";
 import clsx from "clsx";
 import { CompanyModel } from "@/models/Company";
 import { useSession } from "next-auth/react";
+import { UserModel } from "@/models/User";
+import { getWordDay } from "@/app/helper";
 
 interface Coordinate {
   latitude: number;
@@ -187,45 +189,60 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    fetch("/api/company")
-      .then((response) => response.json())
-      .then((data: CompanyModel) => {
-        // set company coordinate position
-        setCompanyPosition({
-          latitude: +data.latitude,
-          longitude: +data.longitude,
-        });
-        if (data.tolerance_active) {
-          const shiftStart = session?.user.today_shift.split("-")[0];
-          if (shiftStart) {
-            const toleratedTime = calculateToleratedTime(
-              shiftStart,
-              data.tolerance_time
-            );
-            setToleranceClockIn(toleratedTime);
-          }
-        }
+    Promise.all([
+      fetch(`/api/users/${session?.user.work_id}`).then(
+        (res) => res.json() as Promise<UserModel>
+      ),
+      fetch(`/api/company`).then((res) => res.json() as Promise<CompanyModel>),
+      fetch(`/api/attendance`).then((res) => res.json() as Promise<LogModel[]>),
+    ]).then((data) => {
+      // save the company coordinate to state
+      setCompanyPosition({
+        latitude: +data[1].latitude,
+        longitude: +data[1].longitude,
       });
-    fetch("/api/attendance")
-      .then((response) => response.json())
-      .then((logs: LogModel[]) => {
-        if (logs.length > 0) {
-          const sick = logs.find((log) => log.type === "sick");
-          const clockIn = logs.find((log) => log.type === "clock-in");
-          const clockOut = logs.find((log) => log.type === "clock-out");
-          if (sick) {
-            changeToRestwell();
-            return;
-          } else if (clockIn && clockOut) {
-            changeToGoodWork();
-            handleDoneToday();
-            return;
-          } else if (clockIn) {
-            changeToOut();
-            return;
-          }
+
+      // if company tolerance time is active then calculate it
+      if (data[1].tolerance_active) {
+        const shiftStart = data[0].job_position?.shift_start;
+        if (shiftStart) {
+          const toleratedTime = calculateToleratedTime(
+            shiftStart,
+            data[1].tolerance_time
+          );
+          setToleranceClockIn(toleratedTime);
         }
-      });
+      }
+
+      // check for day off, sick, and other clock-in states
+      const havePosition = data[0].job_position;
+      const today = getWordDay();
+      const dayOff = !data[0].job_position?.work_day.includes(today);
+      if (!havePosition) {
+        setNavigationError("No job position asigned to you");
+        setDoneForToday(true);
+      } else if (dayOff) {
+        setNavigationError("Enjoy your day off");
+        setDoneForToday(true);
+      } else if (data[2].length > 0) {
+        const sick = data[2].find((log) => log.type === "sick");
+        const clockIn = data[2].find((log) => log.type === "clock-in");
+        const clockOut = data[2].find((log) => log.type === "clock-out");
+        if (sick) {
+          changeToRestwell();
+          return;
+        } else if (clockIn && clockOut) {
+          changeToGoodWork();
+          handleDoneToday();
+          return;
+        } else if (clockIn) {
+          changeToOut();
+          return;
+        }
+      }
+    });
+
+    // watch the user coordinate
     if ("geolocation" in navigator) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {

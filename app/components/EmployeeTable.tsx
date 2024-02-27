@@ -1,7 +1,7 @@
 "use client";
 
 import { createColumnHelper } from "@tanstack/react-table";
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "./Table";
 import { FaUserAltSlash, FaUserEdit } from "react-icons/fa";
 import { UserModel } from "@/models/User";
@@ -25,14 +25,14 @@ const EmployeeTable = () => {
       header: "Work ID",
       cell: (info) => info.getValue(),
     }),
-    employeeColumn.accessor("job_position", {
+    employeeColumn.accessor("job_position.name", {
       header: "Job Position",
-      cell: (info) => info.getValue(),
+      cell: (info) => info.getValue() || "No Position",
       minSize: 125,
     }),
-    employeeColumn.accessor("today_shift", {
+    employeeColumn.accessor("job_position.shift_duration", {
       header: "Today Shift",
-      cell: (info) => info.getValue(),
+      cell: (info) => info.getValue() || "No Shift",
       minSize: 125,
     }),
     employeeColumn.accessor("action", {

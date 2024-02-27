@@ -3,6 +3,7 @@ import Table from "@/app/components/Table";
 import { LogModel } from "@/models/Log";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { TableSkeleton } from "@/app/skeletons";
 
 const attendanceColumnHelper = createColumnHelper<LogModel>();
 const attendanceColumns = [
@@ -10,7 +11,7 @@ const attendanceColumns = [
     header: "Name",
     cell: (info) => info.getValue(),
   }),
-  attendanceColumnHelper.accessor("user.today_shift", {
+  attendanceColumnHelper.accessor("user.job_position.shift_duration", {
     header: "Shift",
     cell: (info) => info.getValue(),
   }),
@@ -25,6 +26,7 @@ const attendanceColumns = [
 ];
 const Dashboard = () => {
   const [logs, setLogs] = useState<LogModel[]>([]);
+  const [fetchingAttendance, setFetchingAttendance] = useState<boolean>(true);
   const fetchAttendance = async () => {
     const res = await fetch("/api/attendances?limit=3&latest=true", {
       cache: "no-cache",
@@ -34,6 +36,7 @@ const Dashboard = () => {
     }
     const data = await res.json();
     setLogs(data);
+    setFetchingAttendance(false);
   };
 
   useEffect(() => {
@@ -46,7 +49,11 @@ const Dashboard = () => {
       <hr />
       <article className="border border-slate-200 p-4 shadow">
         <h2 className="text-lg mb-4">Latest Attendance</h2>
-        <Table data={logs} columns={attendanceColumns} />
+        {fetchingAttendance ? (
+          <TableSkeleton />
+        ) : (
+          <Table data={logs} columns={attendanceColumns} />
+        )}
       </article>
     </section>
   );

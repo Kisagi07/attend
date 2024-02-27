@@ -34,16 +34,12 @@ export const authConfig: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.work_id = user.work_id;
-        token.job_position = user.job_position;
-        token.today_shift = user.today_shift;
         token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.work_id = token.work_id as any;
-      session.user.job_position = token.job_position as string;
-      session.user.today_shift = token.today_shift as string;
       session.user.role = token.role;
       return session;
     },

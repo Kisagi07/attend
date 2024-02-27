@@ -1,5 +1,6 @@
 import Card from "@/app/components/Card";
-import { getServerSession } from "next-auth";
+import { getWordDay } from "../helper";
+import { UserModel } from "@/models/User";
 
 interface UserInfoProps {
   promise: Promise<any>;
@@ -7,21 +8,27 @@ interface UserInfoProps {
 
 const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
   // const session = await getServerSession();
-  const user = await promise;
+  const user: UserModel = await promise;
   return (
     <Card>
       <article className="grid grid-cols-[auto_10px_auto]">
         <span>Name</span>
         <span>:</span>
-        <span>{user?.work_id}</span>
+        <span>{user?.name}</span>
 
         <span>Job Position</span>
         <span>:</span>
-        <span>{user?.job_position}</span>
+        <span>{user?.job_position?.name || "No Position"}</span>
 
         <span>Today Shift</span>
         <span>:</span>
-        <span>{user?.today_shift}</span>
+        <span>
+          {user?.job_position
+            ? user?.job_position?.work_day.includes(getWordDay())
+              ? user?.job_position.shift_duration
+              : "Day off"
+            : "No Shift"}
+        </span>
       </article>
     </Card>
   );

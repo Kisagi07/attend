@@ -1,4 +1,4 @@
-import { Log, User } from "@/models";
+import { Log, User, JobPosition } from "@/models";
 import { LogModel } from "@/models/Log";
 import { NextRequest, NextResponse } from "next/server";
 import { FindOptions } from "sequelize";
@@ -9,11 +9,19 @@ export async function GET(req: NextRequest) {
   const latest = searchParams.get("latest");
   const queryOption: FindOptions<LogModel> = {
     attributes: ["user_id", "time", "type", "id"],
-    include: {
-      model: User,
-      attributes: ["name", "job_position", "today_shift"],
-      as: "user",
-    },
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["name"],
+        include: [
+          {
+            model: JobPosition,
+            attributes: ["name", "shift_start", "shift_end", "shift_duration"],
+          },
+        ],
+      },
+    ],
   };
 
   if (limit) {
