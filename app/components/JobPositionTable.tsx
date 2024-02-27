@@ -10,6 +10,7 @@ import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import Link from "next/link";
 import { Confirmation } from "@/app/components";
 import { toast } from "react-toastify";
+import { formatRupiah } from "@/app/helper";
 
 const columnHelper = createColumnHelper<JobPositionModel>();
 
@@ -58,26 +59,15 @@ const JobPositionTable = () => {
       header: "Work Day",
       cell: (info) => {
         const days = info.getValue() as unknown as string[];
-        const weekDay = [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ];
+        const weekDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
         return (
-          <div className="flex gap-x-2 uppercase text-xs">
+          <div className="flex gap-2 uppercase text-xs flex-wrap">
             {weekDay.map((day) => (
               <div
                 key={day}
-                className={clsx(
-                  "border border-gray-200 p-2 hover-bg-gray-200 cursor-pointer",
-                  {
-                    "bg-gray-200": days.includes(day),
-                  }
-                )}
+                className={clsx("border border-gray-200 p-2 hover-bg-gray-200 cursor-pointer", {
+                  "bg-gray-200": days.includes(day),
+                })}
               >
                 {day[0]}
               </div>
@@ -85,6 +75,12 @@ const JobPositionTable = () => {
           </div>
         );
       },
+      minSize: 150,
+    }),
+    columnHelper.accessor("salary", {
+      header: "Hourly Salary",
+      cell: (info) => formatRupiah(info.getValue()),
+      minSize: 200,
     }),
     columnHelper.accessor("id", {
       header: "Action",
@@ -99,10 +95,7 @@ const JobPositionTable = () => {
           >
             <IoBagRemoveSharp />
           </button>
-          <Link
-            href={`/dashboard/job-positions/${row.original.id}/edit`}
-            className="bg-amber-400 inline-block align-middle rounded p-2 ms-2 hover:bg-amber-500"
-          >
+          <Link href={`/dashboard/job-positions/${row.original.id}/edit`} className="bg-amber-400 inline-block align-middle rounded p-2 ms-2 hover:bg-amber-500">
             <BiSolidMessageSquareEdit />
           </Link>
         </>
@@ -122,13 +115,7 @@ const JobPositionTable = () => {
     <TableSkeleton />
   ) : (
     <>
-      <Confirmation
-        text="Are you sure you want to delete this job position?"
-        title="Delete Job Position"
-        show={showConfirmation}
-        onClose={setShowConfirmation}
-        onConfirm={handleDelete}
-      />
+      <Confirmation text="Are you sure you want to delete this job position?" title="Delete Job Position" show={showConfirmation} onClose={setShowConfirmation} onConfirm={handleDelete} />
       <div>
         <Table columns={columns} data={data} />
       </div>
