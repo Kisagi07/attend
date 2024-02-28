@@ -1,18 +1,9 @@
 import sequelize from "@/db";
-import {
-  BelongsToGetAssociationMixin,
-  CreationOptional,
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-  NonAttribute,
-} from "sequelize";
+import { BelongsToGetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
 import { UserModel } from "./User";
 import User from "./User";
 
-export interface LogModel
-  extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>> {
+export interface LogModel extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>> {
   id: CreationOptional<number>;
   type: "clock-in" | "clock-out" | "sick";
   user_id: number;
@@ -20,6 +11,9 @@ export interface LogModel
   date: string;
   latitude: number;
   longitude: number;
+
+  createdAt: CreationOptional<Date>;
+  updatedAt: CreationOptional<Date>;
 
   getUser: BelongsToGetAssociationMixin<UserModel>;
 
@@ -59,6 +53,12 @@ const Log = sequelize.define<LogModel>(
     },
     longitude: {
       type: DataTypes.DECIMAL(11, 8),
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
     },
   },
   {

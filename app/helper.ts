@@ -7,15 +7,7 @@ export function getWordDay() {
 }
 
 export function dayNumberToWord(day: number) {
-  const days = [
-    "Sunday",
-    "Mondat",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = ["Sunday", "Mondat", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   return days[day];
 }
 

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
     include: {
       model: JobPosition,
     },
+    attributes: ["id", "name", "work_id", "role", "job_position_id", "createdAt", "updatedAt"],
   });
 
   return NextResponse.json(users);
