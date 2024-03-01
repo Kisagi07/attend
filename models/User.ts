@@ -14,15 +14,14 @@ import Log, { LogModel } from "./Log";
 import { JobPositionModel } from "./JobPosition";
 
 export interface UserModel
-  extends Model<
-    InferAttributes<UserModel>,
-    InferCreationAttributes<UserModel>
-  > {
+  extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   id: CreationOptional<number>;
   name: string;
   work_id: string;
   password: string;
   role: CreationOptional<"employee" | "admin">;
+  home_latitude: CreationOptional<number>;
+  home_longitude: CreationOptional<number>;
 
   job_position_id: CreationOptional<number>;
 
@@ -56,6 +55,8 @@ const User = sequelize.define<UserModel>(
       onUpdate: "CASCADE",
       onDelete: "SET NULL",
     },
+    home_latitude: DataTypes.DECIMAL(10, 8),
+    home_longitude: DataTypes.DECIMAL(11, 8),
   },
   {
     underscored: true,
