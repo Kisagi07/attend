@@ -25,9 +25,7 @@ const AttendTolerance = () => {
       }),
     });
     if (!res.ok) {
-      toast.error(
-        "Something went wrong with the server when updating attend tolerance"
-      );
+      toast.error("Something went wrong with the server when updating attend tolerance");
     }
     const data = await res.json();
     toast.success("Attend Tolerance Updated");
@@ -51,10 +49,7 @@ const AttendTolerance = () => {
     <section className="spacep-y-4">
       <div className="flex justify-between">
         <h1 className="text-xl uppercase font-semibold">Attend Tolerance</h1>
-        <InputCheckbox
-          checked={toleranceActive}
-          onChange={setToleranceActive}
-        />
+        <InputCheckbox checked={toleranceActive} onChange={setToleranceActive} />
       </div>
       <article
         className={clsx("space-y-4", {
@@ -62,9 +57,8 @@ const AttendTolerance = () => {
         })}
       >
         <small className="text-slate-400 font-semibold">
-          <CiCircleQuestion className="inline text-xl" /> The time tolerance of
-          when you can and can't clock-in before respective start of each shift
-          (in minute)
+          <CiCircleQuestion className="inline text-xl" /> The time tolerance of when you can and
+          can&apos;t clock-in before respective start of each shift (in minute)
         </small>
         <InputText
           value={toleranceValue}
