@@ -43,6 +43,7 @@ const JobCreatePage = () => {
       toast.promise(
         storeJobPosition().then((res) => {
           setSubmitting(false);
+          if(!res.ok) throw new Error('Something went wrong')
           return res;
         }),
         {
@@ -63,9 +64,6 @@ const JobCreatePage = () => {
     }
     if (shiftEnd.trim().length === 0) {
       errors.shiftEnd = "Shift end is required";
-    }
-    if (extractNumber(salary) === 0) {
-      errors.salary = "Salary is required";
     }
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) {
@@ -97,16 +95,12 @@ const JobCreatePage = () => {
         />
         <div>
           <h6>Shift :</h6>
-          <small className="text-red-400 block">
-            {formErrors["shiftStart"]}
-          </small>
+          <small className="text-red-400 block">{formErrors["shiftStart"]}</small>
           <small className="text-red-400 block">{formErrors["shiftEnd"]}</small>
           <div className="grid grid-cols-3 items-center">
             <input
               value={shiftStart}
-              onChange={({ currentTarget }) =>
-                setShiftStart(currentTarget.value)
-              }
+              onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
               type="time"
               className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
             />
