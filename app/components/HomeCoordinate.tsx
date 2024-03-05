@@ -70,9 +70,9 @@ const HomeCoordinate = () => {
         <FaHome />
       </button>
       <div
-        className={clsx(`space-y-4 transition-all border-gray-200 overflow-hidden h-full`, {
+        className={clsx(`space-y-4 transition-all border-gray-300 rounded overflow-hidden h-full`, {
           "max-h-0": !open,
-          "max-h-max p-2 border": open,
+          "max-h-max p-4 border": open,
         })}
       >
         <div className="flex justify-between items-start">

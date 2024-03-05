@@ -14,6 +14,7 @@ interface ButtonDropdownProps {
   className?: string;
   onClick?: (value: string) => void;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
@@ -22,6 +23,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   className,
   onClick,
   disabled,
+  loading,
 }) => {
   // component error handling
   if ((!options || options.length === 0) && !label) {
@@ -69,7 +71,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
           optionsExists() ? options![activeOptionIndex].className : className
         }  transition-colors rounded-l w-full px-3 py-2`}
       >
-        {optionsExists() ? options![activeOptionIndex].label : label}
+        {loading ? "Loading..." : optionsExists() ? options![activeOptionIndex].label : label}
       </button>
       {options && options.length > 0 && (
         <>
