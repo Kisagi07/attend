@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../auth/[...nextauth]/auth";
 import { User, Log } from "@/models";
+import { auth } from "../../auth/[...nextauth]/auth";
 
 export async function POST(req: NextRequest) {
-  const { type, time, date, latitude, longitude } = await req.json();
+  const { type, time, date, latitude, longitude, todaysWork } = await req.json();
   const session = await auth();
 
   if (!session)
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
     date,
     latitude,
     longitude,
+    work: todaysWork,
   });
 
   return NextResponse.json(log);

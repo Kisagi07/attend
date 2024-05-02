@@ -1,16 +1,26 @@
 import sequelize from "@/db";
-import { BelongsToGetAssociationMixin, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
+import {
+  BelongsToGetAssociationMixin,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from "sequelize";
 import { UserModel } from "./User";
 import User from "./User";
 
-export interface LogModel extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>> {
+export interface LogModel
+  extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>> {
   id: CreationOptional<number>;
-  type: "clock-in" | "clock-out" | "sick";
+  type: "from-home" | "from-office" | "sick-day" | "clock-out";
   user_id: number;
   time: string;
   date: string;
   latitude: number;
   longitude: number;
+  work: CreationOptional<string>;
 
   createdAt: CreationOptional<Date>;
   updatedAt: CreationOptional<Date>;
@@ -29,7 +39,7 @@ const Log = sequelize.define<LogModel>(
       autoIncrement: true,
     },
     type: {
-      type: DataTypes.ENUM("clock-in", "clock-out", "sick"),
+      type: DataTypes.ENUM("from-home", "from-office", "sick-day", "clock-out"),
       allowNull: false,
     },
     user_id: {
@@ -60,6 +70,7 @@ const Log = sequelize.define<LogModel>(
     updatedAt: {
       type: DataTypes.DATE,
     },
+    work: DataTypes.STRING,
   },
   {
     underscored: true,

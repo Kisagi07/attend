@@ -16,8 +16,6 @@ const getMonthLogs = async (month = new Date().getMonth() + 1, year = new Date()
     },
   });
 
-  console.log(logs);
-
   return logs;
 };
 

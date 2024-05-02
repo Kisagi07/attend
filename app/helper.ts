@@ -60,3 +60,14 @@ export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2
 export function degreesToRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
+
+export function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+  let timeoutId: NodeJS.Timeout;
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  } as T;
+}
+

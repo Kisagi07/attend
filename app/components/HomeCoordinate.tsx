@@ -3,45 +3,33 @@ import { FaHome } from "react-icons/fa";
 import { InputText } from "./";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import clsx from "clsx";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSWR, { Fetcher } from "swr";
 import { UserModel } from "@/models/User";
-import { useSession } from "next-auth/react";
+import { debounce } from "../helper";
 
 const fetcher: Fetcher<UserModel, string> = (...args) => fetch(...args).then((res) => res.json());
 
 const HomeCoordinate = () => {
-  const { data: session, status } = useSession();
-  const { data, error, isLoading } = useSWR(`/api/users/${session?.user.work_id}`, fetcher);
-  const [latitude, setLatitude] = useState<number>(0);
-  const [longitude, setLongitude] = useState<number>(0);
+  const { data, error, isLoading } = useSWR(`/api/user`, fetcher);
+  const [latitude, setLatitude] = useState<string>("");
+  const [longitude, setLongitude] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (data?.home_latitude && data.home_longitude) {
-        setLatitude(data?.home_latitude);
-        setLongitude(data?.home_longitude);
-      } else {
-        setLatitude(0);
-        setLongitude(0);
-      }
-    }
-  }, [isLoading]);
 
   const getPosition = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLatitude(position.coords.latitude);
-        setLongitude(position.coords.longitude);
-        updateHomeCoordinate(position.coords.latitude, position.coords.longitude);
+        setLatitude(position.coords.latitude.toString());
+        setLongitude(position.coords.longitude.toString());
+        // updateHomeCoordinate(position.coords.latitude, position.coords.longitude);
       },
       (error) => console.error(error)
     );
   };
 
-  const updateHomeCoordinate = async (latitude: number, longitude: number) => {
-    const res = await fetch(`/api/users/${session?.user.work_id}/home`, {
+  const updateHomeCoordinate = async () => {
+    if (!latitude || !longitude) return;
+    const res = await fetch(`/api/user/home`, {
       method: "PUT",
       body: JSON.stringify({
         latitude,
@@ -54,7 +42,66 @@ const HomeCoordinate = () => {
     if (!res.ok) {
       console.error("Failed on updating home coordinate");
     }
+    const data = await res.json();
   };
+
+  const debouncedUpdateHomeCoordinate = useCallback(debounce(updateHomeCoordinate, 500), []);
+
+  const latitudeChanged = (value: string) => {
+    const cleanValue = filterCoordinate(value);
+    setLatitude(cleanValue);
+  };
+
+  const longitudeChanged = (value: string) => {
+    const cleanValue = filterCoordinate(value);
+    setLongitude(cleanValue);
+  };
+
+  const filterCoordinate = (input: string): string => {
+    let filteredInput = "";
+
+    // Count occurrences of hyphen and dot
+    let hyphenCount = 0;
+    let dotCount = 0;
+
+    for (let i = 0; i < input.length; i++) {
+      const char = input[i];
+      if (char === "-") {
+        // Allow hyphen only if it's the first character
+        if (i === 0 && hyphenCount === 0) {
+          filteredInput += char;
+          hyphenCount++;
+        }
+      } else if (char === ".") {
+        // Allow dot only if it hasn't occurred before
+        if (dotCount === 0) {
+          filteredInput += char;
+          dotCount++;
+        }
+      } else if (!isNaN(Number(char))) {
+        // Allow only numbers
+        filteredInput += char;
+      }
+    }
+
+    return filteredInput;
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (data?.home_latitude && data.home_longitude) {
+        setLatitude(data?.home_latitude.toString());
+        setLongitude(data?.home_longitude.toString());
+      } else {
+        setLatitude("");
+        setLongitude("");
+      }
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    debouncedUpdateHomeCoordinate();
+  }, [latitude, longitude]);
 
   return isLoading ? (
     <div className="h-8 w-8 bg-gray-200 animate-pulse"></div>
@@ -83,12 +130,12 @@ const HomeCoordinate = () => {
         </div>
         <div className="grid grid-cols-2 gap-x-2">
           <InputText
-            onChange={(value) => setLatitude(+value)}
+            onChange={(value) => latitudeChanged(value)}
             label="Latitude"
             value={`${latitude}`}
           />
           <InputText
-            onChange={(value) => setLongitude(+value)}
+            onChange={(value) => longitudeChanged(value)}
             label="Longitude"
             value={`${longitude}`}
           />

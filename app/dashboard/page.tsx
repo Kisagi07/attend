@@ -23,6 +23,10 @@ const attendanceColumns = [
     header: "Type",
     cell: (info) => <span className="capitalize">{info.getValue()}</span>,
   }),
+  attendanceColumnHelper.accessor("work", {
+    header: "Work",
+    cell: (info) => <small className="text-sm">{info.getValue()}</small>,
+  }),
 ];
 const Dashboard = () => {
   const [logs, setLogs] = useState<LogModel[]>([]);
@@ -44,16 +48,12 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 p-4">
       <h1 className="text-xl uppercase font-semibold">Dashboard</h1>
       <hr />
-      <article className="border border-slate-200 p-4 shadow">
+      <article className="">
         <h2 className="text-lg mb-4">Latest Attendance</h2>
-        {fetchingAttendance ? (
-          <TableSkeleton />
-        ) : (
-          <Table data={logs} columns={attendanceColumns} />
-        )}
+        {fetchingAttendance ? <TableSkeleton /> : <Table data={logs} columns={attendanceColumns} />}
       </article>
     </section>
   );
