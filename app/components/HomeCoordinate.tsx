@@ -8,7 +8,8 @@ import useSWR, { Fetcher } from "swr";
 import { UserModel } from "@/models/User";
 import { debounce } from "../helper";
 
-const fetcher: Fetcher<UserModel, string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<UserModel, string> = (...args) =>
+  fetch(...args).then((res) => res.json());
 
 const HomeCoordinate = () => {
   const { data, error, isLoading } = useSWR(`/api/user`, fetcher);
@@ -27,7 +28,7 @@ const HomeCoordinate = () => {
     );
   };
 
-  const updateHomeCoordinate = async () => {
+  const updateHomeCoordinate = useCallback(async () => {
     if (!latitude || !longitude) return;
     const res = await fetch(`/api/user/home`, {
       method: "PUT",
@@ -43,7 +44,7 @@ const HomeCoordinate = () => {
       console.error("Failed on updating home coordinate");
     }
     const data = await res.json();
-  };
+  }, [latitude, longitude]);
 
   const debouncedUpdateHomeCoordinate = useCallback(
     () => debounce(updateHomeCoordinate, 500),
@@ -112,18 +113,24 @@ const HomeCoordinate = () => {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className={clsx("p-2 border border-sky-400 rounded hover:bg-sky-400 hover:text-white", {
-          "bg-sky-400 text-white": open,
-          "bg-transparent : text-sky-400": !open,
-        })}
+        className={clsx(
+          "p-2 border border-sky-400 rounded hover:bg-sky-400 hover:text-white",
+          {
+            "bg-sky-400 text-white": open,
+            "bg-transparent : text-sky-400": !open,
+          }
+        )}
       >
         <FaHome />
       </button>
       <div
-        className={clsx(`space-y-4 transition-all border-gray-300 rounded overflow-hidden h-full`, {
-          "max-h-0": !open,
-          "max-h-max p-4 border": open,
-        })}
+        className={clsx(
+          `space-y-4 transition-all border-gray-300 rounded overflow-hidden h-full`,
+          {
+            "max-h-0": !open,
+            "max-h-max p-4 border": open,
+          }
+        )}
       >
         <div className="flex justify-between items-start">
           <h3>Home Coordinate</h3>

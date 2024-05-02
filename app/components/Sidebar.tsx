@@ -1,5 +1,5 @@
 "use client";
-import { FC, useEffect, useRef } from "react";
+import { FC, useCallback, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { LuArrowLeftFromLine } from "react-icons/lu";
@@ -32,9 +32,12 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
 }) => {
   const pathname = usePathname();
   const sidebarRef = useRef<HTMLElement>(null);
-  const handleSidebarClose = (e: MouseEvent) => {
-    !sidebarRef.current!.contains(e.target as Node) && setSidebarOpen(false);
-  };
+  const handleSidebarClose = useCallback(
+    (e: MouseEvent) => {
+      !sidebarRef.current!.contains(e.target as Node) && setSidebarOpen(false);
+    },
+    [setSidebarOpen]
+  );
 
   useEffect(() => {
     if (sidebarOpen && window.innerWidth >= 768) {
@@ -115,7 +118,9 @@ const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
         onClick={() => setSidebarOpen(false)}
         href={href}
         className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-          "bg-slate-100": subMatch ? pathname?.startsWith(href) : pathname === href,
+          "bg-slate-100": subMatch
+            ? pathname?.startsWith(href)
+            : pathname === href,
         })}
       >
         {name}
