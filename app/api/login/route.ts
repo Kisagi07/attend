@@ -21,15 +21,7 @@ export async function POST(req: NextRequest) {
 
   const matched = await bcryptjs.compare(password, user.password);
 
-  if (!matched)
-    return NextResponse.json(
-      {
-        message: "Wrong Password",
-      },
-      {
-        status: 401,
-      }
-    );
+  if (!matched) return NextResponse.json(null);
 
   return NextResponse.json(user);
 }

@@ -3,7 +3,7 @@ import { FaHome } from "react-icons/fa";
 import { InputText } from "./";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import clsx from "clsx";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import useSWR, { Fetcher } from "swr";
 import { UserModel } from "@/models/User";
 import { debounce } from "../helper";
@@ -44,9 +44,10 @@ const HomeCoordinate = () => {
       console.error("Failed on updating home coordinate");
     }
     const data = await res.json();
+    console.log(data);
   }, [latitude, longitude]);
 
-  const debouncedUpdateHomeCoordinate = useCallback(
+  const debouncedUpdateHomeCoordinate = useMemo(
     () => debounce(updateHomeCoordinate, 500),
     [updateHomeCoordinate]
   );
@@ -105,7 +106,7 @@ const HomeCoordinate = () => {
 
   useEffect(() => {
     debouncedUpdateHomeCoordinate();
-  }, [latitude, longitude, debouncedUpdateHomeCoordinate]);
+  }, [debouncedUpdateHomeCoordinate]);
 
   return isLoading ? (
     <div className="h-8 w-8 bg-gray-200 animate-pulse"></div>

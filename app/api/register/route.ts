@@ -1,6 +1,7 @@
 import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
+import { AiOutlineConsoleSql } from "react-icons/ai";
 
 export async function POST(req: NextRequest) {
   const {
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
     job_position_id,
     role = "employee",
   } = await req.json();
-
+  console.log(password);
   const user = await User.create({
     work_id,
     password: await bcryptjs.hash(password, 10),

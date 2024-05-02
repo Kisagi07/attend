@@ -8,7 +8,10 @@ export const authConfig: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
-      credentials: {},
+      credentials: {
+        work_id: { label: "Work Id" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials) {
         const res = await fetch(`${process.env.APP_URL}/api/login`, {
           method: "POST",
@@ -19,17 +22,13 @@ export const authConfig: NextAuthOptions = {
         });
         const user = await res.json();
 
-        if (user) {
+        if (user && res.ok) {
           return user;
-        } else {
-          throw new Error("Invalid Credentials");
         }
+        return null;
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
