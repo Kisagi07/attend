@@ -42,7 +42,7 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
 
       return () => document.removeEventListener("click", handleSidebarClose);
     }
-  }, [sidebarOpen]);
+  }, [sidebarOpen, handleSidebarClose]);
   return (
     <aside
       ref={sidebarRef}
@@ -115,9 +115,7 @@ const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
         onClick={() => setSidebarOpen(false)}
         href={href}
         className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-          "bg-slate-100": subMatch
-            ? pathname?.startsWith(href)
-            : pathname === href,
+          "bg-slate-100": subMatch ? pathname?.startsWith(href) : pathname === href,
         })}
       >
         {name}

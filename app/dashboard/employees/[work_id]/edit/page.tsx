@@ -97,12 +97,8 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then(
-        (res) => res.json() as Promise<JobPositionModel[]>
-      ),
-      fetch(`/api/users/${params.work_id}`).then(
-        (res) => res.json() as Promise<UserModel>
-      ),
+      fetch("/api/job-positions").then((res) => res.json() as Promise<JobPositionModel[]>),
+      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<UserModel>),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
@@ -114,9 +110,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         setUser(data[1]);
         setWorkId(data[1].work_id);
         setName(data[1].name);
-        const defaultPosition = options.find(
-          (option) => option.value === data[1].job_position_id
-        );
+        const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
@@ -125,7 +119,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         console.error(error.message);
       })
       .finally(() => setFetching(false));
-  }, []);
+  }, [params.work_id]);
 
   return (
     <section className="space-y-2">
@@ -147,12 +141,9 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["name"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                "!border-red-500": validation["name"],
+              })}
             />
           </div>
 

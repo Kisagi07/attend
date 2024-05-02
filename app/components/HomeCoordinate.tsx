@@ -45,7 +45,10 @@ const HomeCoordinate = () => {
     const data = await res.json();
   };
 
-  const debouncedUpdateHomeCoordinate = useCallback(debounce(updateHomeCoordinate, 500), []);
+  const debouncedUpdateHomeCoordinate = useCallback(
+    () => debounce(updateHomeCoordinate, 500),
+    [updateHomeCoordinate]
+  );
 
   const latitudeChanged = (value: string) => {
     const cleanValue = filterCoordinate(value);
@@ -97,11 +100,11 @@ const HomeCoordinate = () => {
         setLongitude("");
       }
     }
-  }, [isLoading]);
+  }, [isLoading, data?.home_latitude, data?.home_longitude]);
 
   useEffect(() => {
     debouncedUpdateHomeCoordinate();
-  }, [latitude, longitude]);
+  }, [latitude, longitude, debouncedUpdateHomeCoordinate]);
 
   return isLoading ? (
     <div className="h-8 w-8 bg-gray-200 animate-pulse"></div>

@@ -103,7 +103,7 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
         setSalary(formatRupiah(data.salary));
       })
       .finally(() => setFetching(false));
-  }, []);
+  }, [params.id]);
 
   return (
     <section className="space-y-4 p-4">

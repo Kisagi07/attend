@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
 interface CProps {
   onChange?: (active: boolean) => void;
@@ -10,9 +10,11 @@ const InputCheckbox = ({ onChange, checked = false }: CProps) => {
   const handleClick = () => {
     setActive(!active);
   };
-  useEffect(() => {
+  const callChange = useCallback(() => {
     onChange?.(active);
-  }, [active]);
+  }, [onChange, active]);
+
+  useEffect(() => {}, [callChange]);
   return (
     <div
       onClick={handleClick}

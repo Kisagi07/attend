@@ -187,7 +187,7 @@ const ClockInOut = () => {
         setClockedIn(true);
       }
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   return isSick ? (
     <button className="w-full bg-sky-400 hover:bg-sky-500 text-white disabled:bg-sky-300 rounded p-2">

@@ -67,15 +67,6 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   };
 
   useEffect(() => {
-    if (options && activeButton) {
-      activeButton(options[activeOptionIndex]);
-    }
-    if (buttonChanged) {
-      buttonChanged();
-    }
-  }, [activeOptionIndex]);
-
-  useEffect(() => {
     setActiveOptionIndex(0);
   }, [options]);
 
