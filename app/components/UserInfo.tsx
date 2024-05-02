@@ -23,10 +23,10 @@ const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
         <span>Today Shift</span>
         <span>:</span>
         <span>
-          {user?.job_position
-            ? user?.job_position?.work_day.includes(getWordDay())
-              ? user?.job_position.shift_duration
-              : "Day off"
+          {user.job_position
+            ? user.job_position.work_day.includes(getWordDay())
+              ? user.job_position.shift_duration
+              : "Day Off"
             : "No Shift"}
         </span>
       </article>

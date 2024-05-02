@@ -1,6 +1,6 @@
 "use client";
 import { throws } from "assert";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronCircleDown } from "react-icons/fa";
 
 interface Option {
@@ -14,6 +14,9 @@ interface ButtonDropdownProps {
   className?: string;
   onClick?: (value: string) => void;
   disabled?: boolean;
+  loading?: boolean;
+  activeButton?: (option: Option) => void;
+  buttonChanged?: () => void;
 }
 
 const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
@@ -22,6 +25,9 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   className,
   onClick,
   disabled,
+  loading,
+  activeButton,
+  buttonChanged,
 }) => {
   // component error handling
   if ((!options || options.length === 0) && !label) {
@@ -60,6 +66,19 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (options && activeButton) {
+      activeButton(options[activeOptionIndex]);
+    }
+    if (buttonChanged) {
+      buttonChanged();
+    }
+  }, [activeOptionIndex]);
+
+  useEffect(() => {
+    setActiveOptionIndex(0);
+  }, [options]);
+
   return (
     <div className="flex relative z-[1]">
       <button
@@ -69,7 +88,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
           optionsExists() ? options![activeOptionIndex].className : className
         }  transition-colors rounded-l w-full px-3 py-2`}
       >
-        {optionsExists() ? options![activeOptionIndex].label : label}
+        {loading ? "Loading..." : optionsExists() ? options![activeOptionIndex].label : label}
       </button>
       {options && options.length > 0 && (
         <>

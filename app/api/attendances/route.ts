@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const limit = searchParams.get("limit");
   const latest = searchParams.get("latest");
   const queryOption: FindOptions<LogModel> = {
-    attributes: ["user_id", "time", "type", "id"],
+    attributes: ["user_id", "time", "type", "id", "work"],
     include: [
       {
         model: User,

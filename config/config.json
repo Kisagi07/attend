@@ -14,9 +14,9 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "k6480823_attend",
-    "password": "k6480823_attend",
-    "database": "k6480823_attend",
+    "username": "root",
+    "password": null,
+    "database": "attend",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }

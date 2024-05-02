@@ -1,323 +1,209 @@
 "use client";
-import ButtonDropdown from "./ButtonDropdown";
-import { useEffect, useState } from "react";
-import { FaRegCircleQuestion } from "react-icons/fa6";
-import { toast } from "react-toastify";
-import { LogModel } from "@/models/Log";
-import clsx from "clsx";
+import { ButtonDropdown, InputText } from "@/app/components";
+import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { CompanyModel } from "@/models/Company";
-import { useSession } from "next-auth/react";
+import { LogModel } from "@/models/Log";
 import { UserModel } from "@/models/User";
-import { getWordDay } from "@/app/helper";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "react-toastify";
+import useSWR, { Fetcher } from "swr";
 
-interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
-
+const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 const ClockInOut = () => {
-  const { data: session, status } = useSession();
-  const [attendanceOptions, setAttendanceOptions] = useState([
+  // hook variable
+  const [sending, setSending] = useState<boolean>(false);
+  const [clockedIn, setClockedIn] = useState<boolean>(false);
+  const [done, setDone] = useState<boolean>(false);
+  const [isSick, setIsSick] = useState<boolean>(false);
+  const [fromHome, setFromHome] = useState<boolean>(false);
+  const [todaysWork, setTodaysWork] = useState<string>("");
+  //fetched data
+  const { data, error, isLoading } = useSWR<LogModel[]>("/api/user/attendance", fetcher);
+  const {
+    data: company,
+    error: companyError,
+    isLoading: companyLoading,
+  } = useSWR<CompanyModel>(`/api/company`, fetcher);
+  const { data: user } = useSWR<UserModel>(`/api/user`, fetcher);
+  // non state variable
+  const options = [
     {
-      label: "Clock-in",
-      className:
-        "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
+      label: "Clock From Home",
+      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
     },
     {
-      label: "Sick",
+      label: "Clock From Office",
+      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
+    },
+    {
+      label: "Sick Day",
       className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
     },
-  ]);
-  const [navigationError, setNavigationError] = useState<string>("Loading");
-  const [position, setPosition] = useState<Coordinate>();
-  const [companyPosition, setCompanyPosition] = useState<Coordinate>();
-  const [sendingLog, setSendingLog] = useState<boolean>(false);
-  const [doneForToday, setDoneForToday] = useState<boolean>(false);
-  const [toleranceClockIn, setToleranceClockIn] = useState<string>("");
-  const [allowToleranceClockIn, setAllowToleranceClockIn] =
-    useState<boolean>(true);
-
-  const changeToOut = () => {
-    setAttendanceOptions([
-      {
-        label: "Clock-out",
-        className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
-      },
-    ]);
-  };
-
-  const changeToRestwell = () => {
-    setNavigationError("Rest Well");
-  };
-
-  const changeToGoodWork = () => [
-    setNavigationError("Thanks for your work today"),
+  ];
+  const options2 = [
+    {
+      label: "Clock-Out",
+      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
+    },
+  ];
+  const options3 = [
+    {
+      label: "Good Job",
+      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
+    },
   ];
 
-  const handleDoneToday = () => {
-    setDoneForToday(true);
-  };
+  const handleClockBtn = async (value: string) => {
+    let targetLatitude = 0;
+    let targetLongitude = 0;
+    let type = "";
 
-  const haversineDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ) => {
-    const earthRadius = 6371000;
-
-    const degToRad = (degrees: number) => degrees * (Math.PI / 180);
-
-    const dLat = degToRad(lat2 - lat1);
-    const dLon = degToRad(lon2 - lon1);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(degToRad(lat1)) *
-        Math.cos(degToRad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    const distance = earthRadius * c;
-
-    return distance;
-  };
-
-  const pastTolerance = (
-    currentTime: string,
-    toleranceTime: String
-  ): boolean => {
-    const [hours1, minutes1] = currentTime.split(":").map(Number);
-    const [hours2, minutes2] = toleranceTime.split(":").map(Number);
-
-    const totalMinutes1 = hours1 * 60 + minutes1;
-    const totalMinutes2 = hours2 * 60 + minutes2;
-
-    if (totalMinutes1 > totalMinutes2) {
-      return true;
-    } else {
-      return false;
+    switch (value) {
+      case "Clock From Home":
+        targetLatitude = user?.home_latitude || 0;
+        targetLongitude = user?.home_longitude || 0;
+        type = "from-home";
+        break;
+      case "Clock From Office":
+        targetLatitude = company?.latitude || 0;
+        targetLongitude = company?.longitude || 0;
+        type = "from-office";
+        break;
+      case "Sick Day":
+        type = "sick-day";
+        break;
+      case "Clock-Out":
+        type = "clock-out";
+        if (fromHome) {
+          targetLatitude = user?.home_latitude || 0;
+          targetLongitude = user?.home_longitude || 0;
+        } else {
+          targetLatitude = company?.latitude || 0;
+          targetLongitude = company?.longitude || 0;
+        }
+        break;
+      default:
+        break;
     }
-  };
 
-  const compareDistance = () => {
-    if (companyPosition && position) {
-      const distance = haversineDistance(
-        position.latitude,
-        position.longitude,
-        companyPosition.latitude,
-        companyPosition.longitude
-      );
-      if (distance > 50) {
-        setNavigationError("You are too far from the company");
-      } else if (!doneForToday) {
-        setNavigationError("");
-      }
+    if (value === "Clock-Out" && !todaysWork) {
+      toast.error("You need to fill today's work in order to clockout");
+      return;
     }
-  };
 
-  const handleClockIn = async (type: string) => {
-    setSendingLog(true);
-
-    const dateObj = new Date();
-    const typeLower = type.toLowerCase();
-
-    const hours = dateObj.getHours().toString().padStart(2, "0");
-    const minutes = dateObj.getMinutes().toString().padStart(2, "0");
-    const seconds = dateObj.getSeconds().toString().padStart(2, "0");
-
-    const time = `${hours}:${minutes}:${seconds}`;
-    const date = dateObj.toLocaleDateString();
-    const latitude = +position!.latitude.toFixed(8);
-    const longitude = +position!.longitude.toFixed(8);
     try {
-      const res = await fetch(`/api/attendance`, {
-        method: "POST",
-        body: JSON.stringify({
-          type: typeLower,
-          time,
-          date,
-          latitude,
-          longitude,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        cache: "no-cache",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed on sending attendance log");
-      }
-
-      const data = await res.json();
-      toast.success("Attendance Log Saved.");
-      if (typeLower === "sick") {
-        changeToRestwell();
-      } else if (typeLower === "clock-in") {
-        changeToOut();
-      } else if (typeLower === "clock-out") {
-        changeToGoodWork();
-        handleDoneToday();
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-    setSendingLog(false);
-  };
-  const calculateToleratedTime = (
-    shiftStart: string,
-    tolerance: number
-  ): string => {
-    // Parse the shift start time
-    const [hours, minutes] = shiftStart.split(":").map(Number);
-
-    let toleratedHours = hours;
-    let toleratedMinutes = minutes - tolerance;
-
-    if (toleratedMinutes < 0) {
-      toleratedHours--;
-      toleratedMinutes += 60;
-    }
-
-    const toleratedTime = `${String(toleratedHours).padStart(2, "0")}:${String(
-      toleratedMinutes
-    ).padStart(2, "0")}`;
-    return toleratedTime;
-  };
-
-  useEffect(() => {
-    Promise.all([
-      fetch(`/api/users/${session?.user.work_id}`).then(
-        (res) => res.json() as Promise<UserModel>
-      ),
-      fetch(`/api/company`).then((res) => res.json() as Promise<CompanyModel>),
-      fetch(`/api/attendance`).then((res) => res.json() as Promise<LogModel[]>),
-    ]).then((data) => {
-      // save the company coordinate to state
-      setCompanyPosition({
-        latitude: +data[1].latitude,
-        longitude: +data[1].longitude,
-      });
-
-      // if company tolerance time is active then calculate it
-      if (data[1].tolerance_active) {
-        const shiftStart = data[0].job_position?.shift_start;
-        if (shiftStart) {
-          const toleratedTime = calculateToleratedTime(
-            shiftStart,
-            data[1].tolerance_time
-          );
-          setToleranceClockIn(toleratedTime);
+      if (type === "sick-day") {
+        setSending(true);
+        const response = await fetch(`/api/user/attendance`, {
+          method: "POST",
+          body: JSON.stringify({
+            type,
+            time: getTimeOnly(),
+            date: getDateOnly(),
+            latitude: 0,
+            longitude: 0,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        setSending(false);
+        if (value === "Clock-Out") {
+          setDone(true);
+        } else if (value === "Clock From Home" || value === "Clock From Office") {
+          setClockedIn(true);
+        } else if (value === "Sick Day") {
+          setIsSick(true);
         }
-      }
-
-      // check for day off, sick, and other clock-in states
-      const havePosition = data[0].job_position;
-      const today = getWordDay();
-      const dayOff = !data[0].job_position?.work_day.includes(today);
-      if (!havePosition) {
-        setNavigationError("No job position asigned to you");
-        setDoneForToday(true);
-      } else if (dayOff) {
-        setNavigationError("Enjoy your day off");
-        setDoneForToday(true);
-      } else if (data[2].length > 0) {
-        const sick = data[2].find((log) => log.type === "sick");
-        const clockIn = data[2].find((log) => log.type === "clock-in");
-        const clockOut = data[2].find((log) => log.type === "clock-out");
-        if (sick) {
-          changeToRestwell();
-          return;
-        } else if (clockIn && clockOut) {
-          changeToGoodWork();
-          handleDoneToday();
-          return;
-        } else if (clockIn) {
-          changeToOut();
-          return;
-        }
-      }
-    });
-
-    // watch the user coordinate
-    if ("geolocation" in navigator) {
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          setPosition({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          if (error.code === 1) {
-            setNavigationError("Location Access Denied");
+      } else {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const distance =
+            Math.floor(
+              calculateDistance(
+                position.coords.latitude,
+                position.coords.longitude,
+                targetLatitude,
+                targetLongitude
+              )
+            ) * 1000;
+          if (distance > 50) {
+            toast.info(
+              `You're too far from location, you need to get closer by ${distance - 50} meters`
+            );
+          } else {
+            setSending(true);
+            const response = await fetch(`/api/user/attendance`, {
+              method: "POST",
+              body: JSON.stringify({
+                type,
+                time: getTimeOnly(),
+                date: getDateOnly(),
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                todaysWork,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+            const data = await response.json();
+            setSending(false);
+            if (value === "Clock-Out") {
+              setDone(true);
+            } else if (value === "Clock From Home" || value === "Clock From Office") {
+              setClockedIn(true);
+            } else if (value === "Sick Day") {
+              setIsSick(true);
+            }
           }
-          if (error.code === 2) {
-            setNavigationError("Position Is Unavailable");
-          }
-        }
-      );
-      return () => navigator.geolocation.clearWatch(watchId);
-    } else {
-      setNavigationError("Location is not supported in this browser");
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setSending(false);
     }
-  }, []);
-  useEffect(() => {
-    compareDistance();
-  }, [position, companyPosition]);
-  useEffect(() => {
-    const compareTime = () => {
-      const date = new Date();
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
+  };
 
-      const time = `${hours}:${minutes}`;
-      setAllowToleranceClockIn(pastTolerance(time, toleranceClockIn));
-    };
-    if (toleranceClockIn) {
-      const intervalId = setInterval(compareTime, 1000);
+  useEffect(() => {
+    if (!isLoading) {
+      const fromHome = data?.find((log) => log.type === "from-home");
+      const fromOffice = data?.find((log) => log.type === "from-office");
+      const clockOut = data?.find((log) => log.type === "clock-out");
+      const sick = data?.find((log) => log.type === "sick-day");
 
-      return () => clearInterval(intervalId);
+      setIsSick(false);
+      setDone(false);
+      setClockedIn(false);
+      setFromHome(false);
+      if (sick) {
+        setIsSick(true);
+      } else if ((fromHome || fromOffice) && clockOut) {
+        setDone(true);
+      } else if (fromHome) {
+        setClockedIn(true);
+        setFromHome(true);
+      } else if (fromOffice) {
+        setClockedIn(true);
+      }
     }
-  }, [toleranceClockIn]);
-  return navigationError || !allowToleranceClockIn ? (
-    <button
-      disabled
-      className={clsx(
-        "bg-slate-400 w-full text-white flex gap-x-2 items-center justify-center rounded px-3 py-2 relative",
-        {
-          "!bg-green-400": doneForToday,
-        }
-      )}
-    >
-      {navigationError || `You can clock in past ${toleranceClockIn}`}
-      {!doneForToday && (
-        <>
-          <FaRegCircleQuestion className="cursor-pointer peer" />
-          <div className="border border-slate-200 bottom-0 text-left peer-hover:block text-sm hidden translate-y-full text-slate-600 p-2 absolute bg-white">
-            <p>
-              If you&apos;re already in office area but still the button show
-              &quot;Too far...&quot;
-            </p>
-            <ul className="list-disc list-inside">
-              <li>Make sure your GPS active</li>
-              <li>Turn off then turn your GPS on again</li>
-              <li>Change your connection</li>
-            </ul>
-          </div>
-        </>
-      )}
+  }, [data]);
+
+  return isSick ? (
+    <button className="w-full bg-sky-400 hover:bg-sky-500 text-white disabled:bg-sky-300 rounded p-2">
+      Rest Well!
     </button>
   ) : (
     <>
+      {clockedIn && !done && (
+        <InputText label="Today's work" value={todaysWork} onChange={setTodaysWork} />
+      )}
       <ButtonDropdown
-        onClick={(value) => handleClockIn(value)}
-        disabled={sendingLog}
+        onClick={(value) => handleClockBtn(value)}
+        loading={isLoading || sending}
+        disabled={done || isLoading || sending}
         className="bg-slate-900 hover:bg-black text-white"
-        options={attendanceOptions}
+        options={done ? options3 : clockedIn ? options2 : options}
       />
     </>
   );

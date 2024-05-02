@@ -9,6 +9,7 @@ interface CProps {
   disabled?: boolean;
   label?: string;
   error?: string;
+  onBlur?: (value: string) => void;
 }
 const InputText = ({
   className,
@@ -19,6 +20,7 @@ const InputText = ({
   disabled,
   label,
   error,
+  onBlur,
 }: CProps) => {
   return (
     <div>
@@ -26,14 +28,13 @@ const InputText = ({
       {label && <label>{label}:</label>}
       <input
         disabled={disabled}
-        onChange={({ currentTarget }) =>
-          onChange && onChange(currentTarget.value)
-        }
+        onChange={({ currentTarget }) => onChange && onChange(currentTarget.value)}
         defaultValue={defaultValue}
         value={value}
         id={id}
         type="text"
-        className={`${className} rounded w-full p-2 outline-none border-2 border-slate-200 focus:border-sky-400`}
+        className={`${className} rounded w-full py-1 px-2 outline-none border-2 border-slate-200 focus:border-sky-400`}
+        onBlur={({ currentTarget }) => onBlur && onBlur(currentTarget.value)}
       />
     </div>
   );

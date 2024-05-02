@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Logout from "@/app/components/Logout";
 import UserInfoSkeleton from "@/app/_loader/UserInfoSekleton";
 import ClockInOut from "@/app/components/ClockInOut";
+import { HomeCoordinate } from "@/app/components";
 
 import getUser from "@/app/libs/getUser";
 
@@ -23,6 +24,7 @@ const Home = () => {
           <UserInfo promise={promise} />
         </Suspense>
         <ClockInOut />
+        <HomeCoordinate />
       </div>
     </main>
   );
