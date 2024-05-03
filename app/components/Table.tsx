@@ -1,6 +1,12 @@
 "use client";
-import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getPaginationRowModel,
+} from "@tanstack/react-table";
 import { FC } from "react";
+import { FaCaretRight, FaCaretLeft } from "react-icons/fa";
 
 interface TableProps {
   data: any[];
@@ -11,6 +17,7 @@ const Table: FC<TableProps> = ({ data, columns }) => {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     defaultColumn: {
       size: 100,
       minSize: 50,
@@ -45,6 +52,27 @@ const Table: FC<TableProps> = ({ data, columns }) => {
           ))}
         </tbody>
       </table>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          disabled={!table.getCanPreviousPage()}
+          onClick={() => table.previousPage()}
+          className="p-2 disabled:text-gray-400 hover:bg-gray-100"
+        >
+          <FaCaretLeft />
+        </button>
+        <span className="p-2">
+          {table.getState().pagination.pageIndex + 1} of {table.getPageCount().toLocaleString()}
+        </span>
+        <button
+          type="button"
+          disabled={!table.getCanNextPage()}
+          onClick={() => table.nextPage()}
+          className="p-2  hover:bg-gray-100 disabled:text-gray-400"
+        >
+          <FaCaretRight />
+        </button>
+      </div>
     </div>
   );
 };

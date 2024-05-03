@@ -3,7 +3,7 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import Table from "./Table";
-import { FaUserAltSlash, FaUserEdit } from "react-icons/fa";
+import { FaUserAltSlash, FaUserEdit, FaClock } from "react-icons/fa";
 import { UserModel } from "@/models/User";
 import Confirmation from "@/app/components/Confirmation";
 import { toast } from "react-toastify";
@@ -38,23 +38,29 @@ const EmployeeTable = () => {
     employeeColumn.accessor("action", {
       header: "Action",
       cell: ({ row }) => (
-        <>
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => {
               setShowConfirmation(true);
               setWorkIdDelete(row.original.work_id);
             }}
-            className="bg-red-400 hover:bg-red-500 inline-block align-middle rounded p-2"
+            className="bg-red-400 hover:bg-red-500 inline-block align-middle text-white rounded p-2"
           >
             <FaUserAltSlash />
           </button>
           <Link
             href={`/dashboard/employees/${row.original.work_id}/edit`}
-            className="bg-amber-400 inline-block align-middle rounded p-2 ms-4 hover:bg-amber-500"
+            className="bg-amber-400 inline-block align-middle rounded p-2 text-white hover:bg-amber-500"
           >
             <FaUserEdit />
           </Link>
-        </>
+          <Link
+            className="bg-violet-400 text-white p-2 align-middle inline-block rounded hover:bg-violet-500"
+            href={`/dashboard/employees/${row.original.work_id}/attendances`}
+          >
+            <FaClock />
+          </Link>
+        </div>
       ),
       minSize: 100,
     }),

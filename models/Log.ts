@@ -70,7 +70,16 @@ const Log = sequelize.define<LogModel>(
     updatedAt: {
       type: DataTypes.DATE,
     },
-    work: DataTypes.STRING,
+    work: {
+      type: DataTypes.JSON,
+      get() {
+        if (typeof this.getDataValue("work") === "string") {
+          return JSON.parse(this.getDataValue("work"));
+        } else {
+          return this.getDataValue("work");
+        }
+      },
+    },
   },
   {
     underscored: true,

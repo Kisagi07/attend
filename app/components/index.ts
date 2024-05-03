@@ -4,3 +4,6 @@ export { default as TotalGrossSalary } from "./TotalGrossSalary";
 export { default as HomeCoordinate } from "./HomeCoordinate";
 export { default as InputText } from "./InputText";
 export { default as ButtonDropdown } from "./ButtonDropdown";
+export { default as Table } from "./Table";
+export { default as SWR } from "./SWR";
+export { default as ListInput } from "./ListInput";

@@ -2,11 +2,6 @@
 import clsx from "clsx";
 import { FC, useState, useEffect, useRef } from "react";
 
-interface Option {
-  label: string;
-  value: string | number;
-}
-
 interface SelectProps {
   label?: string;
   placeholder?: string;
@@ -16,7 +11,7 @@ interface SelectProps {
   optionDirection?: "top" | "bottom";
   onChange?: (option: Option) => void;
   error?: boolean;
-  value: Option | undefined;
+  value?: Option | undefined;
   required?: boolean;
 }
 const Select: FC<SelectProps> = ({
@@ -51,29 +46,22 @@ const Select: FC<SelectProps> = ({
     if (showOption) {
       document.addEventListener("click", handleDynamicCloseOption);
 
-      return () =>
-        document.removeEventListener("click", handleDynamicCloseOption);
+      return () => document.removeEventListener("click", handleDynamicCloseOption);
     }
   }, [showOption]);
 
   return (
-    <div>
+    <div className="w-full">
       <label>
         {label}
         {required && <span className="text-red-500">*</span>}
       </label>
       <div
-        className={clsx(
-          "border bg-white w-full border-slate-200  rounded relative",
-          {
-            "!border-red-500": error,
-          }
-        )}
+        className={clsx("border bg-white w-full border-slate-200  rounded relative", {
+          "!border-red-500": error,
+        })}
       >
-        <h4
-          onClick={handleShowOption}
-          className="text-slate-700 select-none cursor-pointer p-2"
-        >
+        <h4 onClick={handleShowOption} className="text-slate-700 select-none cursor-pointer p-2">
           {value?.label || placeholder || "Select one option..."}
         </h4>
         <div

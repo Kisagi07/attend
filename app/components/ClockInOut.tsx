@@ -1,5 +1,5 @@
 "use client";
-import { ButtonDropdown, InputText } from "@/app/components";
+import { ButtonDropdown, InputText, ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { CompanyModel } from "@/models/Company";
 import { LogModel } from "@/models/Log";
@@ -16,7 +16,7 @@ const ClockInOut = () => {
   const [done, setDone] = useState<boolean>(false);
   const [isSick, setIsSick] = useState<boolean>(false);
   const [fromHome, setFromHome] = useState<boolean>(false);
-  const [todaysWork, setTodaysWork] = useState<string>("");
+  const [todaysWork, setTodaysWork] = useState<string[]>([]);
   //fetched data
   const { data, error, isLoading } = useSWR<LogModel[]>("/api/user/attendance", fetcher);
   const {
@@ -165,6 +165,14 @@ const ClockInOut = () => {
     }
   };
 
+  const handleAddItem = (value: string) => {
+    setTodaysWork((prev) => [...prev, value]);
+  };
+
+  const handleRemoveItem = (value: string) => {
+    setTodaysWork((prev) => prev.filter((pre) => pre !== value));
+  };
+
   useEffect(() => {
     if (!isLoading) {
       const fromHome = data?.find((log) => log.type === "from-home");
@@ -196,7 +204,7 @@ const ClockInOut = () => {
   ) : (
     <>
       {clockedIn && !done && (
-        <InputText label="Today's work" value={todaysWork} onChange={setTodaysWork} />
+        <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
       <ButtonDropdown
         onClick={(value) => handleClockBtn(value)}

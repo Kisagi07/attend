@@ -32,7 +32,7 @@ const Dashboard = () => {
   const [logs, setLogs] = useState<LogModel[]>([]);
   const [fetchingAttendance, setFetchingAttendance] = useState<boolean>(true);
   const fetchAttendance = async () => {
-    const res = await fetch("/api/attendances?limit=3&latest=true", {
+    const res = await fetch("/api/attendances", {
       cache: "no-cache",
     });
     if (!res.ok) {

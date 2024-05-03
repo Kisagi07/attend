@@ -1,3 +1,5 @@
+import { Fetcher } from "swr";
+
 export function getWordDay() {
   const today = new Date();
   const dayOfWeek = today.getDay();
@@ -38,6 +40,14 @@ export function getTimeOnly() {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+/**
+ * function to calculate the distance between 2 real coordinate in straight line
+ * @param lat1 - the first location latitude
+ * @param lon1 - the first location longitude
+ * @param lat2 - the second location latitude
+ * @param lon2 - the second location longitude
+ * @returns distance - distance in kilometers
+ */
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const earthRadiusKm = 6371;
 
@@ -71,3 +81,39 @@ export function debounce<T extends (...args: any[]) => void>(func: T, delay: num
   } as T;
 }
 
+const fetcher: Fetcher<any, string> = (...args) =>
+  fetch(...args).then(async (res) => {
+    if (!res.ok) {
+      const error: CustomError = new Error("Something went wrong when fetching data");
+      error.status = res.status;
+      error.info = await res.json();
+      throw error;
+    }
+    return res.json();
+  });
+
+/**
+ * Helper function to turn number month into full name
+ * @param month - number from 0-11
+ * @returns string - month name
+ */
+const monthNumberToWord = (month: number): string => {
+  const monthName = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "Desember",
+  ];
+
+  return monthName[month];
+};
+
+export { fetcher, monthNumberToWord };

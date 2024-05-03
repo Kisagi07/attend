@@ -29,6 +29,7 @@ const Layout: React.FC<Layout> = ({ children }) => {
         <Sidebar.LinkItem href="/dashboard" name="Dashboard" />
         <Sidebar.LinkItem href="/dashboard/employees" subMatch name="Employee" />
         <Sidebar.LinkItem href="/dashboard/job-positions" subMatch name="Job Position" />
+        <Sidebar.LinkItem href="/dashboard/attendances" subMatch name="Attendances" />
         {/* <Sidebar.LinkItem href="/dashboard/salary" name="Salary" /> */}
         <Sidebar.LinkItem href="/dashboard/settings" name="Settings" />
         <Sidebar.Divider />
