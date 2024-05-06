@@ -75,7 +75,7 @@ const Page = () => {
         );
       }
     }
-  }, [logs, selectedUser, selectedDate, selectedDate]);
+  }, [logs, selectedUser, selectedDate]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -87,7 +87,7 @@ const Page = () => {
         setDateOptions([]);
       }
     }
-  }, [selectedUser]);
+  }, [selectedUser, logs]);
   return (
     <div className="space-y-4 p-4">
       <section className="md:grid md:grid-cols-2 md:gap-4">

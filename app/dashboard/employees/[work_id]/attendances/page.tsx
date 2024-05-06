@@ -55,7 +55,7 @@ const Page = ({ params }: { params: { work_id: string } }) => {
       const logs = monthLogs[selectedOption.value];
       setTableData(logs);
     }
-  }, [selectedOption]);
+  }, [selectedOption, monthLogs]);
 
   return (
     <div className="space-y-4">

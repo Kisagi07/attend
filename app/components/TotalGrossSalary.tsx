@@ -1,20 +1,15 @@
 import { UserModel } from "@/models/User";
 import { FaMoneyCheckAlt } from "react-icons/fa";
-import useSWR, { Fetcher } from "swr";
 import { SmallCardSkeleton } from "../skeletons";
-import { formatRupiah } from "../helper";
+import { fetcher, formatRupiah } from "../helper";
+import useSWR from "swr";
 
 interface CProps {
   days: number;
 }
 
 const TotalGrossSalary = ({ days }: CProps) => {
-  const fetcher: Fetcher<UserModel[], string> = (...args) =>
-    fetch(...args).then((res) => res.json());
-  const { data, error, isLoading, mutate } = useSWR<UserModel[]>(
-    "/api/users",
-    fetcher
-  );
+  const { data, error, isLoading, mutate } = useSWR<UserModel[]>("/api/users", fetcher);
   return isLoading ? (
     <SmallCardSkeleton />
   ) : (
@@ -23,10 +18,7 @@ const TotalGrossSalary = ({ days }: CProps) => {
         Gross Salary :{" "}
         <span className="whitespace-nowrap">
           {formatRupiah(
-            data!.reduce(
-              (pre, curr) => pre + (curr.job_position?.salary || 0),
-              0
-            ) * days
+            data!.reduce((pre, curr) => pre + (curr.job_position?.salary || 0), 0) * days
           )}
         </span>
       </h3>
