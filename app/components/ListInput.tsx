@@ -2,6 +2,7 @@
 import React, { useRef, useState } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
+import { TbTextPlus } from "react-icons/tb";
 
 type Props = {
   placeholder?: string;
@@ -14,26 +15,38 @@ type Props = {
 const ListInput = (props: Props) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const triggerAddItem = () => {
+    if (inputRef.current?.value) {
+      props.addItem && props.addItem(inputRef.current.value);
+      inputRef.current.value = "";
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (inputRef.current?.value) {
-        props.addItem && props.addItem(inputRef.current.value);
-        inputRef.current.value = "";
-      }
+      triggerAddItem();
     }
   };
 
   return (
     <div>
       <label className="font-medium">{props.label}</label>
-      <input
-        ref={inputRef}
-        type="text"
-        className="outline-none w-full px-2 py-1 border border-gray-200"
-        placeholder={props.placeholder}
-        onKeyDown={handleKeyDown}
-      />
+      <div className="flex w-full">
+        <input
+          ref={inputRef}
+          type="text"
+          className="outline-none w-full px-2 py-1 border border-gray-200"
+          placeholder={props.placeholder}
+          onKeyDown={handleKeyDown}
+        />
+        <button
+          onClick={triggerAddItem}
+          className="bg-blue-500 flex justify-center items-center w-8 hover:bg-blue-600 text-white"
+        >
+          <TbTextPlus />
+        </button>
+      </div>
       <ul className="space-y-2 mt-2">
         {props.items?.map((item) => (
           <li key={item} className="bg-gray-100 flex justify-between items-stretch">
