@@ -23,7 +23,13 @@ const MonthAttendances = ({ data }: { data: any[] }) => {
     }),
     columnHelper.accessor("work", {
       header: "Work",
-      cell: (info) => <small className="text-sm">{info.getValue()}</small>,
+      cell: (info) => (
+        <ul className="text-sm list-disc">
+          {info.getValue()?.map((work) => (
+            <li key={work}>{work}</li>
+          ))}
+        </ul>
+      ),
       size: 200,
     }),
   ];

@@ -20,7 +20,7 @@ export interface LogModel
   date: string;
   latitude: number;
   longitude: number;
-  work: CreationOptional<string>;
+  work: CreationOptional<string[]>;
 
   createdAt: CreationOptional<Date>;
   updatedAt: CreationOptional<Date>;
@@ -74,9 +74,11 @@ const Log = sequelize.define<LogModel>(
       type: DataTypes.JSON,
       get() {
         if (typeof this.getDataValue("work") === "string") {
-          return JSON.parse(this.getDataValue("work"));
-        } else {
+          return JSON.parse(this.getDataValue("work") as unknown as string);
+        } else if (Array.isArray(this.getDataValue("work"))) {
           return this.getDataValue("work");
+        } else {
+          return [];
         }
       },
     },

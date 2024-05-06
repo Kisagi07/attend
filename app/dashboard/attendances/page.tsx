@@ -8,6 +8,7 @@ import { UserModel } from "@/models/User";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { FaXmark } from "react-icons/fa6";
+import TableSkeleton from "@/app/_loader/TableSkeleton";
 
 const Page = () => {
   const { data: logs, isLoading: logsLoading } = useSWR<any>(
@@ -88,34 +89,43 @@ const Page = () => {
     }
   }, [selectedUser]);
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       <section className="md:grid md:grid-cols-2 md:gap-4">
-        <div className="flex items-centern gap-2">
-          <Select
-            options={userOptions}
-            value={selectedUser}
-            onChange={handleUserChange}
-            label="Employee :"
-            placeholder="Select Employees"
-          />
-          <button onClick={() => handleRemoveUser()} className="mt-5">
-            <FaXmark className="text-red-500" />
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select
-            options={dateOptions}
-            value={selectedDate}
-            onChange={setSelectedDate}
-            label="Month & Year :"
-            placeholder="Select Date Attendances"
-          />
-          <button onClick={() => handleRemoveDate()} className="mt-5">
-            <FaXmark className="text-red-500" />
-          </button>
-        </div>
+        {usersLoading ? (
+          <>
+            <div className="h-8 bg-gray-200 animate-pulse"></div>
+            <div className="h-8 bg-gray-200 animate-pulse"></div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-centern gap-2">
+              <Select
+                options={userOptions}
+                value={selectedUser}
+                onChange={handleUserChange}
+                label="Employee :"
+                placeholder="Select Employees"
+              />
+              <button onClick={() => handleRemoveUser()} className="mt-5">
+                <FaXmark className="text-red-500" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select
+                options={dateOptions}
+                value={selectedDate}
+                onChange={setSelectedDate}
+                label="Month & Year :"
+                placeholder="Select Date Attendances"
+              />
+              <button onClick={() => handleRemoveDate()} className="mt-5">
+                <FaXmark className="text-red-500" />
+              </button>
+            </div>
+          </>
+        )}
       </section>
-      <MonthAttendances data={tableData} />
+      {logsLoading ? <TableSkeleton /> : <MonthAttendances data={tableData} />}
     </div>
   );
 };
