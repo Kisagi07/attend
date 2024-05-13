@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
+    const monthString = month.toString().padStart(2, "0");
     const dateString = `${year}-${month}-01`;
 
     // create holidays instance and initiate with Indonesia holidays
@@ -82,12 +83,9 @@ export async function GET(req: NextRequest) {
       // get total logs, work from home, and absent
       const totalLogs = logs.length;
       // get total work from home
-      const totalWorkFromHome = logs.filter(
-        (log) => log.type === "work-from-home"
-      ).length;
+      const totalWorkFromHome = logs.filter((log) => log.type === "work-from-home").length;
       // get total absent
-      const totalAbsent =
-        currentTotalDays - totalHolidays - totalWeekend - totalLogs;
+      const totalAbsent = currentTotalDays - totalHolidays - totalWeekend - totalLogs;
       // set virtual fields
       user.setDataValue("totalAbsent", totalAbsent);
       user.setDataValue("totalWorkFromHome", totalWorkFromHome);

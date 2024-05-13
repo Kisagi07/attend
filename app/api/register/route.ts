@@ -5,14 +5,7 @@ import { AiOutlineConsoleSql } from "react-icons/ai";
 import Timeline from "@/models/Timeline";
 
 export async function POST(req: NextRequest) {
-  const {
-    work_id,
-    password,
-    name,
-    job_position_id,
-    role = "employee",
-    gender,
-  } = await req.json();
+  const { work_id, password, name, job_position_id, role = "employee", gender } = await req.json();
   const user = await User.create({
     work_id,
     password: await bcryptjs.hash(password, 10),
@@ -23,7 +16,7 @@ export async function POST(req: NextRequest) {
   });
 
   await Timeline.create({
-    title: "User",
+    title: "New User",
     description: `User ${user.name} has been registered`,
     type: "new",
   });

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       work: todaysWork,
     });
     await Timeline.create({
-      title: "Attendance",
+      title: `${user.name} is Sick`,
       description: `${user.name} is sick today`,
       type: "new",
     });
@@ -81,14 +81,14 @@ export async function POST(req: NextRequest) {
     });
 
     await Timeline.create({
-      title: "Clock out",
+      title: `${user.name} Has Clock Out`,
       description: `${user.name} has clocked out at ${clock_out_time}`,
       type: "updated",
     });
 
     await Timeline.create({
-      title: "Work",
-      description: `${user.name} is working on ${JSON.stringify(todaysWork)}`,
+      title: `${user.name} is Working on :`,
+      description: `${JSON.stringify(todaysWork)}`,
       type: "updated",
     });
 
@@ -104,9 +104,11 @@ export async function POST(req: NextRequest) {
     });
 
     await Timeline.create({
-      title: "Attendance",
+      title: `${user.name} Attendance: ${
+        log.type === "work-from-home" ? "Work From Home" : "Work From Office"
+      }`,
       description: `${user.name} has clocked in at ${clock_in_time}`,
-      type: "updated",
+      type: "new",
     });
   }
 

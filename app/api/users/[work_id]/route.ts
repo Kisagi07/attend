@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { User, JobPosition, Timeline } from "@/models";
 import sequelize from "@/db";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { work_id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
@@ -34,10 +31,7 @@ export async function GET(
   return NextResponse.json(user);
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { work_id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
@@ -55,7 +49,7 @@ export async function DELETE(
   await user.destroy();
 
   await Timeline.create({
-    title: "User",
+    title: "User Deleted",
     description: `User ${user.name} has been deleted`,
     type: "removed",
   });
@@ -63,12 +57,8 @@ export async function DELETE(
   return NextResponse.json(user);
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { work_id: string } }
-) {
-  const { name, job_position_id, gender } = await req.json();
-  console.log(gender);
+export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
+  const { name, job_position_id, gender, role } = await req.json();
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
@@ -77,14 +67,16 @@ export async function PUT(
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
+  console.log(role);
   const updateUser = await user.update({
     name,
     job_position_id,
     gender,
+    role,
   });
 
   await Timeline.create({
-    title: "User",
+    title: "User Update",
     description: `User ${user.name} data has been updated`,
     type: "updated",
   });

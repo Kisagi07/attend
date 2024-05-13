@@ -7,6 +7,7 @@ import { UserModel } from "@/models/User";
 import { useRouter } from "next/navigation";
 import { JobPositionModel } from "@/models/JobPosition";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
+import InputCheckbox from "@/app/components/InputCheckbox";
 interface Option {
   label: string;
   value: string | number;
@@ -22,6 +23,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
   ]);
+  const [isIntern, setIsIntern] = useState<boolean>(false);
   const [gender, setGender] = useState<Option>({
     label: "Male",
     value: "male",
@@ -70,7 +72,6 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
     };
   };
   const handleUpdate = async () => {
-    console.log(gender.value);
     const sendUpdate = async () => {
       const res = await fetch(`/api/users/${params.work_id}`, {
         method: "PUT",
@@ -79,6 +80,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           work_id: workId,
           job_position_id: jobPosition!.value,
           gender: gender.value,
+          role: isIntern ? "intern" : "employee",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -113,12 +115,8 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then(
-        (res) => res.json() as Promise<JobPositionModel[]>
-      ),
-      fetch(`/api/users/${params.work_id}`).then(
-        (res) => res.json() as Promise<UserModel>
-      ),
+      fetch("/api/job-positions").then((res) => res.json() as Promise<JobPositionModel[]>),
+      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<UserModel>),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
@@ -129,9 +127,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         setUser(data[1]);
         setWorkId(data[1].work_id);
         setName(data[1].name);
-        const defaultPosition = options.find(
-          (option) => option.value === data[1].job_position_id
-        );
+        const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
@@ -155,7 +151,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="space-y-4 md:grid md:grid-cols-2 md:space-y-0 md:gap-4"
+          className="space-y-4 md:grid md:grid-cols-2 md:items-center md:space-y-0 md:gap-4"
         >
           <div className="md:col-span-2">
             <label htmlFor="name">
@@ -165,12 +161,9 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["name"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                "!border-red-500": validation["name"],
+              })}
             />
           </div>
           <div>
@@ -207,6 +200,17 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
             error={validation["job_position"]}
             required
           />
+          <div className="flex items-center gap-2 pt-4">
+            <input
+              type="checkbox"
+              checked={isIntern}
+              onChange={() => setIsIntern(!isIntern)}
+              className="cursor-pointer"
+            />
+            <label htmlFor="" className="block">
+              Intern
+            </label>
+          </div>
           <button
             disabled={submitting}
             className={clsx(

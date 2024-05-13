@@ -16,6 +16,7 @@ const CreateEmployee = () => {
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
+  const [isIntern, setIsIntern] = useState<boolean>(false);
   const [genderOptions, setGenderOptions] = useState<Option[]>([
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
@@ -99,6 +100,7 @@ const CreateEmployee = () => {
         work_id: workId,
         job_position_id: jobPosition!.value,
         gender: gender.value,
+        role: isIntern ? "intern" : "employee",
       }),
       headers: {
         "Content-Type": "application/json",
@@ -131,9 +133,7 @@ const CreateEmployee = () => {
   useEffect(() => {
     Promise.all([
       fetch(`/api/register`).then((res) => res.json() as Promise<string>),
-      fetch(`/api/job-positions`).then(
-        (res) => res.json() as Promise<JobPositionModel[]>
-      ),
+      fetch(`/api/job-positions`).then((res) => res.json() as Promise<JobPositionModel[]>),
     ])
       .then((data) => {
         setWorkId(data[0]);
@@ -165,12 +165,9 @@ const CreateEmployee = () => {
             <input
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["name"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                "!border-red-500": validation["name"],
+              })}
             />
           </div>
 
@@ -180,16 +177,11 @@ const CreateEmployee = () => {
             </label>
             <div className="relative">
               <input
-                onChange={({ currentTarget }) =>
-                  setPassword(currentTarget.value)
-                }
+                onChange={({ currentTarget }) => setPassword(currentTarget.value)}
                 type={showPassword ? "text" : "password"}
-                className={clsx(
-                  "w-full rounded outline-none border border-slate-200 p-2",
-                  {
-                    "!border-red-500": validation["password"],
-                  }
-                )}
+                className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                  "!border-red-500": validation["password"],
+                })}
               />
               <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
                 {showPassword ? (
@@ -217,12 +209,9 @@ const CreateEmployee = () => {
             <input
               readOnly
               type="text"
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["work_id"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                "!border-red-500": validation["work_id"],
+              })}
               value={workId}
             />
           </div>
@@ -234,6 +223,17 @@ const CreateEmployee = () => {
             error={validation["job_position"]}
             required
           />
+          <div className="flex items-center gap-2 pt-4">
+            <input
+              type="checkbox"
+              checked={isIntern}
+              onChange={() => setIsIntern(!isIntern)}
+              className="cursor-pointer"
+            />
+            <label htmlFor="" className="block">
+              Intern
+            </label>
+          </div>
           <button
             disabled={submitting}
             className={clsx(

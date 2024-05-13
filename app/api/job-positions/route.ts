@@ -16,10 +16,7 @@ export async function POST(req: NextRequest) {
     work_day: string;
     salary: number;
   } = await req.json();
-  if (
-    (name.trim().length === 0 || shift_start.trim().length === 0,
-    shift_end.trim().length === 0)
-  )
+  if ((name.trim().length === 0 || shift_start.trim().length === 0, shift_end.trim().length === 0))
     return NextResponse.json({ message: "Need all field" }, { status: 422 });
 
   const jobPosition = await JobPosition.create({
@@ -31,7 +28,7 @@ export async function POST(req: NextRequest) {
   });
 
   await Timeline.create({
-    title: "Job Position",
+    title: "New Job Position",
     description: `Job Position ${jobPosition.name} has been created`,
     type: "new",
   });

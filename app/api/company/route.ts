@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   });
 
   await Timeline.create({
-    title: "Company Location",
+    title: "Create Company Location",
     description: "Company Location has been set",
     type: "new",
   });
@@ -37,14 +37,14 @@ export async function PUT(req: NextRequest) {
   if (!company) {
     const newCompany = await Company.create(toUpdated);
     await Timeline.create({
-      title: "Company",
+      title: "Create Company",
       description: "Company has been created and set",
       type: "new",
     });
     return NextResponse.json(newCompany);
   } else {
     await Timeline.create({
-      title: "Company",
+      title: "Company Location",
       description: "Company has been updated",
       type: "updated",
     });
