@@ -56,8 +56,8 @@ const Dashboard = () => {
     fetcher
   );
 
-  const [labels, setLabels] = useState<string[]>(["1", "2", "3", "4", "5"]);
-  const [data, setData] = useState({
+  const labels = ['1','2','3','4','5']
+  const data = {
     labels,
     datasets: [
       {
@@ -66,7 +66,7 @@ const Dashboard = () => {
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
-  });
+  };
 
   // function to calculate how long ago is a certain string date
   function calculateTimeAgo(dateString: string): string {
