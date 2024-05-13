@@ -56,19 +56,14 @@ const Dashboard = () => {
     fetcher
   );
 
-  const [labels, setLabels] = useState<string[]>([]);
-  const [data, setData] = useState<{
-    labels: string[];
-    datasets: {
-      label: string;
-      data: (LogModel[] | undefined)[];
-    }[];
-  }>({
+  const [labels, setLabels] = useState<string[]>(["1", "2", "3", "4", "5"]);
+  const [data, setData] = useState({
     labels,
     datasets: [
       {
         label: "Visit",
-        data: [],
+        data: [12, 142, 123, 45, 234],
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
   });
@@ -100,21 +95,21 @@ const Dashboard = () => {
     }
   }
 
-  useEffect(() => {
-    if (chartData) {
-      setLabels(chartData.dates);
-      setData({
-        labels: chartData.dates,
-        datasets: [
-          {
-            label: "Visit",
-            data: [2, 6, 9, 19, 49],
-          },
-        ],
-      });
-      console.log();
-    }
-  }, [chartData]);
+  // useEffect(() => {
+  //   if (chartData) {
+  //     setLabels(chartData.dates);
+  //     setData({
+  //       labels: chartData.dates,
+  //       datasets: [
+  //         {
+  //           label: "Visit",
+  //           data: [2, 6, 9, 19, 49],
+  //         },
+  //       ],
+  //     });
+  //     console.log();
+  //   }
+  // }, [chartData]);
 
   return (
     <>
