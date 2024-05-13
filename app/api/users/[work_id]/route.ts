@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { User, JobPosition } from "@/models";
+import { User, JobPosition, Timeline } from "@/models";
 import sequelize from "@/db";
 
-export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { work_id: string } }
+) {
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
@@ -22,6 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
       "job_position_id",
       "createdAt",
       "updatedAt",
+      "gender",
     ],
   });
 
@@ -30,8 +34,11 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
   return NextResponse.json(user);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
-  const user = await User.destroy({
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { work_id: string } }
+) {
+  const user = await User.findOne({
     where: {
       work_id: params.work_id,
     },
@@ -45,20 +52,41 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
       { status: 404 }
     );
 
+  await user.destroy();
+
+  await Timeline.create({
+    title: "User",
+    description: `User ${user.name} has been deleted`,
+    type: "removed",
+  });
+
   return NextResponse.json(user);
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
-  const { name, job_position_id } = await req.json();
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { work_id: string } }
+) {
+  const { name, job_position_id, gender } = await req.json();
+  console.log(gender);
   const user = await User.findOne({
     where: {
       work_id: params.work_id,
     },
   });
-  if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
+  if (!user) {
+    return NextResponse.json({ message: "User not found" }, { status: 404 });
+  }
   const updateUser = await user.update({
     name,
     job_position_id,
+    gender,
+  });
+
+  await Timeline.create({
+    title: "User",
+    description: `User ${user.name} data has been updated`,
+    type: "updated",
   });
 
   return NextResponse.json(updateUser);

@@ -22,7 +22,6 @@ const HomeCoordinate = () => {
       (position) => {
         setLatitude(position.coords.latitude.toString());
         setLongitude(position.coords.longitude.toString());
-        // updateHomeCoordinate(position.coords.latitude, position.coords.longitude);
       },
       (error) => console.error(error)
     );
@@ -30,6 +29,11 @@ const HomeCoordinate = () => {
 
   const updateHomeCoordinate = useCallback(async () => {
     if (!latitude || !longitude) return;
+    if (
+      latitude === data?.home_latitude.toString() &&
+      longitude === data?.home_longitude.toString()
+    )
+      return;
     const res = await fetch(`/api/user/home`, {
       method: "PUT",
       body: JSON.stringify({
@@ -43,8 +47,7 @@ const HomeCoordinate = () => {
     if (!res.ok) {
       console.error("Failed on updating home coordinate");
     }
-    const data = await res.json();
-    console.log(data);
+    const resData = await res.json();
   }, [latitude, longitude]);
 
   const debouncedUpdateHomeCoordinate = useMemo(

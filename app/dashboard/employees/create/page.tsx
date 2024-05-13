@@ -16,6 +16,14 @@ const CreateEmployee = () => {
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
+  const [genderOptions, setGenderOptions] = useState<Option[]>([
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+  ]);
+  const [gender, setGender] = useState<Option>({
+    label: "Male",
+    value: "male",
+  });
   const [todayShift, setTodayShift] = useState<Option>();
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -57,6 +65,12 @@ const CreateEmployee = () => {
       failed.job_position = true;
     }
 
+    if (gender) {
+      success.gender = true;
+    } else {
+      failed.gender = true;
+    }
+
     let validated = false;
     if (Object.keys(failed).length === 0) {
       validated = true;
@@ -84,6 +98,7 @@ const CreateEmployee = () => {
         password,
         work_id: workId,
         job_position_id: jobPosition!.value,
+        gender: gender.value,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -185,7 +200,17 @@ const CreateEmployee = () => {
               </span>
             </div>
           </div>
-          <div className="md:col-span-2">
+          <div>
+            <Select
+              value={gender}
+              label="Gender"
+              options={genderOptions}
+              onChange={setGender}
+              error={validation["gender"]}
+              required
+            />
+          </div>
+          <div>
             <label htmlFor="name">
               Work ID<span className="text-red-500">*</span> :{" "}
             </label>

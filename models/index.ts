@@ -2,6 +2,7 @@ import User from "./User";
 import Log from "./Log";
 import Company from "./Company";
 import JobPosition from "./JobPosition";
+import Timeline from "./Timeline";
 
 Log.belongsTo(User, {
   foreignKey: "user_id",
@@ -18,4 +19,4 @@ JobPosition.hasMany(User, {
   foreignKey: "job_position_id",
 });
 
-export { User, Log, Company, JobPosition };
+export { User, Log, Company, JobPosition, Timeline };

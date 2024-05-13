@@ -14,13 +14,16 @@ import User from "./User";
 export interface LogModel
   extends Model<InferAttributes<LogModel>, InferCreationAttributes<LogModel>> {
   id: CreationOptional<number>;
-  type: "from-home" | "from-office" | "sick-day" | "clock-out";
+  type: CreationOptional<"work-from-office" | "work-from-home" | "sick">;
   user_id: number;
-  time: string;
-  date: string;
-  latitude: number;
-  longitude: number;
   work: CreationOptional<string[]>;
+  clock_in_time: string;
+  clock_in_latitude: number;
+  clock_in_longitude: number;
+  clock_out_time: CreationOptional<string>;
+  clock_out_latitude: CreationOptional<number>;
+  clock_out_longitude: CreationOptional<number>;
+  date: Date;
 
   createdAt: CreationOptional<Date>;
   updatedAt: CreationOptional<Date>;
@@ -39,7 +42,7 @@ const Log = sequelize.define<LogModel>(
       autoIncrement: true,
     },
     type: {
-      type: DataTypes.ENUM("from-home", "from-office", "sick-day", "clock-out"),
+      type: DataTypes.ENUM("work-from-office", "work-from-home", "sick"),
       allowNull: false,
     },
     user_id: {
@@ -52,16 +55,16 @@ const Log = sequelize.define<LogModel>(
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
     },
-    time: {
+    clock_in_time: {
       type: DataTypes.TIME,
     },
     date: {
       type: DataTypes.DATEONLY,
     },
-    latitude: {
+    clock_in_latitude: {
       type: DataTypes.DECIMAL(10, 8),
     },
-    longitude: {
+    clock_in_longitude: {
       type: DataTypes.DECIMAL(11, 8),
     },
     createdAt: {
@@ -81,6 +84,15 @@ const Log = sequelize.define<LogModel>(
           return [];
         }
       },
+    },
+    clock_out_time: {
+      type: DataTypes.TIME,
+    },
+    clock_out_latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+    },
+    clock_out_longitude: {
+      type: DataTypes.DECIMAL(11, 8),
     },
   },
   {

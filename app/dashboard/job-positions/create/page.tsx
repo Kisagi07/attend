@@ -27,7 +27,8 @@ const JobCreatePage = () => {
       },
     });
     if (!res.ok) {
-      toast.error("Something went wrong when creating job position");
+      const error = await res.json();
+      throw error;
     }
 
     const data = await res.json();
@@ -40,18 +41,11 @@ const JobCreatePage = () => {
     if (validated) {
       setSubmitting(true);
 
-      toast.promise(
-        storeJobPosition().then((res) => {
-          setSubmitting(false);
-          if(!res.ok) throw new Error('Something went wrong')
-          return res;
-        }),
-        {
-          pending: "Creating job position...",
-          success: "Job position created!",
-          error: "Something went wrong when creating job position",
-        }
-      );
+      toast.promise(storeJobPosition(), {
+        pending: "Creating job position...",
+        success: "Job position created!",
+        error: "Something went wrong when creating job position",
+      });
     }
   };
   const validateForm = (): boolean => {
@@ -95,12 +89,16 @@ const JobCreatePage = () => {
         />
         <div>
           <h6>Shift :</h6>
-          <small className="text-red-400 block">{formErrors["shiftStart"]}</small>
+          <small className="text-red-400 block">
+            {formErrors["shiftStart"]}
+          </small>
           <small className="text-red-400 block">{formErrors["shiftEnd"]}</small>
           <div className="grid grid-cols-3 items-center">
             <input
               value={shiftStart}
-              onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
+              onChange={({ currentTarget }) =>
+                setShiftStart(currentTarget.value)
+              }
               type="time"
               className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
             />

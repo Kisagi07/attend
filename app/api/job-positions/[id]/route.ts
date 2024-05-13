@@ -1,6 +1,7 @@
 import JobPosition, { JobPositionModel } from "@/models/JobPosition";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/[...nextauth]/auth";
+import Timeline from "@/models/Timeline";
 
 export async function PUT(
   req: NextRequest,
@@ -21,6 +22,12 @@ export async function PUT(
 
   await jobPosition.update(toUpdate);
 
+  await Timeline.create({
+    title: "Job Position",
+    description: `Job Position ${jobPosition.name} has been updated`,
+    type: "updated",
+  });
+
   return NextResponse.json(jobPosition);
 }
 
@@ -36,6 +43,13 @@ export async function DELETE(
   if (!jobPosition)
     return NextResponse.json("Position not found", { status: 404 });
   await jobPosition.destroy();
+
+  await Timeline.create({
+    title: "Job Position",
+    description: `Job Position ${jobPosition.name} has been deleted`,
+    type: "removed",
+  });
+
   return NextResponse.json({ message: "Job position deleted" });
 }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { JobPosition } from "@/models";
+import Timeline from "@/models/Timeline";
 
 export async function POST(req: NextRequest) {
   const {
@@ -15,7 +16,10 @@ export async function POST(req: NextRequest) {
     work_day: string;
     salary: number;
   } = await req.json();
-  if ((name.trim().length === 0 || shift_start.trim().length === 0, shift_end.trim().length === 0))
+  if (
+    (name.trim().length === 0 || shift_start.trim().length === 0,
+    shift_end.trim().length === 0)
+  )
     return NextResponse.json({ message: "Need all field" }, { status: 422 });
 
   const jobPosition = await JobPosition.create({
@@ -24,6 +28,12 @@ export async function POST(req: NextRequest) {
     shift_end,
     work_day,
     salary,
+  });
+
+  await Timeline.create({
+    title: "Job Position",
+    description: `Job Position ${jobPosition.name} has been created`,
+    type: "new",
   });
 
   return NextResponse.json(jobPosition);

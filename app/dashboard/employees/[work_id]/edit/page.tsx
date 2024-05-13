@@ -18,6 +18,14 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
   const [todayShift, setTodayShift] = useState<Option>();
+  const [genderOptions, setGenderOptions] = useState<Option[]>([
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+  ]);
+  const [gender, setGender] = useState<Option>({
+    label: "Male",
+    value: "male",
+  });
   const [name, setName] = useState<string>("");
   const [workId, setWorkId] = useState<string>("Loading...");
   const [user, setUser] = useState<UserModel>();
@@ -44,6 +52,12 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
       failed.job_position = true;
     }
 
+    if (gender) {
+      success.gender = true;
+    } else {
+      failed.gender = true;
+    }
+
     let validated = false;
     if (Object.keys(failed).length === 0) {
       validated = true;
@@ -56,6 +70,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
     };
   };
   const handleUpdate = async () => {
+    console.log(gender.value);
     const sendUpdate = async () => {
       const res = await fetch(`/api/users/${params.work_id}`, {
         method: "PUT",
@@ -63,6 +78,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           name,
           work_id: workId,
           job_position_id: jobPosition!.value,
+          gender: gender.value,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -97,8 +113,12 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then((res) => res.json() as Promise<JobPositionModel[]>),
-      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<UserModel>),
+      fetch("/api/job-positions").then(
+        (res) => res.json() as Promise<JobPositionModel[]>
+      ),
+      fetch(`/api/users/${params.work_id}`).then(
+        (res) => res.json() as Promise<UserModel>
+      ),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
@@ -106,14 +126,18 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           value: position.id,
         }));
         setJobOptions(options);
-
         setUser(data[1]);
         setWorkId(data[1].work_id);
         setName(data[1].name);
-        const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
+        const defaultPosition = options.find(
+          (option) => option.value === data[1].job_position_id
+        );
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
+        data[1].gender === "male"
+          ? setGender({ label: "Male", value: "male" })
+          : setGender({ label: "Female", value: "female" });
       })
       .catch((error) => {
         console.error(error.message);
@@ -141,13 +165,25 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
-                "!border-red-500": validation["name"],
-              })}
+              className={clsx(
+                "w-full rounded outline-none border border-slate-200 p-2",
+                {
+                  "!border-red-500": validation["name"],
+                }
+              )}
             />
           </div>
-
-          <div className="md:col-span-2">
+          <div>
+            <Select
+              value={gender}
+              label="Gender"
+              options={genderOptions}
+              onChange={setGender}
+              error={validation["gender"]}
+              required
+            />
+          </div>
+          <div>
             <label htmlFor="work_id">
               Work ID<span className="text-red-500">*</span> :{" "}
             </label>

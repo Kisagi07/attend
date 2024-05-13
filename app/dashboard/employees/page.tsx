@@ -3,7 +3,7 @@ import Link from "next/link";
 import EmployeeTable from "@/app/components/EmployeeTable";
 const EmployeePage = () => {
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 bg-white p-2">
       <h1 className="text-xl uppercase font-semibold">Employee</h1>
       <hr />
       <div className="flex justify-end">
