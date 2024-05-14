@@ -68,7 +68,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
     <div className="flex gap-x-2 uppercase text-sm">
       <div
         onClick={() => handleWorkDayChange("sunday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.sunday,
         })}
       >
@@ -76,7 +76,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("monday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.monday,
         })}
       >
@@ -84,7 +84,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("tuesday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.tuesday,
         })}
       >
@@ -92,7 +92,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("wednesday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.wednesday,
         })}
       >
@@ -100,7 +100,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("thursday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.thursday,
         })}
       >
@@ -108,7 +108,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("friday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.friday,
         })}
       >
@@ -116,7 +116,7 @@ const WorkDayInput = ({ name, onChange, defaultValue }: CProps) => {
       </div>
       <div
         onClick={() => handleWorkDayChange("saturday")}
-        className={clsx("border border-gray-200 p-4 hover:bg-gray-200 cursor-pointer", {
+        className={clsx("border border-gray-200 p-2 hover:bg-gray-200 cursor-pointer", {
           "bg-gray-200": workDay.saturday,
         })}
       >

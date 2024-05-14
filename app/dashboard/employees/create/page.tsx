@@ -165,7 +165,7 @@ const CreateEmployee = () => {
             <input
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
                 "!border-red-500": validation["name"],
               })}
             />
@@ -209,7 +209,7 @@ const CreateEmployee = () => {
             <input
               readOnly
               type="text"
-              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
                 "!border-red-500": validation["work_id"],
               })}
               value={workId}

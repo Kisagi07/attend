@@ -96,14 +96,14 @@ const JobCreatePage = () => {
               value={shiftStart}
               onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
             />
             <span className="text-center">-</span>
             <input
               value={shiftEnd}
               onChange={({ currentTarget }) => setShiftEnd(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
             />
           </div>
         </div>

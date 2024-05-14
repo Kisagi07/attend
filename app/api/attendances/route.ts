@@ -103,17 +103,19 @@ export async function GET(req: NextRequest) {
       const month = monthNumberToWord(date.getMonth());
       const year = date.getFullYear();
       const monthYear = `${month} ${year}`;
-      const user = log.user.name;
-      if (Object.hasOwn(grouped, user)) {
-        if (Object.hasOwn(grouped[user], monthYear)) {
-          grouped[user][monthYear].push(log);
+      const user = log.user?.name;
+      if (user) {
+        if (Object.hasOwn(grouped, user)) {
+          if (Object.hasOwn(grouped[user], monthYear)) {
+            grouped[user][monthYear].push(log);
+          } else {
+            grouped[user][monthYear] = [log];
+          }
         } else {
-          grouped[user][monthYear] = [log];
+          grouped[user] = {
+            [monthYear]: [log],
+          };
         }
-      } else {
-        grouped[user] = {
-          [monthYear]: [log],
-        };
       }
     });
     logs = grouped;

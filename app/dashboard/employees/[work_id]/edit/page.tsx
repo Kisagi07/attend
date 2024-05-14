@@ -161,7 +161,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
                 "!border-red-500": validation["name"],
               })}
             />
@@ -184,7 +184,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               readOnly
               type="text"
               className={clsx(
-                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-4",
+                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-2",
                 {
                   "border-red-500": validation["work_id"],
                 }

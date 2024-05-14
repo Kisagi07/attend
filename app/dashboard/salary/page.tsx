@@ -24,9 +24,9 @@ const SalaryPage = () => {
         <h3 className="font-semibold text-lg">Work Hours : 300</h3>
         <FaClock className="w-12 h-12 bg-rose-400 text-white p-4 rounded-full" />
       </article>
-      <TotalGrossSalary
+      {/* <TotalGrossSalary
         days={new Date(+monthYear.split("-")[0], +monthYear.split("-")[1] - 1, 0).getDate()}
-      />
+      /> */}
       <article className="border border-gray-200 rounded p-4 flex justify-between items-center">
         <h3 className="font-semibold text-lg">
           Net Salary : <span className="whitespace-nowrap">Rp. 4.275.000</span>

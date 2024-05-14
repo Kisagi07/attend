@@ -47,7 +47,7 @@ const HomeCoordinate = () => {
       console.error("Failed on updating home coordinate");
     }
     const resData = await res.json();
-  }, [latitude, longitude]);
+  }, [latitude, longitude, data?.home_latitude, data?.home_longitude]);
 
   const debouncedUpdateHomeCoordinate = useMemo(
     () => debounce(updateHomeCoordinate, 500),
