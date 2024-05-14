@@ -54,10 +54,13 @@ export async function GET(req: NextRequest) {
     while (lastSevenDays.length < 5) {
       const date: Date = new Date(lastSevenDays[lastSevenDays.length - 1]);
       date.setDate(date.getDate() - 1);
+
       while (
         date.getDay() === 0 ||
         date.getDay() === 6 ||
-        holidays.find((holiday) => new Date(holiday.date.split(" ")[0]) === date)
+        holidays.some(
+          (holiday) => new Date(holiday.date.split(" ")[0]).getTime() === date.getTime()
+        )
       ) {
         date.setDate(date.getDate() - 1);
       }
