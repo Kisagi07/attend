@@ -9,14 +9,11 @@ import {
 } from "sequelize";
 
 export interface TimelineModel
-  extends Model<
-    InferAttributes<TimelineModel>,
-    InferCreationAttributes<TimelineModel>
-  > {
+  extends Model<InferAttributes<TimelineModel>, InferCreationAttributes<TimelineModel>> {
   id: CreationOptional<number>;
   title: string;
   description: string;
-  type: CreationOptional<"changed" | "removed" | "new" | "updated">;
+  type: CreationOptional<"removed" | "new" | "updated">;
   createdAt: CreationOptional<Date>;
   updatedAt: CreationOptional<Date>;
 }

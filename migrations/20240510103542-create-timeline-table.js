@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM("changed", "removed", "new", "updated"),
+        type: Sequelize.ENUM("removed", "new", "updated"),
         allowNull: false,
       },
       created_at: {
