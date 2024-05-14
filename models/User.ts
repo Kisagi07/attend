@@ -14,14 +14,23 @@ import Log, { LogModel } from "./Log";
 import { JobPositionModel } from "./JobPosition";
 
 export interface UserModel
-  extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
+  extends Model<
+    InferAttributes<UserModel>,
+    InferCreationAttributes<UserModel>
+  > {
   id: CreationOptional<number>;
   name: string;
   work_id: string;
   password: string;
-  role: CreationOptional<"employee" | "admin">;
+  role: CreationOptional<"employee" | "admin" | "intern">;
   home_latitude: CreationOptional<number>;
   home_longitude: CreationOptional<number>;
+  gender: CreationOptional<"male" | "female">;
+
+  // virtual fields
+  totalAbsent?: number;
+  totalWorkFromHome?: number;
+  todayStatus?: string;
 
   job_position_id: CreationOptional<number>;
 
@@ -30,6 +39,7 @@ export interface UserModel
   countLogs: HasManyCountAssociationsMixin;
 
   job_position?: NonAttribute<JobPositionModel>;
+  logs?: NonAttribute<LogModel[]>;
 }
 
 const User = sequelize.define<UserModel>(
@@ -45,7 +55,7 @@ const User = sequelize.define<UserModel>(
     password: {
       type: DataTypes.STRING,
     },
-    role: DataTypes.ENUM("employee", "admin"),
+    role: DataTypes.ENUM("employee", "admin", "intern"),
     job_position_id: {
       type: DataTypes.INTEGER,
       references: {
@@ -55,8 +65,33 @@ const User = sequelize.define<UserModel>(
       onUpdate: "CASCADE",
       onDelete: "SET NULL",
     },
-    home_latitude: DataTypes.DECIMAL(10, 8),
-    home_longitude: DataTypes.DECIMAL(11, 8),
+    home_latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      get() {
+        const rawValue = this.getDataValue(
+          "home_latitude"
+        ) as unknown as string;
+        // retutn as number type
+        return parseFloat(rawValue);
+      },
+    },
+    home_longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      get() {
+        const rawValue = this.getDataValue(
+          "home_longitude"
+        ) as unknown as string;
+        // retutn as number type
+        return parseFloat(rawValue);
+      },
+    },
+    totalAbsent: DataTypes.VIRTUAL(DataTypes.INTEGER),
+    totalWorkFromHome: DataTypes.VIRTUAL(DataTypes.INTEGER),
+    todayStatus: DataTypes.VIRTUAL(DataTypes.STRING),
+    gender: {
+      type: DataTypes.ENUM("male", "female"),
+      defaultValue: "male",
+    },
   },
   {
     underscored: true,

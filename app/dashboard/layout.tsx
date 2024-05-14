@@ -12,13 +12,13 @@ const Layout: React.FC<Layout> = ({ children }) => {
   return (
     <>
       <nav
-        className={`p-2  border-b h-14  border-slate-200 bg-white text-slate-600 shadow flex items-center`}
+        className={`p-4  border-b h-14 sticky top-0 left-0 z-[100]  border-slate-200 bg-white text-slate-600 shadow flex items-center`}
       >
         <h1 className="text-xl font-sixtyfour uppercase italic font-bold">Attendance</h1>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
-          className="ml-auto hover:bg-slate-100 p-2 lg:hidden"
+          className="ml-auto hover:bg-slate-100 p-4 lg:hidden"
           title="open sidebar"
         >
           <FaBars className="text-xl " />
@@ -33,10 +33,12 @@ const Layout: React.FC<Layout> = ({ children }) => {
         {/* <Sidebar.LinkItem href="/dashboard/salary" name="Salary" /> */}
         <Sidebar.LinkItem href="/dashboard/settings" name="Settings" />
         <Sidebar.Divider />
-        <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />
+        <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-4   text-left" />
       </Sidebar>
 
-      <main className="lg:ml-[280px] p-2">{children}</main>
+      <main className="lg:ml-[280px] p-4 space-y-4 bg-white min-h-[calc(100vh-3.5rem)]">
+        {children}
+      </main>
     </>
   );
 };

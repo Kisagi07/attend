@@ -70,7 +70,7 @@ const AttendTolerance = () => {
         type="button"
         onClick={saveTolerance}
         disabled={submitting}
-        className="p-2 px-8 disabled:bg-emerald-300 mt-4 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
+        className="p-4 px-8 disabled:bg-emerald-300 mt-4 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
       >
         {submitting ? "Saving" : "Save"}
       </button>

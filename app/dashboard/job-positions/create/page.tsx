@@ -27,7 +27,8 @@ const JobCreatePage = () => {
       },
     });
     if (!res.ok) {
-      toast.error("Something went wrong when creating job position");
+      const error = await res.json();
+      throw error;
     }
 
     const data = await res.json();
@@ -40,18 +41,11 @@ const JobCreatePage = () => {
     if (validated) {
       setSubmitting(true);
 
-      toast.promise(
-        storeJobPosition().then((res) => {
-          setSubmitting(false);
-          if(!res.ok) throw new Error('Something went wrong')
-          return res;
-        }),
-        {
-          pending: "Creating job position...",
-          success: "Job position created!",
-          error: "Something went wrong when creating job position",
-        }
-      );
+      toast.promise(storeJobPosition(), {
+        pending: "Creating job position...",
+        success: "Job position created!",
+        error: "Something went wrong when creating job position",
+      });
     }
   };
   const validateForm = (): boolean => {
@@ -102,14 +96,14 @@ const JobCreatePage = () => {
               value={shiftStart}
               onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
             />
             <span className="text-center">-</span>
             <input
               value={shiftEnd}
               onChange={({ currentTarget }) => setShiftEnd(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
             />
           </div>
         </div>
@@ -122,7 +116,7 @@ const JobCreatePage = () => {
         />
         <button
           type="submit"
-          className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"
+          className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-4"
         >
           Save
         </button>

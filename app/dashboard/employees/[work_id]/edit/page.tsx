@@ -7,6 +7,7 @@ import { UserModel } from "@/models/User";
 import { useRouter } from "next/navigation";
 import { JobPositionModel } from "@/models/JobPosition";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
+import InputCheckbox from "@/app/components/InputCheckbox";
 interface Option {
   label: string;
   value: string | number;
@@ -18,6 +19,15 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
   const [todayShift, setTodayShift] = useState<Option>();
+  const [genderOptions, setGenderOptions] = useState<Option[]>([
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+  ]);
+  const [isIntern, setIsIntern] = useState<boolean>(false);
+  const [gender, setGender] = useState<Option>({
+    label: "Male",
+    value: "male",
+  });
   const [name, setName] = useState<string>("");
   const [workId, setWorkId] = useState<string>("Loading...");
   const [user, setUser] = useState<UserModel>();
@@ -44,6 +54,12 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
       failed.job_position = true;
     }
 
+    if (gender) {
+      success.gender = true;
+    } else {
+      failed.gender = true;
+    }
+
     let validated = false;
     if (Object.keys(failed).length === 0) {
       validated = true;
@@ -63,6 +79,8 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           name,
           work_id: workId,
           job_position_id: jobPosition!.value,
+          gender: gender.value,
+          role: isIntern ? "intern" : "employee",
         }),
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +124,6 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           value: position.id,
         }));
         setJobOptions(options);
-
         setUser(data[1]);
         setWorkId(data[1].work_id);
         setName(data[1].name);
@@ -114,6 +131,9 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
+        data[1].gender === "male"
+          ? setGender({ label: "Male", value: "male" })
+          : setGender({ label: "Female", value: "female" });
       })
       .catch((error) => {
         console.error(error.message);
@@ -122,7 +142,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   }, [params.work_id]);
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-4">
       <h1 className="text-lg uppercase font-semibold">Edit Employee</h1>
       <hr />
       {fetching ? (
@@ -131,7 +151,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="space-y-4 md:grid md:grid-cols-2 md:space-y-0 md:gap-4"
+          className="space-y-4 md:grid md:grid-cols-2 md:items-center md:space-y-0 md:gap-4"
         >
           <div className="md:col-span-2">
             <label htmlFor="name">
@@ -141,13 +161,22 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
                 "!border-red-500": validation["name"],
               })}
             />
           </div>
-
-          <div className="md:col-span-2">
+          <div>
+            <Select
+              value={gender}
+              label="Gender"
+              options={genderOptions}
+              onChange={setGender}
+              error={validation["gender"]}
+              required
+            />
+          </div>
+          <div>
             <label htmlFor="work_id">
               Work ID<span className="text-red-500">*</span> :{" "}
             </label>
@@ -155,7 +184,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               readOnly
               type="text"
               className={clsx(
-                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-2",
+                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-4",
                 {
                   "border-red-500": validation["work_id"],
                 }
@@ -171,10 +200,21 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
             error={validation["job_position"]}
             required
           />
+          <div className="flex items-center gap-4 pt-4">
+            <input
+              type="checkbox"
+              checked={isIntern}
+              onChange={() => setIsIntern(!isIntern)}
+              className="cursor-pointer"
+            />
+            <label htmlFor="" className="block">
+              Intern
+            </label>
+          </div>
           <button
             disabled={submitting}
             className={clsx(
-              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
+              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-4 rounded",
               {
                 "!bg-slate-700": submitting,
               }

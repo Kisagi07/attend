@@ -2,22 +2,23 @@ import { User } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import { AiOutlineConsoleSql } from "react-icons/ai";
+import Timeline from "@/models/Timeline";
 
 export async function POST(req: NextRequest) {
-  const {
-    work_id,
-    password,
-    name,
-    job_position_id,
-    role = "employee",
-  } = await req.json();
-  console.log(password);
+  const { work_id, password, name, job_position_id, role = "employee", gender } = await req.json();
   const user = await User.create({
     work_id,
     password: await bcryptjs.hash(password, 10),
     name,
     job_position_id,
     role,
+    gender,
+  });
+
+  await Timeline.create({
+    title: "New User",
+    description: `User ${user.name} has been registered`,
+    type: "new",
   });
 
   return NextResponse.json(user);

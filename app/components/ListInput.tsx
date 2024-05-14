@@ -47,7 +47,7 @@ const ListInput = (props: Props) => {
           <TbTextPlus />
         </button>
       </div>
-      <ul className="space-y-2 mt-2">
+      <ul className="space-y-4 mt-2">
         {props.items?.map((item) => (
           <li key={item} className="bg-gray-100 flex justify-between items-stretch">
             <div className="flex items-center gap-1 text-green-500">

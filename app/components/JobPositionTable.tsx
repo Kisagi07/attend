@@ -59,13 +59,21 @@ const JobPositionTable = () => {
       header: "Work Day",
       cell: (info) => {
         const days = info.getValue() as unknown as string[];
-        const weekDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const weekDay = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
         return (
-          <div className="flex gap-2 uppercase text-xs flex-wrap">
+          <div className="flex gap-4 uppercase text-xs flex-wrap">
             {weekDay.map((day) => (
               <div
                 key={day}
-                className={clsx("border border-gray-200 p-2 hover-bg-gray-200 cursor-pointer", {
+                className={clsx("border border-gray-200 p-4 hover-bg-gray-200 cursor-pointer", {
                   "bg-gray-200": days.includes(day),
                 })}
               >
@@ -91,11 +99,14 @@ const JobPositionTable = () => {
               setShowConfirmation(true);
               setIdDelete(row.original.id);
             }}
-            className="bg-red-400 hover:bg-red-500 inline-block align-middle rounded p-2"
+            className="bg-red-400 hover:bg-red-500 inline-block align-middle rounded p-4"
           >
             <IoBagRemoveSharp />
           </button>
-          <Link href={`/dashboard/job-positions/${row.original.id}/edit`} className="bg-amber-400 inline-block align-middle rounded p-2 ms-2 hover:bg-amber-500">
+          <Link
+            href={`/dashboard/job-positions/${row.original.id}/edit`}
+            className="bg-amber-400 inline-block align-middle rounded p-4 ms-2 hover:bg-amber-500"
+          >
             <BiSolidMessageSquareEdit />
           </Link>
         </>
@@ -115,7 +126,13 @@ const JobPositionTable = () => {
     <TableSkeleton />
   ) : (
     <>
-      <Confirmation text="Are you sure you want to delete this job position?" title="Delete Job Position" show={showConfirmation} onClose={setShowConfirmation} onConfirm={handleDelete} />
+      <Confirmation
+        text="Are you sure you want to delete this job position?"
+        title="Delete Job Position"
+        show={showConfirmation}
+        onClose={setShowConfirmation}
+        onConfirm={handleDelete}
+      />
       <div>
         <Table columns={columns} data={data} />
       </div>

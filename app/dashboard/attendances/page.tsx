@@ -31,8 +31,8 @@ const Page = () => {
   };
 
   const sortByDateAndTime = (a: LogModel, b: LogModel) => {
-    const dateA = new Date(`${a.date}T${a.time}`).getTime();
-    const dateB = new Date(`${b.date}T${b.time}`).getTime();
+    const dateA = new Date(`${a.date}T${a.clock_in_time}`).getTime();
+    const dateB = new Date(`${b.date}T${b.clock_in_time}`).getTime();
     return dateB - dateA;
   };
 
@@ -98,7 +98,7 @@ const Page = () => {
           </>
         ) : (
           <>
-            <div className="flex items-centern gap-2">
+            <div className="flex items-centern gap-4">
               <Select
                 options={userOptions}
                 value={selectedUser}
@@ -110,7 +110,7 @@ const Page = () => {
                 <FaXmark className="text-red-500" />
               </button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Select
                 options={dateOptions}
                 value={selectedDate}
@@ -125,7 +125,7 @@ const Page = () => {
           </>
         )}
       </section>
-      {logsLoading ? <TableSkeleton /> : <MonthAttendances data={tableData} />}
+      {logsLoading ? <TableSkeleton /> : <MonthAttendances withName data={tableData} />}
     </div>
   );
 };

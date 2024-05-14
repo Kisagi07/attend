@@ -18,7 +18,12 @@ const ClockInOut = () => {
   const [fromHome, setFromHome] = useState<boolean>(false);
   const [todaysWork, setTodaysWork] = useState<string[]>([]);
   //fetched data
-  const { data, error, isLoading } = useSWR<LogModel[]>("/api/user/attendance", fetcher);
+  const {
+    data: todayAttendance,
+    error,
+    isLoading,
+    mutate: mutateAttendance,
+  } = useSWR<LogModel>("/api/user/attendance", fetcher);
   const {
     data: company,
     error: companyError,
@@ -54,115 +59,173 @@ const ClockInOut = () => {
   ];
 
   const handleClockBtn = async (value: string) => {
-    let targetLatitude = 0;
-    let targetLongitude = 0;
-    let type = "";
+    const type = getType(value);
+    const { latitude, longitude } = await getUserLocation();
+    const { targetLatitude, targetLongitude } = getTargetLocation(
+      type === "work-from-home" || fromHome
+    );
+    const distance = Math.floor(
+      calculateDistance(latitude, longitude, targetLatitude, targetLongitude) * 1000
+    );
 
-    switch (value) {
-      case "Clock From Home":
-        targetLatitude = user?.home_latitude || 0;
-        targetLongitude = user?.home_longitude || 0;
-        type = "from-home";
-        break;
-      case "Clock From Office":
-        targetLatitude = company?.latitude || 0;
-        targetLongitude = company?.longitude || 0;
-        type = "from-office";
-        break;
-      case "Sick Day":
-        type = "sick-day";
-        break;
-      case "Clock-Out":
-        type = "clock-out";
-        if (fromHome) {
-          targetLatitude = user?.home_latitude || 0;
-          targetLongitude = user?.home_longitude || 0;
-        } else {
-          targetLatitude = company?.latitude || 0;
-          targetLongitude = company?.longitude || 0;
-        }
-        break;
-      default:
-        break;
-    }
-
-    if (value === "Clock-Out" && !todaysWork) {
+    if (type === "clock-out" && !todaysWork) {
       toast.error("You need to fill today's work in order to clockout");
       return;
     }
 
+    if (type === "sick") {
+      sendSickDay({ type, latitude, longitude });
+    } else {
+      sendWork({
+        type,
+        latitude,
+        longitude,
+        todaysWork,
+      });
+    }
+  };
+
+  const sendSickDay = async ({
+    type,
+    latitude,
+    longitude,
+  }: {
+    type: string;
+    latitude: number;
+    longitude: number;
+  }) => {
     try {
-      if (type === "sick-day") {
-        setSending(true);
-        const response = await fetch(`/api/user/attendance`, {
-          method: "POST",
-          body: JSON.stringify({
-            type,
-            time: getTimeOnly(),
-            date: getDateOnly(),
-            latitude: 0,
-            longitude: 0,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        setSending(false);
-        if (value === "Clock-Out") {
-          setDone(true);
-        } else if (value === "Clock From Home" || value === "Clock From Office") {
-          setClockedIn(true);
-        } else if (value === "Sick Day") {
-          setIsSick(true);
-        }
-      } else {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const distance =
-            Math.floor(
-              calculateDistance(
-                position.coords.latitude,
-                position.coords.longitude,
-                targetLatitude,
-                targetLongitude
-              )
-            ) * 1000;
-          if (distance > 50) {
-            toast.info(
-              `You're too far from location, you need to get closer by ${distance - 50} meters`
-            );
-          } else {
-            setSending(true);
-            const response = await fetch(`/api/user/attendance`, {
-              method: "POST",
-              body: JSON.stringify({
-                type,
-                time: getTimeOnly(),
-                date: getDateOnly(),
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                todaysWork,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            const data = await response.json();
-            setSending(false);
-            if (value === "Clock-Out") {
-              setDone(true);
-            } else if (value === "Clock From Home" || value === "Clock From Office") {
-              setClockedIn(true);
-            } else if (value === "Sick Day") {
-              setIsSick(true);
-            }
-          }
-        });
-      }
+      setSending(true);
+      const response = await fetch(`/api/user/attendance`, {
+        method: "POST",
+        body: JSON.stringify({
+          type,
+          clock_in_time: getTimeOnly(),
+          date: getDateOnly(),
+          clock_in_latitude: latitude,
+          clock_in_longitude: longitude,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      mutateAttendance();
+      setSending(false);
     } catch (error) {
       console.error(error);
       setSending(false);
     }
+  };
+
+  const sendWork = async ({
+    type,
+    latitude,
+    longitude,
+    todaysWork,
+  }: {
+    type: string;
+    latitude: number;
+    longitude: number;
+    todaysWork: string[];
+  }) => {
+    let sendData = {};
+    if (type === "clock-out") {
+      sendData = {
+        type,
+        clock_out_time: getTimeOnly(),
+        date: getDateOnly(),
+        clock_out_latitude: latitude,
+        clock_out_longitude: longitude,
+        todaysWork,
+      };
+    } else {
+      sendData = {
+        type,
+        clock_in_time: getTimeOnly(),
+        date: getDateOnly(),
+        clock_in_latitude: latitude,
+        clock_in_longitude: longitude,
+        todaysWork,
+      };
+    }
+    try {
+      setSending(true);
+      const res = await fetch(`/api/user/attendance`, {
+        method: "POST",
+        body: JSON.stringify(sendData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      console.log(data);
+      mutateAttendance();
+      setSending(false);
+    } catch (error) {
+      setSending(false);
+      console.error(error);
+    }
+  };
+
+  const getType = (value: string) => {
+    switch (value) {
+      case "Sick Day":
+        return "sick";
+        break;
+      case "Clock From Home":
+        return "work-from-home";
+        break;
+      case "Clock From Office":
+        return "work-from-office";
+        break;
+      case "Clock-Out":
+        return "clock-out";
+        break;
+      default:
+        return "work-from-office";
+    }
+  };
+
+  const getUserLocation = () => {
+    return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          resolve({ latitude, longitude });
+        },
+        (error) => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    });
+  };
+
+  const getTargetLocation = (
+    fromHome: boolean
+  ): {
+    targetLatitude: number;
+    targetLongitude: number;
+  } => {
+    let targetLatitude = 0;
+    let targetLongitude = 0;
+    if (fromHome) {
+      targetLatitude = user?.home_latitude || 0;
+      targetLongitude = user?.home_longitude || 0;
+    } else {
+      targetLatitude = company?.latitude || 0;
+      targetLongitude = company?.longitude || 0;
+    }
+    return {
+      targetLatitude,
+      targetLongitude,
+    };
   };
 
   const handleAddItem = (value: string) => {
@@ -174,33 +237,24 @@ const ClockInOut = () => {
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      const fromHome = data?.find((log) => log.type === "from-home");
-      const fromOffice = data?.find((log) => log.type === "from-office");
-      const clockOut = data?.find((log) => log.type === "clock-out");
-      const sick = data?.find((log) => log.type === "sick-day");
-
-      setIsSick(false);
-      setDone(false);
-      setClockedIn(false);
-      setFromHome(false);
-      if (sick) {
+    if (!isLoading && todayAttendance) {
+      const type = todayAttendance?.type;
+      if (type === "sick") {
         setIsSick(true);
-      } else if ((fromHome || fromOffice) && clockOut) {
-        setDone(true);
-      } else if (fromHome) {
+      } else {
         setClockedIn(true);
-        setFromHome(true);
-      } else if (fromOffice) {
-        setClockedIn(true);
+        if (type === "work-from-home") {
+          setFromHome(true);
+        }
+        if (todayAttendance.clock_out_time) {
+          setDone(true);
+        }
       }
     }
-  }, [data, isLoading]);
+  }, [todayAttendance, isLoading]);
 
   return isSick ? (
-    <button className="w-full bg-sky-400 hover:bg-sky-500 text-white disabled:bg-sky-300 rounded p-2">
-      Rest Well!
-    </button>
+    <button className="w-full bg-sky-400  text-white cursor-default rounded p-4">Rest Well!</button>
   ) : (
     <>
       {clockedIn && !done && (

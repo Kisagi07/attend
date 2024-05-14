@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { User, Log } from "@/models";
+import { User, Log, Timeline } from "@/models";
 import { auth } from "../../auth/[...nextauth]/auth";
 
 export async function POST(req: NextRequest) {
-  const { type, time, date, latitude, longitude, todaysWork } = await req.json();
+  const {
+    type,
+    clock_in_time,
+    date,
+    clock_in_latitude,
+    clock_in_longitude,
+    todaysWork,
+    clock_out_time,
+    clock_out_latitude,
+    clock_out_longitude,
+  } = await req.json();
+
   const session = await auth();
 
-  if (!session)
+  if (!session) {
     return NextResponse.json(
       {
         error: "Unauthorized",
@@ -15,6 +26,7 @@ export async function POST(req: NextRequest) {
         status: 401,
       }
     );
+  }
 
   const user = await User.findOne({
     where: {
@@ -22,7 +34,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  if (!user)
+  if (!user) {
     return NextResponse.json(
       {
         error: "User not found",
@@ -31,15 +43,74 @@ export async function POST(req: NextRequest) {
         status: 404,
       }
     );
+  }
 
-  const log = await user!.createLog({
-    type,
-    time,
-    date,
-    latitude,
-    longitude,
-    work: todaysWork,
-  });
+  let log;
+
+  if (type === "sick") {
+    log = await user.createLog({
+      type,
+      clock_in_time,
+      date,
+      clock_in_latitude,
+      clock_in_longitude,
+      work: todaysWork,
+    });
+    await Timeline.create({
+      title: `${user.name} is Sick`,
+      description: `${user.name} is sick today`,
+      type: "new",
+    });
+  } else if (type === "clock-out") {
+    const existingLog = await Log.findOne({
+      where: {
+        user_id: user.id,
+        date,
+      },
+    });
+
+    if (!existingLog) {
+      return NextResponse.json("Not Found", { status: 404 });
+    }
+
+    await existingLog.update({
+      clock_out_time,
+      clock_out_latitude,
+      clock_out_longitude,
+      work: todaysWork,
+    });
+
+    await Timeline.create({
+      title: `${user.name} Has Clock Out`,
+      description: `${user.name} has clocked out at ${clock_out_time}`,
+      type: "updated",
+    });
+
+    await Timeline.create({
+      title: `${user.name} is Working on :`,
+      description: `${JSON.stringify(todaysWork)}`,
+      type: "updated",
+    });
+
+    log = existingLog;
+  } else {
+    log = await user.createLog({
+      type,
+      clock_in_time,
+      date,
+      clock_in_latitude,
+      clock_in_longitude,
+      work: todaysWork,
+    });
+
+    await Timeline.create({
+      title: `${user.name} Attendance: ${
+        log.type === "work-from-home" ? "Work From Home" : "Work From Office"
+      }`,
+      description: `${user.name} has clocked in at ${clock_in_time}`,
+      type: "new",
+    });
+  }
 
   return NextResponse.json(log);
 }
@@ -92,5 +163,9 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  return NextResponse.json(logs);
+  if (logs.length > 0) {
+    return NextResponse.json(logs[0]);
+  } else {
+    return NextResponse.json(null);
+  }
 }

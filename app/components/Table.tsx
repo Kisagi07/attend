@@ -31,7 +31,7 @@ const Table: FC<TableProps> = ({ data, columns }) => {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} className="bg-slate-50">
               {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ width: header.getSize() }} className="p-2 text-left">
+                <th key={header.id} style={{ width: header.getSize() }} className="p-4 text-left">
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
@@ -44,7 +44,7 @@ const Table: FC<TableProps> = ({ data, columns }) => {
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-2">
+                <td key={cell.id} className="p-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -57,18 +57,18 @@ const Table: FC<TableProps> = ({ data, columns }) => {
           type="button"
           disabled={!table.getCanPreviousPage()}
           onClick={() => table.previousPage()}
-          className="p-2 disabled:text-gray-400 hover:bg-gray-100"
+          className="p-4 disabled:text-gray-400 hover:bg-gray-100"
         >
           <FaCaretLeft />
         </button>
-        <span className="p-2">
+        <span className="p-4">
           {table.getState().pagination.pageIndex + 1} of {table.getPageCount().toLocaleString()}
         </span>
         <button
           type="button"
           disabled={!table.getCanNextPage()}
           onClick={() => table.nextPage()}
-          className="p-2  hover:bg-gray-100 disabled:text-gray-400"
+          className="p-4  hover:bg-gray-100 disabled:text-gray-400"
         >
           <FaCaretRight />
         </button>

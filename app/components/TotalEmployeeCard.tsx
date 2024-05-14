@@ -13,7 +13,7 @@ const TotalEmployeeCard = () => {
   ) : (
     <article className="border border-gray-200 rounded p-4 flex justify-between items-center">
       <h3 className="font-semibold text-lg">Employees : {data?.length}</h3>
-      <FaPeopleGroup className="w-12 h-12 bg-sky-400 text-white p-2 rounded-full" />
+      <FaPeopleGroup className="w-12 h-12 bg-sky-400 text-white p-4 rounded-full" />
     </article>
   );
 };

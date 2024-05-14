@@ -16,6 +16,15 @@ const CreateEmployee = () => {
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
+  const [isIntern, setIsIntern] = useState<boolean>(false);
+  const [genderOptions, setGenderOptions] = useState<Option[]>([
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+  ]);
+  const [gender, setGender] = useState<Option>({
+    label: "Male",
+    value: "male",
+  });
   const [todayShift, setTodayShift] = useState<Option>();
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -57,6 +66,12 @@ const CreateEmployee = () => {
       failed.job_position = true;
     }
 
+    if (gender) {
+      success.gender = true;
+    } else {
+      failed.gender = true;
+    }
+
     let validated = false;
     if (Object.keys(failed).length === 0) {
       validated = true;
@@ -84,6 +99,8 @@ const CreateEmployee = () => {
         password,
         work_id: workId,
         job_position_id: jobPosition!.value,
+        gender: gender.value,
+        role: isIntern ? "intern" : "employee",
       }),
       headers: {
         "Content-Type": "application/json",
@@ -116,9 +133,7 @@ const CreateEmployee = () => {
   useEffect(() => {
     Promise.all([
       fetch(`/api/register`).then((res) => res.json() as Promise<string>),
-      fetch(`/api/job-positions`).then(
-        (res) => res.json() as Promise<JobPositionModel[]>
-      ),
+      fetch(`/api/job-positions`).then((res) => res.json() as Promise<JobPositionModel[]>),
     ])
       .then((data) => {
         setWorkId(data[0]);
@@ -132,7 +147,7 @@ const CreateEmployee = () => {
   }, []);
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-4">
       <h1 className="text-lg uppercase font-semibold">Add Employee</h1>
       <hr />
       {fetching ? (
@@ -150,12 +165,9 @@ const CreateEmployee = () => {
             <input
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["name"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+                "!border-red-500": validation["name"],
+              })}
             />
           </div>
 
@@ -165,16 +177,11 @@ const CreateEmployee = () => {
             </label>
             <div className="relative">
               <input
-                onChange={({ currentTarget }) =>
-                  setPassword(currentTarget.value)
-                }
+                onChange={({ currentTarget }) => setPassword(currentTarget.value)}
                 type={showPassword ? "text" : "password"}
-                className={clsx(
-                  "w-full rounded outline-none border border-slate-200 p-2",
-                  {
-                    "!border-red-500": validation["password"],
-                  }
-                )}
+                className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+                  "!border-red-500": validation["password"],
+                })}
               />
               <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
                 {showPassword ? (
@@ -185,19 +192,26 @@ const CreateEmployee = () => {
               </span>
             </div>
           </div>
-          <div className="md:col-span-2">
+          <div>
+            <Select
+              value={gender}
+              label="Gender"
+              options={genderOptions}
+              onChange={setGender}
+              error={validation["gender"]}
+              required
+            />
+          </div>
+          <div>
             <label htmlFor="name">
               Work ID<span className="text-red-500">*</span> :{" "}
             </label>
             <input
               readOnly
               type="text"
-              className={clsx(
-                "w-full rounded outline-none border border-slate-200 p-2",
-                {
-                  "!border-red-500": validation["work_id"],
-                }
-              )}
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+                "!border-red-500": validation["work_id"],
+              })}
               value={workId}
             />
           </div>
@@ -209,10 +223,21 @@ const CreateEmployee = () => {
             error={validation["job_position"]}
             required
           />
+          <div className="flex items-center gap-4 pt-4">
+            <input
+              type="checkbox"
+              checked={isIntern}
+              onChange={() => setIsIntern(!isIntern)}
+              className="cursor-pointer"
+            />
+            <label htmlFor="" className="block">
+              Intern
+            </label>
+          </div>
           <button
             disabled={submitting}
             className={clsx(
-              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
+              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-4 rounded",
               {
                 "!bg-slate-700": submitting,
               }

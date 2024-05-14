@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { JobPosition } from "@/models";
+import Timeline from "@/models/Timeline";
 
 export async function POST(req: NextRequest) {
   const {
@@ -24,6 +25,12 @@ export async function POST(req: NextRequest) {
     shift_end,
     work_day,
     salary,
+  });
+
+  await Timeline.create({
+    title: "New Job Position",
+    description: `Job Position ${jobPosition.name} has been created`,
+    type: "new",
   });
 
   return NextResponse.json(jobPosition);
