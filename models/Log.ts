@@ -30,7 +30,7 @@ export interface LogModel
 
   getUser: BelongsToGetAssociationMixin<UserModel>;
 
-  user: NonAttribute<UserModel>;
+  user?: NonAttribute<UserModel>;
 }
 
 const Log = sequelize.define<LogModel>(

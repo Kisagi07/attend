@@ -128,14 +128,14 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
                 value={shiftStart}
                 onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
                 type="time"
-                className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+                className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
               />
               <span className="text-center">-</span>
               <input
                 value={shiftEnd}
                 onChange={({ currentTarget }) => setShiftEnd(currentTarget.value)}
                 type="time"
-                className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+                className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
           />
           <button
             type="submit"
-            className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"
+            className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-4"
           >
             Save
           </button>

@@ -80,14 +80,14 @@ const Select: FC<SelectProps> = ({
           )}
         >
           {options.length === 0 ? (
-            <h5 className="italic p-2 text-slate-400">No Option</h5>
+            <h5 className="italic p-4 text-slate-400">No Option</h5>
           ) : (
             <ul>
               {options.map((option) => (
                 <li
                   onClick={() => handleOptionClicked(option)}
                   key={option.value}
-                  className="hover:bg-slate-200 p-2 cursor-pointer"
+                  className="hover:bg-slate-200 p-4 cursor-pointer"
                 >
                   {option.label}
                 </li>

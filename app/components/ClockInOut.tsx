@@ -8,8 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import useSWR, { Fetcher } from "swr";
 
-const fetcher: Fetcher<any, string> = (...args) =>
-  fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 const ClockInOut = () => {
   // hook variable
   const [sending, setSending] = useState<boolean>(false);
@@ -35,13 +34,11 @@ const ClockInOut = () => {
   const options = [
     {
       label: "Clock From Home",
-      className:
-        "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
+      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
     },
     {
       label: "Clock From Office",
-      className:
-        "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
+      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
     },
     {
       label: "Sick Day",
@@ -57,8 +54,7 @@ const ClockInOut = () => {
   const options3 = [
     {
       label: "Good Job",
-      className:
-        "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
+      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
     },
   ];
 
@@ -69,8 +65,7 @@ const ClockInOut = () => {
       type === "work-from-home" || fromHome
     );
     const distance = Math.floor(
-      calculateDistance(latitude, longitude, targetLatitude, targetLongitude) *
-        1000
+      calculateDistance(latitude, longitude, targetLatitude, targetLongitude) * 1000
     );
 
     if (type === "clock-out" && !todaysWork) {
@@ -193,25 +188,23 @@ const ClockInOut = () => {
   };
 
   const getUserLocation = () => {
-    return new Promise<{ latitude: number; longitude: number }>(
-      (resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            reject(error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          }
-        );
-      }
-    );
+    return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          resolve({ latitude, longitude });
+        },
+        (error) => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    });
   };
 
   const getTargetLocation = (
@@ -261,17 +254,11 @@ const ClockInOut = () => {
   }, [todayAttendance, isLoading]);
 
   return isSick ? (
-    <button className="w-full bg-sky-400  text-white cursor-default rounded p-2">
-      Rest Well!
-    </button>
+    <button className="w-full bg-sky-400  text-white cursor-default rounded p-4">Rest Well!</button>
   ) : (
     <>
       {clockedIn && !done && (
-        <ListInput
-          items={todaysWork}
-          addItem={handleAddItem}
-          removeItem={handleRemoveItem}
-        />
+        <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
       <ButtonDropdown
         onClick={(value) => handleClockBtn(value)}

@@ -142,7 +142,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   }, [params.work_id]);
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-4">
       <h1 className="text-lg uppercase font-semibold">Edit Employee</h1>
       <hr />
       {fetching ? (
@@ -161,7 +161,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
                 "!border-red-500": validation["name"],
               })}
             />
@@ -184,7 +184,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               readOnly
               type="text"
               className={clsx(
-                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-2",
+                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-4",
                 {
                   "border-red-500": validation["work_id"],
                 }
@@ -200,7 +200,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
             error={validation["job_position"]}
             required
           />
-          <div className="flex items-center gap-2 pt-4">
+          <div className="flex items-center gap-4 pt-4">
             <input
               type="checkbox"
               checked={isIntern}
@@ -214,7 +214,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           <button
             disabled={submitting}
             className={clsx(
-              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
+              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-4 rounded",
               {
                 "!bg-slate-700": submitting,
               }

@@ -50,16 +50,16 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
     <aside
       ref={sidebarRef}
       className={clsx(
-        "fixed z-40 top-0 left-0 lg:max-w-[280px] lg:p-2 lg:min-h-[calc(100vh-56px)] lg:bottom-0 lg:top-auto  transition-all text-slate-600 overflow-x-hidden max-w-0 min-h-screen  border border-slate-100 shadow w-full bg-white",
+        "fixed z-40 top-0 left-0 lg:max-w-[280px] lg:p-4 lg:min-h-[calc(100vh-56px)] lg:bottom-0 lg:top-auto  transition-all text-slate-600 overflow-x-hidden max-w-0 min-h-screen  border border-slate-100 shadow w-full bg-white",
         {
-          "max-w-xs p-2": sidebarOpen,
+          "max-w-xs p-4": sidebarOpen,
         }
       )}
     >
       <button
         onClick={() => setSidebarOpen(false)}
         type="button"
-        className="ml-auto block hover:bg-slate-100 p-2 md:hidden"
+        className="ml-auto block hover:bg-slate-100 p-4 md:hidden"
         title="close sidebar"
       >
         <LuArrowLeftFromLine className="text-xl" />
@@ -68,43 +68,6 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
         <SidebarContext.Provider value={{ setSidebarOpen, pathname }}>
           {children}
         </SidebarContext.Provider>
-        {/* <li>
-          <Link
-            onClick={() => setSidebarOpen(false)}
-            href="/dashboard"
-            className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-              "bg-slate-100": pathname === "/dashboard",
-            })}
-          >
-            Dashboard
-          </Link>
-        </li>
-        <li>
-          <Link
-            onClick={() => setSidebarOpen(false)}
-            href="/dashboard/employees"
-            className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-              "bg-slate-100": pathname.startsWith("/dashboard/employees"),
-            })}
-          >
-            Employee
-          </Link>
-        </li>
-        <li>
-          <Link
-            onClick={() => setSidebarOpen(false)}
-            href="/dashboard/settings"
-            className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-              "bg-slate-100": pathname === "/dashboard/settings",
-            })}
-          >
-            Settings
-          </Link>
-        </li>
-        <hr className="!mt-8" />
-        <li>
-          <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-2   text-left" />
-        </li> */}
       </ul>
     </aside>
   );
@@ -118,9 +81,7 @@ const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
         onClick={() => setSidebarOpen(false)}
         href={href}
         className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
-          "bg-slate-100": subMatch
-            ? pathname?.startsWith(href)
-            : pathname === href,
+          "bg-slate-100": subMatch ? pathname?.startsWith(href) : pathname === href,
         })}
       >
         {name}

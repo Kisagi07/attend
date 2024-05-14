@@ -9,7 +9,7 @@ const JobPositionPage = () => {
       <div className="flex justify-end">
         <Link
           href="/dashboard/job-positions/create"
-          className="bg-slate-950 text-white p-2 rounded flex gap-x-2 items-center hover:bg-slate-900"
+          className="bg-slate-950 text-white p-4 rounded flex gap-x-2 items-center hover:bg-slate-900"
         >
           <FaUserPlus /> Job Position
         </Link>

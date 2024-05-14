@@ -89,25 +89,21 @@ const JobCreatePage = () => {
         />
         <div>
           <h6>Shift :</h6>
-          <small className="text-red-400 block">
-            {formErrors["shiftStart"]}
-          </small>
+          <small className="text-red-400 block">{formErrors["shiftStart"]}</small>
           <small className="text-red-400 block">{formErrors["shiftEnd"]}</small>
           <div className="grid grid-cols-3 items-center">
             <input
               value={shiftStart}
-              onChange={({ currentTarget }) =>
-                setShiftStart(currentTarget.value)
-              }
+              onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
             />
             <span className="text-center">-</span>
             <input
               value={shiftEnd}
               onChange={({ currentTarget }) => setShiftEnd(currentTarget.value)}
               type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              className="outline-none border-2 border-gray-200 p-4 focus:border-sky-500"
             />
           </div>
         </div>
@@ -120,7 +116,7 @@ const JobCreatePage = () => {
         />
         <button
           type="submit"
-          className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-2"
+          className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-4"
         >
           Save
         </button>

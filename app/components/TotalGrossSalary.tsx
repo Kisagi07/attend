@@ -22,7 +22,7 @@ const TotalGrossSalary = ({ days }: CProps) => {
   //         )}
   //       </span>
   //     </h3>
-  //     <FaMoneyCheckAlt className="w-12 h-12 bg-amber-400 text-white p-2 rounded-full" />
+  //     <FaMoneyCheckAlt className="w-12 h-12 bg-amber-400 text-white p-4 rounded-full" />
   //   </article>
   // );
 };

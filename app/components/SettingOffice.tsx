@@ -95,7 +95,7 @@ const SettingOffice = () => {
           <button
             disabled={submitting}
             onClick={() => setShowConfirm(true)}
-            className="p-2 w-28 disabled:bg-emerald-300 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
+            className="p-4 w-28 disabled:bg-emerald-300 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
           >
             {submitting ? "Saving" : "Save"}
           </button>
@@ -103,7 +103,7 @@ const SettingOffice = () => {
             onClick={handleUseCurrentLocation}
             type="button"
             title="Use Current Location"
-            className="p-2 bg-slate-400 hover:bg-slate-500 w-max ms-2 rounded"
+            className="p-4 bg-slate-400 hover:bg-slate-500 w-max ms-2 rounded"
           >
             <FaLocationDot className="text-white text-lg" />
           </button>

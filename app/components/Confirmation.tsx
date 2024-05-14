@@ -7,13 +7,7 @@ interface CProps {
   onClose?: (show: boolean) => void;
   onConfirm?: () => void;
 }
-const Confirmation: FC<CProps> = ({
-  show,
-  text,
-  title,
-  onClose,
-  onConfirm,
-}) => {
+const Confirmation: FC<CProps> = ({ show, text, title, onClose, onConfirm }) => {
   return (
     <div
       className={clsx(
@@ -31,7 +25,7 @@ const Confirmation: FC<CProps> = ({
         <div className="flex justify-end">
           <button
             onClick={() => onClose && onClose(false)}
-            className="bg-slate-100 p-2 hover:bg-slate-200"
+            className="bg-slate-100 p-4 hover:bg-slate-200"
           >
             Cancel
           </button>
@@ -40,7 +34,7 @@ const Confirmation: FC<CProps> = ({
               onClose && onClose(false);
               onConfirm && onConfirm();
             }}
-            className="bg-emerald-400 p-2 ms-4 hover:bg-emerald-500 text-white"
+            className="bg-emerald-400 p-4 ms-4 hover:bg-emerald-500 text-white"
           >
             Confirm
           </button>

@@ -147,7 +147,7 @@ const CreateEmployee = () => {
   }, []);
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-4">
       <h1 className="text-lg uppercase font-semibold">Add Employee</h1>
       <hr />
       {fetching ? (
@@ -165,7 +165,7 @@ const CreateEmployee = () => {
             <input
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
                 "!border-red-500": validation["name"],
               })}
             />
@@ -179,7 +179,7 @@ const CreateEmployee = () => {
               <input
                 onChange={({ currentTarget }) => setPassword(currentTarget.value)}
                 type={showPassword ? "text" : "password"}
-                className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
                   "!border-red-500": validation["password"],
                 })}
               />
@@ -209,7 +209,7 @@ const CreateEmployee = () => {
             <input
               readOnly
               type="text"
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+              className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
                 "!border-red-500": validation["work_id"],
               })}
               value={workId}
@@ -223,7 +223,7 @@ const CreateEmployee = () => {
             error={validation["job_position"]}
             required
           />
-          <div className="flex items-center gap-2 pt-4">
+          <div className="flex items-center gap-4 pt-4">
             <input
               type="checkbox"
               checked={isIntern}
@@ -237,7 +237,7 @@ const CreateEmployee = () => {
           <button
             disabled={submitting}
             className={clsx(
-              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-2 rounded",
+              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-4 rounded",
               {
                 "!bg-slate-700": submitting,
               }
