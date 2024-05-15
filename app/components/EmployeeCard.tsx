@@ -14,9 +14,9 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
         <h4 className="text-gray-600 font-bold">{user.name}</h4>
         <h4
           className={clsx(" font-semibold text-sm px-1 rounded-md capitalize", {
-            "bg-green-100 text-green-500": user.todayStatus === "clock-from-office",
+            "bg-violet-100 text-violet-500": user.todayStatus === "work-from-office",
             "bg-red-100 text-red-500": user.todayStatus === "absent",
-            "bg-amber-100 text-amber-500": user.todayStatus === "work-from-home",
+            "bg-green-100 text-green-500": user.todayStatus === "work-from-home",
             "bg-blue-100 text-blue-500": user.todayStatus === "sick",
           })}
         >
@@ -25,6 +25,9 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
         <div className="text-sm">
           <h6 className="text-red-500">{user.totalAbsent || 0} hari tidak hadir</h6>
           <h6 className="text-amber-500">{user.totalWorkFromHome || 0} hari kerja dari rumah</h6>
+          <h6 className="text-violet-500">
+            {user.totalWorkFromOffice || 0} hari kerja dari kantor
+          </h6>
         </div>
         <Link
           href={`/dashboard/employees/${user.work_id}/attendances`}

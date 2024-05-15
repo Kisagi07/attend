@@ -72,7 +72,7 @@ const CompanyHoliday: React.FC = () => {
           company vacation for example: Day off, Company Holiday etc.
         </span>
       </Alert>
-      <div className="space-y-2 lg:grid lg:gap-2 lg:space-y-0 lg:grid-cols-2 lg:items-center">
+      <div className="space-y-2 md:grid md:gap-2 md:space-y-0 md:grid-cols-2 md:items-center">
         <Datepicker
           language="in-ID"
           weekStart={1}
@@ -95,7 +95,7 @@ const CompanyHoliday: React.FC = () => {
       ) : (
         <ul className="divide-y divide-y-slate-400">
           {data?.map((holiday) => (
-            <li className="bg-slate-100 flex items-stretch justify-between">
+            <li key={holiday.id} className="bg-slate-100 flex items-stretch justify-between">
               <div className="py-1 px-2">
                 <small className="block">{holiday.date.toString().split("T")[0]}</small>
                 <p>{holiday.name}</p>

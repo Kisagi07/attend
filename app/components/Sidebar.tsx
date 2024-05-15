@@ -61,7 +61,7 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
       <button
         onClick={() => setSidebarOpen(false)}
         type="button"
-        className="ml-auto block hover:bg-slate-100 p-4 md:hidden"
+        className="ml-auto block hover:bg-slate-100 p-4 lg:hidden"
         title="close sidebar"
       >
         <LuArrowLeftFromLine className="text-xl" />
