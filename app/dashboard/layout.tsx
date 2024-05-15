@@ -3,6 +3,10 @@ import React, { useState } from "react";
 import { FaBars } from "react-icons/fa6";
 import Sidebar from "@/app/components/Sidebar";
 import Logout from "@/app/components/Logout";
+import { GiPartyPopper } from "react-icons/gi";
+import { MdSpaceDashboard } from "react-icons/md";
+import { FaUsers, FaBriefcase, FaClock } from "react-icons/fa";
+import { IoSettingsSharp } from "react-icons/io5";
 
 interface Layout {
   children: React.ReactNode;
@@ -26,12 +30,41 @@ const Layout: React.FC<Layout> = ({ children }) => {
       </nav>
 
       <Sidebar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}>
-        <Sidebar.LinkItem href="/dashboard" name="Dashboard" />
-        <Sidebar.LinkItem href="/dashboard/employees" subMatch name="Employee" />
-        <Sidebar.LinkItem href="/dashboard/job-positions" subMatch name="Job Position" />
-        <Sidebar.LinkItem href="/dashboard/attendances" subMatch name="Attendances" />
+        <Sidebar.LinkItem
+          href="/dashboard"
+          name="Dashboard"
+          icon={<MdSpaceDashboard className="w-5 h-5" />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/employees"
+          subMatch
+          name="Employee"
+          icon={<FaUsers className="w-5 h-5" />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/job-positions"
+          subMatch
+          name="Job Position"
+          icon={<FaBriefcase className="w-5 h-5" />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/attendances"
+          subMatch
+          name="Attendances"
+          icon={<FaClock className="w-5 h-5" />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/holidays"
+          subMatch
+          name="Holidays"
+          icon={<GiPartyPopper className="w-5 h-5" />}
+        />
         {/* <Sidebar.LinkItem href="/dashboard/salary" name="Salary" /> */}
-        <Sidebar.LinkItem href="/dashboard/settings" name="Settings" />
+        <Sidebar.LinkItem
+          href="/dashboard/settings"
+          name="Settings"
+          icon={<IoSettingsSharp className="w-5 h-5" />}
+        />
         <Sidebar.Divider />
         <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-4   text-left" />
       </Sidebar>
