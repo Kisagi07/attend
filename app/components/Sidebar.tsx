@@ -1,10 +1,11 @@
 "use client";
-import { FC, useCallback, useEffect, useRef } from "react";
+import { FC, ReactElement, useCallback, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { LuArrowLeftFromLine } from "react-icons/lu";
 import Link from "next/link";
 import { createContext, useContext } from "react";
+import { FaSquare } from "react-icons/fa6";
 
 const SidebarContext = createContext<ContextProps>({
   setSidebarOpen: () => {},
@@ -18,6 +19,7 @@ interface LinkItemProps {
   href: string;
   name: string;
   subMatch?: boolean;
+  icon?: ReactElement;
 }
 interface CProps {
   sidebarOpen: boolean;
@@ -59,7 +61,7 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
       <button
         onClick={() => setSidebarOpen(false)}
         type="button"
-        className="ml-auto block hover:bg-slate-100 p-4 md:hidden"
+        className="ml-auto block hover:bg-slate-100 p-4 lg:hidden"
         title="close sidebar"
       >
         <LuArrowLeftFromLine className="text-xl" />
@@ -72,7 +74,7 @@ const Sidebar: FC<CProps> & { LinkItem: FC<LinkItemProps>; Divider: FC } = ({
     </aside>
   );
 };
-const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
+const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch, icon }) => {
   const { setSidebarOpen, pathname } = useContext(SidebarContext);
 
   return (
@@ -80,11 +82,11 @@ const LinkItem: FC<LinkItemProps> = ({ href, name, subMatch }) => {
       <Link
         onClick={() => setSidebarOpen(false)}
         href={href}
-        className={clsx("text-lg p-2 hover:bg-slate-100 w-full block", {
+        className={clsx("text-lg p-2 hover:bg-slate-100 w-full flex items-center gap-2", {
           "bg-slate-100": subMatch ? pathname?.startsWith(href) : pathname === href,
         })}
       >
-        {name}
+        {icon ? icon : <FaSquare />} <span>{name}</span>
       </Link>
     </li>
   );

@@ -15,3 +15,4 @@ export { default as VisitChart } from "./VisitChart";
 export { default as AttendancesEmployeeCard } from "./AttendancesEmployeeCard";
 export { default as Select } from "./Select";
 export { default as EmployeeAttendances } from "./EmployeeAttendances";
+export { default as CompanyHoliday } from "./CompanyHoliday";

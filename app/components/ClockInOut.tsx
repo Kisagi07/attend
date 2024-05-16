@@ -59,29 +59,41 @@ const ClockInOut = () => {
   ];
 
   const handleClockBtn = async (value: string) => {
-    const type = getType(value);
-    const { latitude, longitude } = await getUserLocation();
-    const { targetLatitude, targetLongitude } = getTargetLocation(
-      type === "work-from-home" || fromHome
-    );
-    const distance = Math.floor(
-      calculateDistance(latitude, longitude, targetLatitude, targetLongitude) * 1000
-    );
+    try {
+      setSending(true);
+      const type = getType(value);
+      const { latitude, longitude } = await getUserLocation();
+      const { targetLatitude, targetLongitude } = getTargetLocation(
+        type === "work-from-home" || fromHome
+      );
+      const distance = Math.floor(
+        calculateDistance(latitude, longitude, targetLatitude, targetLongitude) * 1000
+      );
 
-    if (type === "clock-out" && !todaysWork) {
-      toast.error("You need to fill today's work in order to clockout");
-      return;
-    }
+      if (distance > 50) {
+        toast.error("You are not in the right location to clockin");
+        return;
+      }
 
-    if (type === "sick") {
-      sendSickDay({ type, latitude, longitude });
-    } else {
-      sendWork({
-        type,
-        latitude,
-        longitude,
-        todaysWork,
-      });
+      if (type === "clock-out" && !todaysWork) {
+        toast.error("You need to fill today's work in order to clockout");
+        return;
+      }
+
+      if (type === "sick") {
+        await sendSickDay({ type, latitude, longitude });
+      } else {
+        await sendWork({
+          type,
+          latitude,
+          longitude,
+          todaysWork,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -95,7 +107,6 @@ const ClockInOut = () => {
     longitude: number;
   }) => {
     try {
-      setSending(true);
       const response = await fetch(`/api/user/attendance`, {
         method: "POST",
         body: JSON.stringify({
@@ -111,10 +122,8 @@ const ClockInOut = () => {
       });
       const data = await response.json();
       mutateAttendance();
-      setSending(false);
     } catch (error) {
       console.error(error);
-      setSending(false);
     }
   };
 
@@ -150,7 +159,6 @@ const ClockInOut = () => {
       };
     }
     try {
-      setSending(true);
       const res = await fetch(`/api/user/attendance`, {
         method: "POST",
         body: JSON.stringify(sendData),
@@ -159,11 +167,8 @@ const ClockInOut = () => {
         },
       });
       const data = await res.json();
-      console.log(data);
       mutateAttendance();
-      setSending(false);
     } catch (error) {
-      setSending(false);
       console.error(error);
     }
   };

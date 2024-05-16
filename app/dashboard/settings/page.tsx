@@ -9,6 +9,7 @@ const SettingPage = () => {
         <SettingOffice />
         <hr />
         <AttendTolerance />
+        <hr />
       </section>
     </>
   );

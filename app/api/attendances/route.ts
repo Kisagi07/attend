@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
     // return grouped and last 5 days work
     return NextResponse.json({
       data: grouped,
-      dates: lastSevenDays.map((day) => day.toISOString().split("T")[0]),
+      dates: lastSevenDays.reverse().map((day) => day.toISOString().split("T")[0]),
     });
   }
 
