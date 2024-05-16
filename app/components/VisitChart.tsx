@@ -16,8 +16,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 interface ChartDataResponse {
-  dates: string[];
-  data: { [key: string]: LogModel[] };
+  [key: string]: LogModel[];
 }
 
 const options = {
@@ -33,7 +32,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const VisitChart = () => {
   const { data: chartData, isLoading: chartDataLoading } = useSWR<ChartDataResponse>(
-    "/api/attendances?last-seven-days",
+    "/api/attendances/monthly-status",
     fetcher
   );
 
@@ -43,7 +42,7 @@ const VisitChart = () => {
     datasets: [
       {
         label: "Visit",
-        data: labels.map((label) => chartData?.data[label]?.length || 0),
+        data: labels.map((label) => chartData?.[label]?.length || 0),
         backgroundColor: "#818cf8",
       },
     ],
@@ -51,13 +50,13 @@ const VisitChart = () => {
 
   useEffect(() => {
     if (chartData) {
-      setLabels(chartData.dates);
+      setLabels(Object.keys(chartData));
       setData({
-        labels: chartData.dates,
+        labels: Object.keys(chartData),
         datasets: [
           {
             label: "Visit",
-            data: chartData?.dates.map((label) => chartData?.data[label]?.length || 0),
+            data: Object.keys(chartData).map((label) => chartData[label].length),
             backgroundColor: "#818cf8",
           },
         ],
@@ -66,7 +65,7 @@ const VisitChart = () => {
   }, [chartData]);
   return (
     <section className="h-80 md:col-span-2 space-y-2">
-      <h1 className="text-xl uppercase font-semibold">Visit by Day</h1>
+      <h1 className="text-xl uppercase font-semibold">Visit by Month</h1>
       <hr />
       {chartDataLoading ? <VerticalChartSkeleton /> : <Bar options={options} data={data} />}
     </section>
