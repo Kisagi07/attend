@@ -64,12 +64,14 @@ const calculateMonthlyStatus = async (data: UserModel | UserModel[]) => {
     // get total work from office
     const totalWorkFromOffice = logs.filter((log) => log.type === "work-from-office").length;
     // get total absent
-    const totalAbsent =
+    const totalAbsent = Math.max(
       currentTotalDays -
-      currentMonthHolidaysCount -
-      totalWeekend -
-      companyHolidays.length -
-      totalLogs;
+        currentMonthHolidaysCount -
+        totalWeekend -
+        companyHolidays.length -
+        totalLogs,
+      0
+    );
     // set virtual fields
     user.setDataValue("totalAbsent", totalAbsent);
     user.setDataValue("totalWorkFromHome", totalWorkFromHome);

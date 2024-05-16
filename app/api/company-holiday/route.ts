@@ -37,6 +37,7 @@ const POST = async (req: NextRequest) => {
     await Timeline.create({
       title: "Holiday Created",
       description: `Holiday ${name} created on ${date}`,
+      type: "new",
     });
     return NextResponse.json(holiday, { status: 201 });
   } catch (error) {

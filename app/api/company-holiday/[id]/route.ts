@@ -18,6 +18,7 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: number } }) 
   await Timeline.create({
     title: "Holiday Deleted",
     description: `Holiday ${holiday.name} deleted on ${holiday.date}`,
+    type: "removed",
   });
 
   return NextResponse.json("Deleted", { status: 200 });
