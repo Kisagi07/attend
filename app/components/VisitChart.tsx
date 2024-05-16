@@ -65,7 +65,7 @@ const VisitChart = () => {
   }, [chartData]);
   return (
     <section className="h-80 md:col-span-2 space-y-2">
-      <h1 className="text-xl uppercase font-semibold">Visit by Day</h1>
+      <h1 className="text-xl uppercase font-semibold">Visit by Month</h1>
       <hr />
       {chartDataLoading ? <VerticalChartSkeleton /> : <Bar options={options} data={data} />}
     </section>
