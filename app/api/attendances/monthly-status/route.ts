@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Log } from "@/models";
 import { LogModel } from "@/models/Log";
 import { NextRequest, NextResponse } from "next/server";

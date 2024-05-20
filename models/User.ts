@@ -20,8 +20,8 @@ export interface UserModel
   work_id: string;
   password: string;
   role: CreationOptional<"employee" | "admin" | "intern">;
-  home_latitude: CreationOptional<number>;
-  home_longitude: CreationOptional<number>;
+  home_latitude: CreationOptional<number | null>;
+  home_longitude: CreationOptional<number | null>;
   gender: CreationOptional<"male" | "female">;
 
   // virtual fields

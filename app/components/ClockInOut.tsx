@@ -29,7 +29,7 @@ const ClockInOut = () => {
     error: companyError,
     isLoading: companyLoading,
   } = useSWR<CompanyModel>(`/api/company`, fetcher);
-  const { data: user } = useSWR<UserModel>(`/api/user`, fetcher);
+  const { data: user } = useSWR<UserModel>(`/api/user`, fetcher, { refreshInterval: 1000 });
   // non state variable
   const options = [
     {
