@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { JobPosition } from "@/models";
 import Timeline from "@/models/Timeline";
+import prisma from "@/app/prisma";
 
 export async function POST(req: NextRequest) {
   const {
@@ -37,6 +38,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const jobPositions = await JobPosition.findAll();
+  const jobPositions = await prisma.job_positions.findMany();
   return NextResponse.json(jobPositions);
 }

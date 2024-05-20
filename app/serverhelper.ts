@@ -1,5 +1,5 @@
-import { Holiday, Log } from "@/models";
-import { UserModel } from "@/models/User";
+import { Holiday, Log } from "@/";
+import { UserModel } from "@//User";
 import Holidays from "date-holidays";
 import { Op } from "sequelize";
 

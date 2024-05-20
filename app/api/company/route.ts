@@ -2,10 +2,16 @@ import { NextResponse, NextRequest } from "next/server";
 import { Company } from "@/models";
 import { CompanyModel } from "@/models/Company";
 import Timeline from "@/models/Timeline";
+import prisma from "@/app/prisma";
 
 export async function GET(req: NextRequest) {
-  const coordinate = await Company.findOne({
-    attributes: ["latitude", "longitude", "tolerance_active", "tolerance_time"],
+  const coordinate = await prisma.company.findFirst({
+    select: {
+      latitude: true,
+      longitude: true,
+      tolerance_active: true,
+      tolerance_time: true,
+    },
   });
   if (!coordinate) return NextResponse.json(null);
   return NextResponse.json(coordinate);

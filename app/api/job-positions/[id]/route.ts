@@ -2,6 +2,7 @@ import JobPosition, { JobPositionModel } from "@/models/JobPosition";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/[...nextauth]/auth";
 import Timeline from "@/models/Timeline";
+import prisma from "@/app/prisma";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
   const session = await auth();
@@ -51,9 +52,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: number }
     return NextResponse.json("Unauthorized", { status: 401 });
   }
 
-  const position = await JobPosition.findOne({
+  // const position = await JobPosition.findOne({
+  //   where: {
+  //     id: params.id,
+  //   },
+  // });
+  const position = await prisma.job_positions.findFirst({
     where: {
-      id: params.id,
+      id: Number(params.id),
     },
   });
   if (position) {
