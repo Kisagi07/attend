@@ -29,8 +29,8 @@ const HomeCoordinate = () => {
   const updateHomeCoordinate = useCallback(async () => {
     if (!latitude || !longitude) return;
     if (
-      latitude === data?.home_latitude.toString() &&
-      longitude === data?.home_longitude.toString()
+      latitude === data?.home_latitude?.toString() &&
+      longitude === data?.home_longitude?.toString()
     )
       return;
     const res = await fetch(`/api/user/home`, {
@@ -44,15 +44,19 @@ const HomeCoordinate = () => {
       },
     });
     if (!res.ok) {
+      const error = await res.json();
+      console.log(error);
       console.error("Failed on updating home coordinate");
+    } else {
+      const resData = await res.json();
+      console.log(resData);
     }
-    const resData = await res.json();
   }, [latitude, longitude, data?.home_latitude, data?.home_longitude]);
 
-  const debouncedUpdateHomeCoordinate = useMemo(
-    () => debounce(updateHomeCoordinate, 500),
-    [updateHomeCoordinate]
-  );
+  //eslint-disable-next-line
+  const debouncedUpdateHomeCoordinate = useCallback(debounce(updateHomeCoordinate, 500), [
+    updateHomeCoordinate,
+  ]);
 
   const latitudeChanged = (value: string) => {
     const cleanValue = filterCoordinate(value);
