@@ -1,42 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { User, JobPosition, Timeline, Log } from "@/models";
-import Holidays from "date-holidays";
-import { Op } from "sequelize";
+import { User, Timeline } from "@/models";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
+import prisma from "@/app/prisma";
 
 export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const searchParams = req.nextUrl.searchParams;
   const monthlyStatus = searchParams.has("monthly-status");
 
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
     },
-    include: [
-      {
-        model: JobPosition,
-      },
-    ],
-    attributes: [
-      "name",
-      "work_id",
-      "home_latitude",
-      "home_longitude",
-      "id",
-      "role",
-      "job_position_id",
-      "createdAt",
-      "updatedAt",
-      "gender",
-    ],
+    select: {
+      name: true,
+      work_id: true,
+      home_latitude: true,
+      home_longitude: true,
+      id: true,
+      role: true,
+      job_position_id: true,
+      created_at: true,
+      updated_at: true,
+      gender: true,
+      job_position: true,
+    },
   });
 
   if (!user) return NextResponse.json(null);
 
   if (monthlyStatus) {
-    await calculateMonthlyStatus(user);
+    const withStatus = await calculateMonthlyStatus(user);
 
-    return NextResponse.json(user);
+    return NextResponse.json(withStatus);
   }
 
   return NextResponse.json(user);
@@ -70,7 +65,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
 
 export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
   const { name, job_position_id, gender, role } = await req.json();
-  const user = await User.findOne({
+
+  let user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
     },
@@ -78,17 +74,24 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
-  const updateUser = await user.update({
-    name,
-    job_position_id,
-    gender,
-    role,
+  const updateUser = await prisma.users.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      name,
+      job_position_id,
+      gender,
+      role,
+    },
   });
 
-  await Timeline.create({
-    title: "User Update",
-    description: `User ${user.name} data has been updated`,
-    type: "updated",
+  await prisma.timelines.create({
+    data: {
+      title: "User Update",
+      description: `User ${user.name} data has been updated`,
+      type: "updated",
+    },
   });
 
   return NextResponse.json(updateUser);

@@ -1,31 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../auth/[...nextauth]/auth";
-import { JobPosition, User } from "@/models";
+import prisma from "@/app/prisma";
 
 const GET = async (req: NextRequest): Promise<NextResponse> => {
   const session = await auth();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
     },
-    include: [
-      {
-        model: JobPosition,
-      },
-    ],
-    attributes: [
-      "name",
-      "work_id",
-      "home_latitude",
-      "home_longitude",
-      "id",
-      "role",
-      "job_position_id",
-      "createdAt",
-      "updatedAt",
-    ],
+    select: {
+      name: true,
+      work_id: true,
+      home_latitude: true,
+      home_longitude: true,
+      id: true,
+      role: true,
+      job_position_id: true,
+      created_at: true,
+      updated_at: true,
+      job_position: true,
+    },
   });
 
   if (!user) return NextResponse.json(null);

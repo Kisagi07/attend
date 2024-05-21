@@ -37,14 +37,37 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(logs);
   }
 
-  let logs: LogWithUser[] = await prisma.logs.findMany({
-    include: {
-      user: true,
+  let logs = (await prisma.logs.findMany({
+    select: {
+      date: true,
+      work: true,
+      clock_in_latitude: true,
+      clock_in_longitude: true,
+      clock_out_latitude: true,
+      clock_out_longitude: true,
+      clock_in_time: true,
+      clock_out_time: true,
+      type: true,
+      created_at: true,
+      updated_at: true,
+      user_id: true,
+      user: {
+        select: {
+          name: true,
+          work_id: true,
+          role: true,
+          tolerance_active: true,
+          tolerance_time: true,
+          updated_at: true,
+          created_at: true,
+        },
+      },
+      works: true,
     },
     orderBy: {
       created_at: "desc",
     },
-  });
+  })) as LogWithUser[];
 
   if (groupedNamedDate) {
     const grouped: { [key: string]: { [key: string]: LogWithUser[] } } = {};

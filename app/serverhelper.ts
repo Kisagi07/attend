@@ -1,25 +1,33 @@
-import { Holiday, Log } from "@/";
-import { UserModel } from "@//User";
 import Holidays from "date-holidays";
-import { Op } from "sequelize";
+import { UserJobExPassword } from "./prisma";
+import prisma from "@/app/prisma";
 
-const calculateMonthlyStatus = async (data: UserModel | UserModel[]) => {
+type withStatus = UserJobExPassword & {
+  totalAbsent?: number;
+  totalWorkFromHome?: number;
+  totalWorkFromOffice?: number;
+  todayStatus?: string;
+};
+
+const calculateMonthlyStatus = async (data: withStatus | withStatus[]) => {
   // get year, month, beggining of the month in string
-  const currentDate = new Date();
+  const currentDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
   const dateString = `${year}-${month}-01`;
-  const startofMonthDate = new Date(year, month - 1, 1);
+  const startofMonthDate = new Date(new Date(year, month - 1, 1).setHours(0, 0, 0, 0));
 
   // get all holidays in this month
-  const companyHolidays = await Holiday.findAll({
+
+  const companyHolidays = await prisma.holidays.findMany({
     where: {
       date: {
-        [Op.gte]: startofMonthDate,
-        [Op.lte]: currentDate,
+        gte: startofMonthDate,
+        lte: currentDate,
       },
     },
   });
+
   // create holidays instance and initiate with Indonesia holidays
   const hd = new Holidays();
   hd.init("ID");
@@ -48,11 +56,20 @@ const calculateMonthlyStatus = async (data: UserModel | UserModel[]) => {
   // check if data is an array or not
   const users = Array.isArray(data) ? data : [data];
   for (const user of users) {
-    const logs = await Log.findAll({
+    // const logs = await Log.findAll({
+    //   where: {
+    //     user_id: user.id,
+    //     createdAt: {
+    //       [Op.gte]: dateString,
+    //     },
+    //   },
+    // });
+
+    const logs = await prisma.logs.findMany({
       where: {
         user_id: user.id,
-        createdAt: {
-          [Op.gte]: dateString,
+        created_at: {
+          gte: startofMonthDate,
         },
       },
     });
@@ -60,9 +77,9 @@ const calculateMonthlyStatus = async (data: UserModel | UserModel[]) => {
     // get total logs, work from home, and absent
     const totalLogs = logs.length;
     // get total work from home
-    const totalWorkFromHome = logs.filter((log) => log.type === "work-from-home").length;
+    const totalWorkFromHome = logs.filter((log) => log.type === "work_from_home").length;
     // get total work from office
-    const totalWorkFromOffice = logs.filter((log) => log.type === "work-from-office").length;
+    const totalWorkFromOffice = logs.filter((log) => log.type === "work_from_office").length;
     // get total absent
     const totalAbsent = Math.max(
       currentTotalDays -
@@ -72,18 +89,19 @@ const calculateMonthlyStatus = async (data: UserModel | UserModel[]) => {
         totalLogs,
       0
     );
+
     // set virtual fields
-    user.setDataValue("totalAbsent", totalAbsent);
-    user.setDataValue("totalWorkFromHome", totalWorkFromHome);
-    user.setDataValue("totalWorkFromOffice", totalWorkFromOffice);
+    user.totalAbsent = totalAbsent;
+    user.totalWorkFromHome = totalWorkFromHome;
+    user.totalWorkFromOffice = totalWorkFromOffice;
 
     // get today log
     const todayLog = logs.find((log) => {
-      const logDate = new Date(log.createdAt);
+      const logDate = new Date(log.created_at);
       return logDate.getDate() === currentDate.getDate();
     });
     // set today status
-    user.setDataValue("todayStatus", todayLog?.type || "absent");
+    user.todayStatus = todayLog?.type || "absent";
   }
 
   return users;

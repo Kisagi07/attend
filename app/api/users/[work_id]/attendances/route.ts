@@ -1,8 +1,8 @@
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
 import { monthNumberToWord } from "@/app/helper";
-import { User } from "@/models";
-import { LogModel } from "@/models/Log";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/prisma";
+import { logs } from "@prisma/client";
 
 const GET = async (
   req: NextRequest,
@@ -11,20 +11,25 @@ const GET = async (
   const session = auth();
   if (!session) return NextResponse.json("Unauthorized", { status: 401 });
 
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
     },
   });
   if (!user) return NextResponse.json("User Not Found", { status: 404 });
 
-  const logs = await user.getLogs({
-    order: [["created_at", "DESC"]],
+  const logs = await prisma.logs.findMany({
+    orderBy: {
+      created_at: "desc",
+    },
+    where: {
+      user_id: user.id,
+    },
   });
 
-  const groupedByMonth: { [key: string]: LogModel[] } = {};
+  const groupedByMonth: { [key: string]: logs[] } = {};
   logs.forEach((log) => {
-    const date = new Date(log.date);
+    const date = new Date(log.date!);
     const month = monthNumberToWord(date.getMonth());
     const year = date.getFullYear();
     if (Object.hasOwn(groupedByMonth, `${month} ${year}`)) {

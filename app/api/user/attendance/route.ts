@@ -1,5 +1,5 @@
+import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { User, Log, Timeline } from "@/models";
 import { auth } from "../../auth/[...nextauth]/auth";
 
 export async function POST(req: NextRequest) {
@@ -28,9 +28,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
+    },
+    include: {
+      logs: true,
     },
   });
 
@@ -48,24 +51,32 @@ export async function POST(req: NextRequest) {
   let log;
 
   if (type === "sick") {
-    log = await user.createLog({
-      type,
-      clock_in_time,
-      date,
-      clock_in_latitude,
-      clock_in_longitude,
-      work: todaysWork,
+    const [hours, minutes, seconds] = clock_in_time.split(":");
+    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+
+    log = await prisma.logs.create({
+      data: {
+        type,
+        clock_in_time: clock_in_time_object,
+        date: new Date(date),
+        clock_in_latitude,
+        clock_in_longitude,
+        work: JSON.stringify(todaysWork),
+        user_id: user.id,
+      },
     });
-    await Timeline.create({
-      title: `${user.name} is Sick`,
-      description: `${user.name} is sick today`,
-      type: "new",
+    await prisma.timelines.create({
+      data: {
+        title: `${user.name} is Sick`,
+        description: `${user.name} is sick today`,
+        type: "new",
+      },
     });
   } else if (type === "clock-out") {
-    const existingLog = await Log.findOne({
+    const existingLog = await prisma.logs.findFirst({
       where: {
         user_id: user.id,
-        date,
+        date: new Date(date),
       },
     });
 
@@ -73,42 +84,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json("Not Found", { status: 404 });
     }
 
-    await existingLog.update({
-      clock_out_time,
-      clock_out_latitude,
-      clock_out_longitude,
-      work: todaysWork,
+    const [hours, minutes, seconds] = clock_out_time.split(":");
+    const clock_out_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+
+    log = await prisma.logs.update({
+      where: {
+        id: existingLog.id,
+      },
+      data: {
+        clock_out_time: clock_out_time_object,
+        clock_out_latitude,
+        clock_out_longitude,
+        work: JSON.stringify(todaysWork),
+      },
     });
 
-    await Timeline.create({
-      title: `${user.name} Has Clock Out`,
-      description: `${user.name} has clocked out at ${clock_out_time}`,
-      type: "updated",
+    await prisma.timelines.create({
+      data: {
+        title: `${user.name} Has Clock Out`,
+        description: `${user.name} has clocked out at ${clock_out_time}`,
+        type: "updated",
+      },
     });
-
-    await Timeline.create({
-      title: `${user.name} is Working on :`,
-      description: `${JSON.stringify(todaysWork)}`,
-      type: "updated",
+    await prisma.timelines.create({
+      data: {
+        title: `${user.name} is Working on :`,
+        description: `${JSON.stringify(todaysWork)}`,
+        type: "updated",
+      },
     });
-
-    log = existingLog;
   } else {
-    log = await user.createLog({
-      type,
-      clock_in_time,
-      date,
-      clock_in_latitude,
-      clock_in_longitude,
-      work: todaysWork,
+    const [hours, minutes, seconds] = clock_in_time.split(":");
+    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    log = await prisma.logs.create({
+      data: {
+        type: type.replaceAll("-", "_"),
+        clock_in_time: clock_in_time_object,
+        date: new Date(date),
+        clock_in_latitude,
+        clock_in_longitude,
+        work: todaysWork,
+        user_id: user.id,
+      },
     });
 
-    await Timeline.create({
-      title: `${user.name} Attendance: ${
-        log.type === "work-from-home" ? "Work From Home" : "Work From Office"
-      }`,
-      description: `${user.name} has clocked in at ${clock_in_time}`,
-      type: "new",
+    await prisma.timelines.create({
+      data: {
+        title: `${user.name} Attendance: ${
+          log.type === "work_from_home" ? "Work From Home" : "Work From Office"
+        }`,
+        description: `${user.name} has clocked in at ${clock_in_time}`,
+        type: "new",
+      },
     });
   }
 
@@ -137,8 +164,7 @@ export async function GET(req: NextRequest) {
         status: 401,
       }
     );
-
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
     },
@@ -153,13 +179,11 @@ export async function GET(req: NextRequest) {
         status: 404,
       }
     );
-  const timeZone = "Asia/Jakarta";
-  const jakartaDate = new Date().toLocaleString("en-ES", { timeZone });
-  const formattedDate = new Date(jakartaDate).toISOString().split("T")[0];
-
-  const logs = await user.getLogs({
+  const jakartaDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
+  const logs = await prisma.logs.findMany({
     where: {
-      date: formattedDate,
+      date: jakartaDate,
+      user_id: user.id,
     },
   });
 
