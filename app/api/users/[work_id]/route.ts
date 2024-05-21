@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
-  const updateUser = await prisma.users.update({
+  await prisma.users.update({
     where: {
       id: user.id,
     },
@@ -83,6 +83,23 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
       job_position_id,
       gender,
       role,
+    },
+  });
+
+  const updateUser = await prisma.users.findFirst({
+    where: {
+      work_id: params.work_id,
+    },
+    select: {
+      name: true,
+      work_id: true,
+      home_latitude: true,
+      home_longitude: true,
+      id: true,
+      role: true,
+      job_position_id: true,
+      created_at: true,
+      updated_at: true,
     },
   });
 
