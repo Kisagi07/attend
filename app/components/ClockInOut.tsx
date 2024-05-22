@@ -1,12 +1,11 @@
 "use client";
-import { ButtonDropdown, InputText, ListInput } from "@/app/components";
+import { ButtonDropdown, ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
-import { CompanyModel } from "@/models/Company";
-import { LogModel } from "@/models/Log";
-import { UserModel } from "@/models/User";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import useSWR, { Fetcher } from "swr";
+import { logs, company, users } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 const ClockInOut = () => {
@@ -23,13 +22,13 @@ const ClockInOut = () => {
     error,
     isLoading,
     mutate: mutateAttendance,
-  } = useSWR<LogModel>("/api/user/attendance", fetcher);
+  } = useSWR<logs>("/api/user/attendance", fetcher);
   const {
     data: company,
     error: companyError,
     isLoading: companyLoading,
-  } = useSWR<CompanyModel>(`/api/company`, fetcher);
-  const { data: user } = useSWR<UserModel>(`/api/user`, fetcher, { refreshInterval: 1000 });
+  } = useSWR<company>(`/api/company`, fetcher);
+  const { data: user } = useSWR<users>(`/api/user`, fetcher, { refreshInterval: 1000 });
   // non state variable
   const options = [
     {
@@ -67,9 +66,9 @@ const ClockInOut = () => {
         type === "work-from-home" || fromHome
       );
       const distance = Math.floor(
-        calculateDistance(latitude, longitude, targetLatitude, targetLongitude) * 1000
+        calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
+          1000
       );
-
       if (distance > 50) {
         toast.error("You are not in the right location to clockin");
         return;
@@ -215,17 +214,17 @@ const ClockInOut = () => {
   const getTargetLocation = (
     fromHome: boolean
   ): {
-    targetLatitude: number;
-    targetLongitude: number;
+    targetLatitude: Prisma.Decimal;
+    targetLongitude: Prisma.Decimal;
   } => {
-    let targetLatitude = 0;
-    let targetLongitude = 0;
+    let targetLatitude = new Prisma.Decimal(0.0);
+    let targetLongitude = new Prisma.Decimal(0.0);
     if (fromHome) {
-      targetLatitude = user?.home_latitude || 0;
-      targetLongitude = user?.home_longitude || 0;
+      targetLatitude = new Prisma.Decimal(user?.home_latitude || 0);
+      targetLongitude = new Prisma.Decimal(user?.home_longitude || 0);
     } else {
-      targetLatitude = company?.latitude || 0;
-      targetLongitude = company?.longitude || 0;
+      targetLatitude = new Prisma.Decimal(company?.latitude || 0);
+      targetLongitude = new Prisma.Decimal(company?.longitude || 0);
     }
     return {
       targetLatitude,
@@ -248,7 +247,7 @@ const ClockInOut = () => {
         setIsSick(true);
       } else {
         setClockedIn(true);
-        if (type === "work-from-home") {
+        if (type === "work_from_home") {
           setFromHome(true);
         }
         if (todayAttendance.clock_out_time) {

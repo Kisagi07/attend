@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
-import prisma, { UserJobExPassword } from "@/app/prisma";
+import prisma, { UserJobExPassword, withStatus } from "@/app/prisma";
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
@@ -19,11 +19,18 @@ export async function GET(req: NextRequest) {
         created_at: true,
         updated_at: true,
         gender: true,
+        id: true,
       },
       where: {
         role: role,
       },
     });
+
+    if (monthlyStatus) {
+      // get year, month, beggining of the month in string
+      const usersWithStatus = await calculateMonthlyStatus(users as withStatus[]);
+      return NextResponse.json(usersWithStatus);
+    }
     return NextResponse.json(users);
   }
 
@@ -51,7 +58,7 @@ export async function GET(req: NextRequest) {
 
   if (monthlyStatus) {
     // get year, month, beggining of the month in string
-    const usersWithStatus = await calculateMonthlyStatus(users);
+    const usersWithStatus = await calculateMonthlyStatus(users as withStatus[]);
     return NextResponse.json(usersWithStatus);
   }
 

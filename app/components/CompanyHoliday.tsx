@@ -3,11 +3,11 @@ import React from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
 import { Datepicker, FloatingLabel, Button, Alert } from "flowbite-react";
-import { HolidayModel } from "@/models/Holiday";
+import { holidays } from "@prisma/client";
 import { IoIosRemoveCircle } from "react-icons/io";
 
 const CompanyHoliday: React.FC = () => {
-  const { data, isLoading, mutate } = useSWR<HolidayModel[]>("/api/company-holiday", fetcher);
+  const { data, isLoading, mutate } = useSWR<holidays[]>("/api/company-holiday", fetcher);
 
   const [companyHoliday, setCompanyHoliday] = React.useState([]);
   const [date, setDate] = React.useState<Date>(new Date());

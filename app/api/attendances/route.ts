@@ -62,7 +62,6 @@ export async function GET(req: NextRequest) {
           created_at: true,
         },
       },
-      works: true,
     },
     orderBy: {
       created_at: "desc",

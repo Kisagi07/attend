@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         date: new Date(date),
         clock_in_latitude,
         clock_in_longitude,
-        work: JSON.stringify(todaysWork),
+        work: todaysWork,
         user_id: user.id,
       },
     });
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         clock_out_time: clock_out_time_object,
         clock_out_latitude,
         clock_out_longitude,
-        work: JSON.stringify(todaysWork),
+        work: todaysWork,
       },
     });
 

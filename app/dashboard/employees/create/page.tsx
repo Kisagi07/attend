@@ -5,7 +5,7 @@ import Select from "@/app/components/Select";
 import { toast } from "react-toastify";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
 import clsx from "clsx";
-import { JobPositionModel } from "@/models/JobPosition";
+import { job_positions } from "@prisma/client";
 interface Option {
   label: string;
   value: string | number;
@@ -133,12 +133,12 @@ const CreateEmployee = () => {
   useEffect(() => {
     Promise.all([
       fetch(`/api/register`).then((res) => res.json() as Promise<string>),
-      fetch(`/api/job-positions`).then((res) => res.json() as Promise<JobPositionModel[]>),
+      fetch(`/api/job-positions`).then((res) => res.json() as Promise<job_positions[]>),
     ])
       .then((data) => {
         setWorkId(data[0]);
         const options: Option[] = data[1].map((position) => ({
-          label: `${position.name} | ${position.shift_duration}`,
+          label: `${position.name} | ${position.shift_start} - ${position.shift_end}`,
           value: position.id,
         }));
         setJobOptions(options);
@@ -179,7 +179,7 @@ const CreateEmployee = () => {
               <input
                 onChange={({ currentTarget }) => setPassword(currentTarget.value)}
                 type={showPassword ? "text" : "password"}
-                className={clsx("w-full rounded outline-none border border-slate-200 p-4", {
+                className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
                   "!border-red-500": validation["password"],
                 })}
               />

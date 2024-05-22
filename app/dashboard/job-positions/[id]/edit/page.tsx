@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import JobFormSkeleton from "@/app/skeletons/JobFormSkeleton";
 import { useRouter } from "next/navigation";
-import { extractNumber, formatRupiah } from "@/app/helper";
+import { dayNumberToWord, extractNumber, formatRupiah } from "@/app/helper";
 const JobEditPage = ({ params }: { params: { id: number } }) => {
   const router = useRouter();
   const [name, setName] = useState<string>("");
@@ -99,7 +99,9 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
         setName(data.name);
         setShiftStart(data.shift_start);
         setShiftEnd(data.shift_end);
-        setDefaultWorkDay(data.work_day);
+        setDefaultWorkDay(
+          data.work_day.split(",").map((day: string) => dayNumberToWord(Number(day)))
+        );
         setSalary(formatRupiah(data.salary));
       })
       .finally(() => setFetching(false));

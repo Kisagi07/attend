@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "../helper";
-import { LogModel } from "@/models/Log";
+import { logs } from "@prisma/client";
 import { VerticalChartSkeleton } from "../skeletons";
 import { Bar } from "react-chartjs-2";
 import {
@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 interface ChartDataResponse {
-  [key: string]: LogModel[];
+  [key: string]: logs[];
 }
 
 const options = {

@@ -4,18 +4,19 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import Table from "./Table";
 import { FaUserAltSlash, FaUserEdit, FaClock } from "react-icons/fa";
-import { UserModel } from "@/models/User";
 import Confirmation from "@/app/components/Confirmation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
-interface UserModelEx extends UserModel {
+import { UserWithJob } from "../prisma";
+import { users } from "@prisma/client";
+interface UserModelEx extends UserWithJob {
   action: string;
 }
 const employeeColumn = createColumnHelper<UserModelEx>();
 
 const EmployeeTable = () => {
-  const [users, setUsers] = useState<UserModel[]>([]);
+  const [users, setUsers] = useState<users[]>([]);
   const columns = [
     employeeColumn.accessor("name", {
       header: "Name",
@@ -30,9 +31,12 @@ const EmployeeTable = () => {
       cell: (info) => info.getValue() || "No Position",
       minSize: 125,
     }),
-    employeeColumn.accessor("job_position.shift_duration", {
+    employeeColumn.accessor("job_position.shift_start", {
       header: "Today Shift",
-      cell: (info) => info.getValue() || "No Shift",
+      cell: ({ row }) =>
+        row.original.job_position
+          ? `${row.original.job_position.shift_start} - ${row.original.job_position.shift_end}`
+          : "No Shift",
       minSize: 125,
     }),
     employeeColumn.accessor("action", {
@@ -42,7 +46,7 @@ const EmployeeTable = () => {
           <button
             onClick={() => {
               setShowConfirmation(true);
-              setWorkIdDelete(row.original.work_id);
+              setWorkIdDelete(row.original.work_id!);
             }}
             className="bg-red-400 hover:bg-red-500 inline-block align-middle text-white rounded p-2"
           >

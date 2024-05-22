@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
-import prisma from "@/app/prisma";
+import prisma, { withStatus } from "@/app/prisma";
 
 export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const searchParams = req.nextUrl.searchParams;
@@ -28,9 +28,9 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
   if (!user) return NextResponse.json(null);
 
   if (monthlyStatus) {
-    const withStatus = await calculateMonthlyStatus(user);
+    const withStatus = await calculateMonthlyStatus(user as unknown as withStatus);
 
-    return NextResponse.json(withStatus);
+    return NextResponse.json(withStatus[0]);
   }
 
   return NextResponse.json(user);

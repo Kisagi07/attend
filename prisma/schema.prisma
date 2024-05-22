@@ -41,13 +41,13 @@ model logs {
   id                  Int       @id @default(autoincrement())
   type                logs_type @default(work_from_office)
   user_id             Int?
-  date                DateTime? @db.Date @default(now())
+  date                DateTime? @db.Date
   clock_in_time       DateTime? @db.Time(0)
   clock_in_latitude   Decimal?  @db.Decimal(10, 8)
   clock_in_longitude  Decimal?  @db.Decimal(11, 8)
   created_at          DateTime  @db.DateTime(0) @default(now())
   updated_at          DateTime  @db.DateTime(0) @updatedAt
-  work                String?   @db.LongText
+  work                Json   @db.Json
   clock_out_time      DateTime? @db.Time(0)
   clock_out_latitude  Decimal?  @db.Decimal(10, 8)
   clock_out_longitude Decimal?  @db.Decimal(11, 8)

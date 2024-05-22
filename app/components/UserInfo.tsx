@@ -1,6 +1,6 @@
 import Card from "@/app/components/Card";
 import { getWordDay } from "../helper";
-import { UserModel } from "@/models/User";
+import { UserWithJob } from "@/app/prisma";
 
 interface UserInfoProps {
   promise: Promise<any>;
@@ -8,7 +8,7 @@ interface UserInfoProps {
 
 const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
   // const session = await getServerSession();
-  const user: UserModel = await promise;
+  const user = (await promise) as UserWithJob;
   return (
     <Card>
       <article className="grid grid-cols-[auto_10px_auto]">
@@ -24,8 +24,8 @@ const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
         <span>:</span>
         <span>
           {user.job_position
-            ? user.job_position.work_day.includes(getWordDay())
-              ? user.job_position.shift_duration
+            ? user.job_position.work_day?.split(",")?.includes(new Date().getDay().toString())
+              ? `${user.job_position.shift_start} - ${user.job_position.shift_end}`
               : "Day Off"
             : "No Shift"}
         </span>

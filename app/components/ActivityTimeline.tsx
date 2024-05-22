@@ -1,13 +1,13 @@
 "use client";
-import { TimelineModel } from "@/models/Timeline";
 import { fetcher } from "../helper";
 import useSWR from "swr";
 import { TimelineSkeleton } from "../skeletons";
 import { CustomFlowbiteTheme, Timeline } from "flowbite-react";
 import clsx from "clsx";
+import { timelines } from "@prisma/client";
 
 const ActivityTimeline = () => {
-  const { data: timelines, isLoading: timelineLoading } = useSWR<TimelineModel[]>(
+  const { data: timelines, isLoading: timelineLoading } = useSWR<timelines[]>(
     "/api/timelines?limit=4",
     fetcher
   );
@@ -46,7 +46,7 @@ const ActivityTimeline = () => {
       ) : (
         <Timeline>
           {timelines?.map((timeline) => {
-            const date = new Date(timeline.createdAt);
+            const date = new Date(timeline.created_at);
             const customTheme: CustomFlowbiteTheme["timeline"] = {
               item: {
                 point: {
@@ -91,7 +91,7 @@ const ActivityTimeline = () => {
                       )}
                     </Timeline.Title>
                     <Timeline.Time>
-                      {calculateTimeAgo(timeline.createdAt as unknown as string)}
+                      {calculateTimeAgo(timeline.created_at as unknown as string)}
                     </Timeline.Time>
                   </div>
                   <Timeline.Body>

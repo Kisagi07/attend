@@ -1,13 +1,6 @@
 import Holidays from "date-holidays";
-import { UserJobExPassword } from "./prisma";
+import { withStatus } from "./prisma";
 import prisma from "@/app/prisma";
-
-type withStatus = UserJobExPassword & {
-  totalAbsent?: number;
-  totalWorkFromHome?: number;
-  totalWorkFromOffice?: number;
-  todayStatus?: string;
-};
 
 const calculateMonthlyStatus = async (data: withStatus | withStatus[]) => {
   // get year, month, beggining of the month in string

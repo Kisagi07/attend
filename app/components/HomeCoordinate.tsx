@@ -5,10 +5,10 @@ import { FaLocationCrosshairs } from "react-icons/fa6";
 import clsx from "clsx";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import useSWR, { Fetcher } from "swr";
-import { UserModel } from "@/models/User";
 import { debounce } from "../helper";
+import { users } from "@prisma/client";
 
-const fetcher: Fetcher<UserModel, string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<users, string> = (...args) => fetch(...args).then((res) => res.json());
 
 const HomeCoordinate = () => {
   const { data, error, isLoading } = useSWR(`/api/user`, fetcher);

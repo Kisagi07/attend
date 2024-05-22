@@ -5,8 +5,8 @@ import { useState, useEffect } from "react";
 import clsx from "clsx";
 import InputText from "./InputText";
 import AttendToleranceSkeleton from "../skeletons/AttendToleranceSkeleton";
-import { CompanyModel } from "@/models/Company";
 import { toast } from "react-toastify";
+import { company } from "@prisma/client";
 const AttendTolerance = () => {
   const [toleranceActive, setToleranceActive] = useState<boolean>(false);
   const [toleranceValue, setToleranceValue] = useState<string>("30");
@@ -35,8 +35,8 @@ const AttendTolerance = () => {
   useEffect(() => {
     fetch("/api/company")
       .then((res) => res.json())
-      .then((data: CompanyModel) => {
-        setToleranceActive(data.tolerance_active);
+      .then((data: company) => {
+        setToleranceActive(data.tolerance_active || false);
         setToleranceValue(data.tolerance_time.toString());
       })
       .catch((error) => toast.error("Something went wrong in server"))

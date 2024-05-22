@@ -1,12 +1,12 @@
 "use client";
 import useSWR from "swr";
 import { fetcher } from "../helper";
-import { UserModel } from "@/models/User";
 import { CardSkeleton } from "../skeletons";
 import EmployeeCard from "./EmployeeCard";
+import { withStatus } from "../prisma";
 
 const TeamBgroup = () => {
-  const { data: users, isLoading: usersLoading } = useSWR<UserModel[]>(
+  const { data: users, isLoading: usersLoading } = useSWR<withStatus[]>(
     "/api/users?monthly-status&role=employee",
     fetcher
   );

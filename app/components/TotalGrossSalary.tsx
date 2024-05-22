@@ -1,4 +1,3 @@
-import { UserModel } from "@/models/User";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { SmallCardSkeleton } from "../skeletons";
 import { fetcher, formatRupiah } from "../helper";

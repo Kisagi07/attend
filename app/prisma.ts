@@ -25,14 +25,6 @@ const prisma = new PrismaClient().$extends({
         },
       },
     },
-    logs: {
-      works: {
-        needs: { work: true },
-        compute(log) {
-          return log.work ? JSON.parse(log.work) : [];
-        },
-      },
-    },
   },
   model: {
     users: {
@@ -81,15 +73,30 @@ const UserJobExPassword = Prisma.validator<Prisma.usersDefaultArgs>()({
     created_at: true,
     updated_at: true,
     id: true,
+    gender: true,
+  },
+});
+
+const UserWithJob = Prisma.validator<Prisma.usersDefaultArgs>()({
+  include: {
+    job_position: true,
   },
 });
 
 export type LogWithUser = Prisma.logsGetPayload<typeof LogWithUser>;
 export type UserJobExPassword = Prisma.usersGetPayload<typeof UserJobExPassword>;
+export type UserWithJob = Prisma.usersGetPayload<typeof UserWithJob>;
+
+export type withStatus = UserJobExPassword & {
+  totalAbsent: number;
+  totalWorkFromHome: number;
+  totalWorkFromOffice: number;
+  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent";
+};
 
 async () => {
-  const logs = await prisma.users.findMany({
-    select: {},
+  const user = await prisma.users.findFirst({
+    include: { job_position: true },
   });
 };
 
