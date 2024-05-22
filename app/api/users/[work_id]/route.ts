@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { User, Timeline } from "@/models";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
 import prisma from "@/app/prisma";
 
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
     },
@@ -52,15 +51,21 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
       { status: 404 }
     );
 
-  await user.destroy();
-
-  await Timeline.create({
-    title: "User Deleted",
-    description: `User ${user.name} has been deleted`,
-    type: "removed",
+  const deleted = await prisma.users.delete({
+    where: {
+      id: user.id,
+    },
   });
 
-  return NextResponse.json(user);
+  await prisma.timelines.create({
+    data: {
+      title: "User Deleted",
+      description: `User ${user.name} has been deleted`,
+      type: "removed",
+    },
+  });
+
+  return NextResponse.json({ message: "Deleted", data: { deleted } });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {

@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, logs } from "@prisma/client";
+import { Prisma, PrismaClient, users } from "@prisma/client";
 
 const prisma = new PrismaClient().$extends({
   name: "status",
@@ -31,6 +31,13 @@ const prisma = new PrismaClient().$extends({
         compute(log) {
           return log.work ? JSON.parse(log.work) : [];
         },
+      },
+    },
+  },
+  model: {
+    users: {
+      excludePassword(user: users) {
+        return Object.fromEntries(Object.entries(user).filter(([key]) => key !== "password"));
       },
     },
   },

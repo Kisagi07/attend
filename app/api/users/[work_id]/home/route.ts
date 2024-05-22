@@ -1,6 +1,7 @@
 import { auth } from "@/app/api/auth/[...nextauth]/auth";
+import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { User } from "@/models";
+
 export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
   const session = await auth();
 
@@ -11,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
   const { latitude, longitude }: { latitude: number; longitude: number } = await req.json();
   if (!latitude || !longitude) return NextResponse.json("Invalid", { status: 422 });
 
-  const user = await User.findOne({
+  let user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
     },
@@ -19,10 +20,18 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
 
   if (!user) return NextResponse.json("Not Found", { status: 404 });
 
-  await user.update({
-    home_latitude: latitude,
-    home_longitude: longitude,
+  user = await prisma.users.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      home_latitude: latitude,
+      home_longitude: longitude,
+    },
   });
 
-  return NextResponse.json("Success");
+  return NextResponse.json({
+    message: "User home coordinate updated",
+    data: prisma.users.excludePassword(user),
+  });
 }
