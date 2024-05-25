@@ -8,6 +8,8 @@ import { auth } from "./api/auth/[...nextauth]/auth";
 import { SWRConfig } from "swr";
 import { notFound } from "next/navigation";
 import { SWR } from "./components";
+import Maintenance from "./components/Maintenance";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +24,22 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const maintenance = process.env.MAINTENANCE_MODE;
+
+  if (maintenance === "on") {
+    const cookieStore = cookies();
+    const key = cookieStore.get("maintenance_key") || { value: "" };
+    if (key.value !== process.env.MAINTENANCE_KEY) {
+      return (
+        <html lang="en">
+          <body className={`${inter.className} bg-white`}>
+            <Maintenance />
+          </body>
+        </html>
+      );
+    }
+  }
+
   return (
     <html lang="en">
       <body className={`${inter.className} bg-white`}>
