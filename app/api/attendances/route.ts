@@ -4,14 +4,19 @@ import prisma, { LogWithUser } from "@/app/prisma";
 
 function getTodayDate() {
   const today = new Date();
-  return new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+  return new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  );
 }
 
 function isWorkDay(date: Date, holidays: any[]) {
   return (
     date.getDay() !== 0 &&
     date.getDay() !== 6 &&
-    !holidays.some((holiday) => new Date(holiday.date.split(" ")[0]).getTime() === date.getTime())
+    !holidays.some(
+      (holiday) =>
+        new Date(holiday.date.split(" ")[0]).getTime() === date.getTime()
+    )
   );
 }
 
@@ -56,8 +61,6 @@ export async function GET(req: NextRequest) {
           name: true,
           work_id: true,
           role: true,
-          tolerance_active: true,
-          tolerance_time: true,
           updated_at: true,
           created_at: true,
         },
