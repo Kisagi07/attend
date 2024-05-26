@@ -1,5 +1,5 @@
-import { NextResponse, NextRequest } from "next/server";
-import { Holiday, Timeline } from "@/models"; // Replace with the actual path to your Holiday model
+import prisma from "@/app/prisma";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../auth/[...nextauth]/auth";
 
 const GET = async (req: NextRequest) => {
@@ -9,7 +9,7 @@ const GET = async (req: NextRequest) => {
   }
 
   try {
-    const holidays = await Holiday.findAll(); // Replace with the appropriate method to retrieve all holidays from your model
+    const holidays = await prisma.holidays.findMany(); // Replace with the appropriate method to retrieve all holidays from your model
 
     return NextResponse.json(holidays);
   } catch (error) {
@@ -33,11 +33,18 @@ const POST = async (req: NextRequest) => {
 
   try {
     const dateObject = new Date(date);
-    const holiday = await Holiday.create({ name, date: dateObject }); // Replace with the appropriate method to create a holiday in your model
-    await Timeline.create({
-      title: "Holiday Created",
-      description: `Holiday ${name} created on ${date}`,
-      type: "new",
+    const holiday = await prisma.holidays.create({
+      data: {
+        name,
+        date: dateObject,
+      },
+    });
+    await prisma.timelines.create({
+      data: {
+        title: "Holiday Created",
+        description: `Holiday ${name} created on ${date}`,
+        type: "new",
+      },
     });
     return NextResponse.json(holiday, { status: 201 });
   } catch (error) {

@@ -1,13 +1,11 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
 import Select from "@/app/components/Select";
-import { toast } from "react-toastify";
-import clsx from "clsx";
-import { UserModel } from "@/models/User";
-import { useRouter } from "next/navigation";
-import { JobPositionModel } from "@/models/JobPosition";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
-import InputCheckbox from "@/app/components/InputCheckbox";
+import { job_positions, users } from "@prisma/client";
+import clsx from "clsx";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 interface Option {
   label: string;
   value: string | number;
@@ -18,7 +16,6 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
-  const [todayShift, setTodayShift] = useState<Option>();
   const [genderOptions, setGenderOptions] = useState<Option[]>([
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
@@ -30,7 +27,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   });
   const [name, setName] = useState<string>("");
   const [workId, setWorkId] = useState<string>("Loading...");
-  const [user, setUser] = useState<UserModel>();
+  const [user, setUser] = useState<users>();
   const [validation, setValidation] = useState<{
     [key: string]: boolean;
   }>({});
@@ -115,18 +112,18 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then((res) => res.json() as Promise<JobPositionModel[]>),
-      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<UserModel>),
+      fetch("/api/job-positions").then((res) => res.json() as Promise<job_positions[]>),
+      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<users>),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
-          label: `${position.name} | ${position.shift_duration}`,
+          label: `${position.name} | ${position.shift_start} - ${position.shift_end}`,
           value: position.id,
         }));
         setJobOptions(options);
         setUser(data[1]);
-        setWorkId(data[1].work_id);
-        setName(data[1].name);
+        setWorkId(data[1].work_id!);
+        setName(data[1].name!);
         const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
         if (defaultPosition) {
           setJobPosition(defaultPosition);
@@ -158,7 +155,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
               Name<span className="text-red-500">*</span> :{" "}
             </label>
             <input
-              defaultValue={user?.name}
+              defaultValue={user?.name!}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
               className={clsx("w-full rounded outline-none border border-slate-200 p-2", {

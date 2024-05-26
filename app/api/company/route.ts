@@ -1,11 +1,14 @@
-import { NextResponse, NextRequest } from "next/server";
-import { Company } from "@/models";
-import { CompanyModel } from "@/models/Company";
-import Timeline from "@/models/Timeline";
+import prisma from "@/app/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const coordinate = await Company.findOne({
-    attributes: ["latitude", "longitude", "tolerance_active", "tolerance_time"],
+  const coordinate = await prisma.company.findFirst({
+    select: {
+      latitude: true,
+      longitude: true,
+      tolerance_active: true,
+      tolerance_time: true,
+    },
   });
   if (!coordinate) return NextResponse.json(null);
   return NextResponse.json(coordinate);
@@ -13,42 +16,59 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const { latitude, longitude } = await req.json();
-  const company = await Company.findOne();
+  // const company = await Company.findOne();
+  const company = await prisma.company.findFirst();
   if (company) {
     return NextResponse.json("Company already exist");
   }
-  const coordinate = await Company.create({
-    latitude,
-    longitude,
+
+  const coordinate = await prisma.company.create({
+    data: {
+      latitude,
+      longitude,
+    },
   });
 
-  await Timeline.create({
-    title: "Create Company Location",
-    description: "Company Location has been set",
-    type: "new",
+  await prisma.timelines.create({
+    data: {
+      title: "Create Company Location",
+      description: "Company Location has been set",
+      type: "new",
+    },
   });
 
   return NextResponse.json(coordinate);
 }
 
 export async function PUT(req: NextRequest) {
-  const toUpdated: CompanyModel = await req.json();
-  const company = await Company.findOne();
+  const toUpdated: { latitude: number; longitude: number } = await req.json();
+  let company = await prisma.company.findFirst();
   if (!company) {
-    const newCompany = await Company.create(toUpdated);
-    await Timeline.create({
-      title: "Create Company",
-      description: "Company has been created and set",
-      type: "new",
+    const newCompany = await prisma.company.create({
+      data: toUpdated,
+    });
+    await prisma.timelines.create({
+      data: {
+        title: "Create Company",
+        description: "Company has been created and set",
+        type: "new",
+      },
     });
     return NextResponse.json(newCompany);
   } else {
-    await Timeline.create({
-      title: "Company Location",
-      description: "Company has been updated",
-      type: "updated",
+    await prisma.timelines.create({
+      data: {
+        title: "Company Location",
+        description: "Company has been updated",
+        type: "updated",
+      },
     });
-    await company.update(toUpdated);
+    company = await prisma.company.update({
+      where: {
+        id: company.id,
+      },
+      data: toUpdated,
+    });
     return NextResponse.json(company);
   }
 }

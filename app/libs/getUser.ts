@@ -1,19 +1,16 @@
-import { getServerSession } from "next-auth";
 import { auth } from "../api/auth/[...nextauth]/auth";
-import { User, JobPosition } from "@/models";
+import prisma from "@/app/prisma";
 
 export default async function getUser() {
   const session = await auth();
 
-  const user = await User.findOne({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: session?.user.work_id,
     },
-    include: [
-      {
-        model: JobPosition,
-      },
-    ],
+    include: {
+      job_position: true,
+    },
   });
 
   return user;

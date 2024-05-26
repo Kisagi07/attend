@@ -2,12 +2,12 @@
 
 import useSWR from "swr";
 import { CardSkeleton } from "../skeletons";
-import { UserModel } from "@/models/User";
 import { fetcher } from "../helper";
 import EmployeeCard from "./EmployeeCard";
+import { withStatus } from "../prisma";
 
 const TeamIntern = () => {
-  const { data: users, isLoading: usersLoading } = useSWR<UserModel[]>(
+  const { data: users, isLoading: usersLoading } = useSWR<withStatus[]>(
     "/api/users?monthly-status&role=intern",
     fetcher
   );

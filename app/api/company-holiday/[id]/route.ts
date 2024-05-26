@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/[...nextauth]/auth";
-import { Holiday, Timeline } from "@/models";
+import prisma from "@/app/prisma";
 
 const DELETE = async (req: NextRequest, { params }: { params: { id: number } }) => {
   const session = await auth();
@@ -8,19 +8,24 @@ const DELETE = async (req: NextRequest, { params }: { params: { id: number } }) 
     return NextResponse.json("Unauthorized", { status: 401 });
   }
 
-  const holiday = await Holiday.findOne({ where: { id: params.id } });
+  // const holiday = await Holiday.findOne({ where: { id: params.id } });
+  const holiday = await prisma.holidays.findFirst({ where: { id: Number(params.id) } });
   if (!holiday) {
     return NextResponse.json("Not Found", { status: 404 });
   }
 
-  await holiday.destroy();
-
-  await Timeline.create({
-    title: "Holiday Deleted",
-    description: `Holiday ${holiday.name} deleted on ${holiday.date}`,
-    type: "removed",
+  const deleted = await prisma.holidays.delete({
+    where: { id: Number(params.id) },
   });
 
-  return NextResponse.json("Deleted", { status: 200 });
+  await prisma.timelines.create({
+    data: {
+      title: "Holiday Deleted",
+      description: `Holiday ${holiday.name} deleted on ${holiday.date}`,
+      type: "removed",
+    },
+  });
+
+  return NextResponse.json({ message: "Deleted", data: deleted }, { status: 200 });
 };
 export { DELETE };

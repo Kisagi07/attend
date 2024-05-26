@@ -1,10 +1,10 @@
-import { UserModel } from "@/models/User";
 import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
+import { withStatus } from "@/app/prisma";
 
 interface Props {
-  user: UserModel;
+  user: withStatus;
 }
 
 const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
@@ -14,13 +14,13 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
         <h4 className="text-gray-600 font-bold">{user.name}</h4>
         <h4
           className={clsx(" font-semibold text-sm px-1 rounded-md capitalize", {
-            "bg-violet-100 text-violet-500": user.todayStatus === "work-from-office",
+            "bg-violet-100 text-violet-500": user.todayStatus === "work_from_office",
             "bg-red-100 text-red-500": user.todayStatus === "absent",
-            "bg-green-100 text-green-500": user.todayStatus === "work-from-home",
+            "bg-green-100 text-green-500": user.todayStatus === "work_from_home",
             "bg-blue-100 text-blue-500": user.todayStatus === "sick",
           })}
         >
-          {user.todayStatus || "Hadir"}
+          {user.todayStatus.replaceAll("_", " ") || "Hadir"}
         </h4>
         <div className="text-sm">
           <h6 className="text-red-500">{user.totalAbsent || 0} hari tidak hadir</h6>

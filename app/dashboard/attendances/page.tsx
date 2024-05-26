@@ -3,8 +3,7 @@
 import MonthAttendances from "@/app/components/MonthAttendances";
 import Select from "@/app/components/Select";
 import { fetcher } from "@/app/helper";
-import { LogModel } from "@/models/Log";
-import { UserModel } from "@/models/User";
+import { logs, users } from "@prisma/client";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { FaXmark } from "react-icons/fa6";
@@ -15,7 +14,7 @@ const Page = () => {
     `/api/attendances?grouped-name-date&latest`,
     fetcher
   );
-  const { data: users, isLoading: usersLoading } = useSWR<UserModel[]>(`/api/users`, fetcher);
+  const { data: users, isLoading: usersLoading } = useSWR<users[]>(`/api/users`, fetcher);
 
   const [userOptions, setUserOptions] = useState<Option[]>([]);
   const [selectedUser, setSelectedUser] = useState<Option>();
@@ -23,14 +22,14 @@ const Page = () => {
   const [dateOptions, setDateOptions] = useState<Option[]>([]);
   const [selectedDate, setSelectedDate] = useState<Option>();
 
-  const [tableData, setTableData] = useState<LogModel[]>([]);
+  const [tableData, setTableData] = useState<logs[]>([]);
 
   const handleUserChange = (option: Option) => {
     setSelectedUser(option);
     setSelectedDate(undefined);
   };
 
-  const sortByDateAndTime = (a: LogModel, b: LogModel) => {
+  const sortByDateAndTime = (a: logs, b: logs) => {
     const dateA = new Date(`${a.date}T${a.clock_in_time}`).getTime();
     const dateB = new Date(`${b.date}T${b.clock_in_time}`).getTime();
     return dateB - dateA;
@@ -47,7 +46,7 @@ const Page = () => {
 
   useEffect(() => {
     if (users) {
-      setUserOptions(users.map((user) => ({ label: user.name, value: user.name })));
+      setUserOptions(users.map((user) => ({ label: user.name!, value: user.name! })));
     }
   }, [users]);
 
@@ -61,7 +60,7 @@ const Page = () => {
         }
       } else if (selectedUser) {
         if (Object.hasOwn(logs, selectedUser.value)) {
-          setTableData(Object.values(logs[selectedUser.value]).flat() as LogModel[]);
+          setTableData(Object.values(logs[selectedUser.value]).flat() as logs[]);
         } else {
           setTableData([]);
         }
@@ -70,8 +69,8 @@ const Page = () => {
           (
             Object.values(logs)
               .flatMap((inner: any) => Object.values(inner))
-              .flat() as LogModel[]
-          ).sort(sortByDateAndTime) as LogModel[]
+              .flat() as logs[]
+          ).sort(sortByDateAndTime) as logs[]
         );
       }
     }

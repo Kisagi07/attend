@@ -4,11 +4,11 @@ import useSWR from "swr";
 import { fetcher } from "../helper";
 import { Select } from "@/app/components";
 import { useEffect, useState } from "react";
-import { LogModel } from "@/models/Log";
 import { TableSkeleton } from "../skeletons";
 import MonthAttendances from "./MonthAttendances";
 import { notFound } from "next/navigation";
 import { FaCircleXmark } from "react-icons/fa6";
+import { logs } from "@prisma/client";
 
 const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
   const { data: monthLogs, isLoading } = useSWR<any>(
@@ -28,17 +28,17 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
 
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option>();
-  const [tableData, setTableData] = useState<LogModel[]>([]);
+  const [tableData, setTableData] = useState<logs[]>([]);
 
   const getTotalWorkDay = (): number => {
     return tableData.filter(
-      (log) => log.type === "work-from-office" || log.type === "work-from-home"
+      (log) => log.type === "work_from_office" || log.type === "work_from_home"
     ).length;
   };
 
   const handleXmarkClick = () => {
     setSelectedOption(undefined);
-    const logs = Object.values(monthLogs).flat() as LogModel[];
+    const logs = Object.values(monthLogs).flat() as logs[];
     setTableData(logs);
   };
 
@@ -58,7 +58,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
         const logs = monthLogs[selectedOption.value];
         setTableData(logs);
       } else {
-        const logs = Object.values(monthLogs).flat() as LogModel[];
+        const logs = Object.values(monthLogs).flat() as logs[];
         setTableData(logs);
       }
     }

@@ -87,7 +87,7 @@ const Select: FC<SelectProps> = ({
                 <li
                   onClick={() => handleOptionClicked(option)}
                   key={option.value}
-                  className="hover:bg-slate-200 p-4 cursor-pointer"
+                  className="hover:bg-slate-200 p-2 cursor-pointer"
                 >
                   {option.label}
                 </li>

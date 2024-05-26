@@ -1,13 +1,13 @@
 "use client";
-import { UserModel } from "@/models/User";
+import { users } from "@prisma/client";
 import { FaPeopleGroup } from "react-icons/fa6";
 import useSWR, { Fetcher } from "swr";
 import { SmallCardSkeleton } from "@/app/skeletons";
 
-const fetcher: Fetcher<UserModel[], string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<users[], string> = (...args) => fetch(...args).then((res) => res.json());
 
 const TotalEmployeeCard = () => {
-  const { data, error, isLoading } = useSWR<UserModel[]>("/api/users", fetcher);
+  const { data, error, isLoading } = useSWR<users[]>("/api/users", fetcher);
   return isLoading ? (
     <SmallCardSkeleton />
   ) : (

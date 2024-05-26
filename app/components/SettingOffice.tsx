@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import InputText from "./InputText";
 import { toast } from "react-toastify";
-import { CompanyModel } from "@/models/Company";
+import { company } from "@prisma/client";
 import SettingOfficeSkeleton from "../skeletons/SettingOfficeSkeleton";
 import Confirmation from "./Confirmation";
 import { FaLocationDot } from "react-icons/fa6";
 
 const SettingOffice = () => {
   const [fetching, setFetching] = useState<boolean>(true);
-  const [company, setCompany] = useState<CompanyModel>();
+  const [company, setCompany] = useState<company>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [latitude, setLatitude] = useState<string>("");
@@ -46,7 +46,7 @@ const SettingOffice = () => {
       if (!res.ok) {
         throw new Error("Failed on updating company office");
       }
-      const data: CompanyModel = await res.json();
+      const data: company = await res.json();
       setLatitude(`${data.latitude}`);
       setLongitude(`${data.longitude}`);
       return data;

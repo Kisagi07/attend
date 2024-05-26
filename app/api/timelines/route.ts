@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Timeline } from "@/models";
 import { auth } from "../auth/[...nextauth]/auth";
+import prisma from "@/app/prisma";
 const GET = async (req: NextRequest) => {
   const session = auth();
   if (!session) return NextResponse.json("Unauthorized", { status: 401 });
@@ -11,14 +11,20 @@ const GET = async (req: NextRequest) => {
   const limit = searchParams.get("limit");
 
   if (limit) {
-    const timelines = await Timeline.findAll({
-      order: [["createdAt", "DESC"]],
-      limit: +limit,
+    const timelines = await prisma.timelines.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
+      take: Number(limit),
     });
 
     return NextResponse.json(timelines);
   } else {
-    const timelines = await Timeline.findAll();
+    const timelines = await prisma.timelines.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
+    });
     return NextResponse.json(timelines);
   }
 };

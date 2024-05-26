@@ -1,46 +1,65 @@
-import { User, JobPosition, Log, Holiday } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
-import { FindOptions, Op } from "sequelize";
-import Holidays from "date-holidays";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
+import prisma, { UserJobExPassword, withStatus } from "@/app/prisma";
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
-  const role = params.get("role");
+  const role = params.get("role") as "intern" | "employee";
   const monthlyStatus = params.has("monthly-status");
 
-  const option: FindOptions = {
-    where: {
-      role: {
-        [Op.in]: ["employee", "intern"],
-      },
-    },
-    include: [{ model: JobPosition }],
-    attributes: [
-      "id",
-      "name",
-      "work_id",
-      "role",
-      "job_position_id",
-      "createdAt",
-      "updatedAt",
-      "gender",
-    ],
-  };
-
   if (role) {
-    option.where = {
-      role,
-    };
+    const users = await prisma.users.findMany({
+      select: {
+        job_position: true,
+        name: true,
+        work_id: true,
+        role: true,
+        job_position_id: true,
+        created_at: true,
+        updated_at: true,
+        gender: true,
+        id: true,
+      },
+      where: {
+        role: role,
+      },
+    });
+
+    if (monthlyStatus) {
+      // get year, month, beggining of the month in string
+      const usersWithStatus = await calculateMonthlyStatus(users as withStatus[]);
+      return NextResponse.json(usersWithStatus);
+    }
+    return NextResponse.json(users);
   }
 
-  const users = await User.findAll(option);
+  let users = (await prisma.users.findMany({
+    select: {
+      job_position: true,
+      name: true,
+      work_id: true,
+      role: true,
+      job_position_id: true,
+      created_at: true,
+      updated_at: true,
+      gender: true,
+      id: true,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+    where: {
+      role: {
+        in: ["employee", "intern"],
+      },
+    },
+  })) as UserJobExPassword[];
 
   if (monthlyStatus) {
     // get year, month, beggining of the month in string
-    await calculateMonthlyStatus(users);
-    return NextResponse.json(users);
+    const usersWithStatus = await calculateMonthlyStatus(users as withStatus[]);
+    return NextResponse.json(usersWithStatus);
   }
 
   return NextResponse.json(users);

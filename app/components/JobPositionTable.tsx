@@ -1,6 +1,5 @@
 "use client";
 import { createColumnHelper } from "@tanstack/react-table";
-import { JobPositionModel } from "@/models/JobPosition";
 import Table from "@/app/components/Table";
 import TableSkeleton from "@/app/skeletons/TableSkeleton";
 import { useState, useEffect } from "react";
@@ -11,11 +10,12 @@ import Link from "next/link";
 import { Confirmation } from "@/app/components";
 import { toast } from "react-toastify";
 import { formatRupiah } from "@/app/helper";
+import { job_positions } from "@prisma/client";
 
-const columnHelper = createColumnHelper<JobPositionModel>();
+const columnHelper = createColumnHelper<job_positions>();
 
 const JobPositionTable = () => {
-  const [data, setData] = useState<JobPositionModel[]>([]);
+  const [data, setData] = useState<job_positions[]>([]);
   const [fetching, setFetching] = useState<boolean>(true);
   const [idDelete, setIdDelete] = useState<number>(-1);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
@@ -50,15 +50,15 @@ const JobPositionTable = () => {
       cell: (info) => info.getValue(),
       minSize: 200,
     }),
-    columnHelper.accessor("shift_duration", {
+    columnHelper.accessor("shift_start", {
       header: "Shift Duration",
-      cell: (info) => info.getValue(),
+      cell: ({ row }) => `${row.original.shift_start || "~"} - ${row.original.shift_end || "~"}`,
       minSize: 150,
     }),
     columnHelper.accessor("work_day", {
       header: "Work Day",
       cell: (info) => {
-        const days = info.getValue() as unknown as string[];
+        const days = info.getValue()?.split(",");
         const weekDay = [
           "Sunday",
           "Monday",
@@ -70,11 +70,11 @@ const JobPositionTable = () => {
         ];
         return (
           <div className="flex gap-2 uppercase text-xs flex-wrap">
-            {weekDay.map((day) => (
+            {weekDay.map((day, index) => (
               <div
                 key={day}
                 className={clsx("border border-gray-200 p-2 hover-bg-gray-200 cursor-pointer", {
-                  "bg-gray-200": days.includes(day),
+                  "bg-gray-200": days?.includes(index.toString()),
                 })}
               >
                 {day[0]}
