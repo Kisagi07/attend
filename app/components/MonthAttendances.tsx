@@ -24,7 +24,8 @@ const MonthAttendances = ({ data, withName = false }: { data: any[]; withName?: 
     }),
     columnHelper.accessor("clock_out_time", {
       header: "Clock Out Time",
-      cell: (info) => (info.getValue() as unknown as string).split("T")[1].slice(0, 7),
+      cell: (info) =>
+        info.getValue() ? (info.getValue() as unknown as string).split("T")[1].slice(0, 7) : "-",
       size: 150,
     }),
     columnHelper.accessor("work", {
