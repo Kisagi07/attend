@@ -30,8 +30,12 @@ const Page = () => {
   };
 
   const sortByDateAndTime = (a: logs, b: logs) => {
-    const dateA = new Date(`${a.date}T${a.clock_in_time}`).getTime();
-    const dateB = new Date(`${b.date}T${b.clock_in_time}`).getTime();
+    const dateA = new Date(
+      `${a.date?.toString().split("T")[0]}T${a.clock_in_time?.toString().split("T")[1]}`
+    ).getTime();
+    const dateB = new Date(
+      `${b.date?.toString().split("T")[0]}T${b.clock_in_time?.toString().split("T")[1]}`
+    ).getTime();
     return dateB - dateA;
   };
 
