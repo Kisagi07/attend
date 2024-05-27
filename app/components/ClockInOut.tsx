@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, users } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import { FloatingLabel } from "flowbite-react";
 
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 const ClockInOut = () => {
@@ -16,6 +17,38 @@ const ClockInOut = () => {
   const [isSick, setIsSick] = useState<boolean>(false);
   const [fromHome, setFromHome] = useState<boolean>(false);
   const [todaysWork, setTodaysWork] = useState<string[]>([]);
+  const [duty, setDuty] = useState<string>("");
+  const [showDuty, setShowDuty] = useState<boolean>(false);
+  const [options1, setOptions1] = useState([
+    {
+      label: "Clock From Home",
+      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
+    },
+    {
+      label: "Clock From Office",
+      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
+    },
+    {
+      label: "Sick Day",
+      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
+    },
+    {
+      label: "Clock With Duty",
+      className: "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
+    },
+  ]);
+  const [options2, setOptions2] = useState([
+    {
+      label: "Clock-Out",
+      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
+    },
+  ]);
+  const [options3, setOptions3] = useState([
+    {
+      label: "Good Job",
+      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
+    },
+  ]);
   //fetched data
   const {
     data: todayAttendance,
@@ -29,33 +62,14 @@ const ClockInOut = () => {
     isLoading: companyLoading,
   } = useSWR<company>(`/api/company`, fetcher);
   const { data: user } = useSWR<users>(`/api/user`, fetcher, { refreshInterval: 1000 });
-  // non state variable
-  const options = [
-    {
-      label: "Clock From Home",
-      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
-    },
-    {
-      label: "Clock From Office",
-      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
-    },
-    {
-      label: "Sick Day",
-      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
-    },
-  ];
-  const options2 = [
-    {
-      label: "Clock-Out",
-      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
-    },
-  ];
-  const options3 = [
-    {
-      label: "Good Job",
-      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
-    },
-  ];
+
+  const buttonChanges = (value: string | null) => {
+    if (value == "Clock With Duty") {
+      setShowDuty(true);
+    } else {
+      setShowDuty(false);
+    }
+  };
 
   const handleClockBtn = async (value: string) => {
     try {
@@ -69,13 +83,18 @@ const ClockInOut = () => {
         calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
           1000
       );
-      if (distance > 50) {
+      if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
         toast.error("You are not in the right location to clockin");
         return;
       }
 
-      if (type === "clock-out" && !todaysWork) {
+      if (type === "clock-out" && todaysWork.length === 0) {
         toast.error("You need to fill today's work in order to clockout");
+        return;
+      }
+
+      if (type === "work_with_duty" && !duty) {
+        toast.error("You need to fill duty in order to clockin");
         return;
       }
 
@@ -147,6 +166,15 @@ const ClockInOut = () => {
         clock_out_longitude: longitude,
         todaysWork,
       };
+    } else if (type === "work_with_duty") {
+      sendData = {
+        type,
+        clock_in_time: getTimeOnly(),
+        date: getDateOnly(),
+        clock_in_latitude: latitude,
+        clock_in_longitude: longitude,
+        todaysWork: [`Duty: ${duty}`],
+      };
     } else {
       sendData = {
         type,
@@ -167,6 +195,7 @@ const ClockInOut = () => {
       });
       const data = await res.json();
       mutateAttendance();
+      setShowDuty(false);
     } catch (error) {
       console.error(error);
     }
@@ -185,6 +214,9 @@ const ClockInOut = () => {
         break;
       case "Clock-Out":
         return "clock-out";
+        break;
+      case "Clock With Duty":
+        return "work_with_duty";
         break;
       default:
         return "work-from-office";
@@ -264,12 +296,21 @@ const ClockInOut = () => {
       {clockedIn && !done && (
         <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
+      {showDuty && (
+        <FloatingLabel
+          variant="outlined"
+          label="Duty"
+          value={duty}
+          onChange={(e) => setDuty(e.currentTarget.value)}
+        />
+      )}
       <ButtonDropdown
+        buttonChanged={buttonChanges}
         onClick={(value) => handleClockBtn(value)}
         loading={isLoading || sending}
         disabled={done || isLoading || sending}
         className="bg-slate-900 hover:bg-black text-white"
-        options={done ? options3 : clockedIn ? options2 : options}
+        options={done ? options3 : clockedIn ? options2 : options1}
       />
     </>
   );

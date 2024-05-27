@@ -8,9 +8,7 @@ const calculateMonthlyStatus = async (data: withStatus | withStatus[]) => {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
   const dateString = `${year}-${month}-01`;
-  const startofMonthDate = new Date(
-    new Date(year, month - 1, 1).setHours(0, 0, 0, 0)
-  );
+  const startofMonthDate = new Date(new Date(year, month - 1, 1).setHours(0, 0, 0, 0));
 
   // get all holidays in this month
 
@@ -63,12 +61,10 @@ const calculateMonthlyStatus = async (data: withStatus | withStatus[]) => {
     // get total logs, work from home, and absent
     const totalLogs = logs.length;
     // get total work from home
-    const totalWorkFromHome = logs.filter(
-      (log) => log.type === "work_from_home"
-    ).length;
+    const totalWorkFromHome = logs.filter((log) => log.type === "work_from_home").length;
     // get total work from office
     const totalWorkFromOffice = logs.filter(
-      (log) => log.type === "work_from_office"
+      (log) => log.type === "work_from_office" || log.type === "work_with_duty"
     ).length;
     // get total absent
     const totalAbsent = Math.max(
