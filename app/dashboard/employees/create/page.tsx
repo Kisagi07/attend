@@ -10,24 +10,25 @@ interface Option {
   label: string;
   value: string | number;
 }
+
+const genderOptions: Option[] = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+];
+
 const CreateEmployee = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showPIN, setShowPIN] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
   const [isIntern, setIsIntern] = useState<boolean>(false);
-  const [genderOptions, setGenderOptions] = useState<Option[]>([
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-  ]);
   const [gender, setGender] = useState<Option>({
     label: "Male",
     value: "male",
   });
-  const [todayShift, setTodayShift] = useState<Option>();
   const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [PIN, setPIN] = useState<string>("");
   const [workId, setWorkId] = useState<string>("Loading...");
   const [validation, setValidation] = useState<{
     [key: string]: boolean;
@@ -50,7 +51,7 @@ const CreateEmployee = () => {
     } else {
       failed.name = true;
     }
-    if (password?.length > 0) {
+    if (PIN?.length > 0) {
       success.password = true;
     } else {
       failed.password = true;
@@ -85,33 +86,46 @@ const CreateEmployee = () => {
   };
   const resetForm = () => {
     setName("");
-    setPassword("");
+    setPIN("");
     setWorkId("");
     setJobPosition(undefined);
-    setTodayShift(undefined);
     formRef.current!.reset();
   };
   const sendRegister = async () => {
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        password,
-        work_id: workId,
-        job_position_id: jobPosition!.value,
-        gender: gender.value,
-        role: isIntern ? "intern" : "employee",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) {
-      toast.error("Failed Registering Employee");
-    } else {
-      toast.success("Employee Registered");
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          password: PIN,
+          work_id: workId,
+          job_position_id: jobPosition!.value,
+          gender: gender.value,
+          role: isIntern ? "intern" : "employee",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.ok) {
+        toast.success("Employee Registered");
+        resetForm();
+        fetchRegisterData();
+      } else {
+        const data = await res.json();
+        if (data.error) {
+          toast.error(data.error);
+          throw new Error(data.error);
+        } else {
+          toast.error("Failed Registering Employee");
+          throw new Error("Something Went Wrong");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
     }
-    const data = await res.json();
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,11 +137,12 @@ const CreateEmployee = () => {
     } else {
       setSubmitting(true);
 
-      await sendRegister();
-
-      resetForm();
-      fetchRegisterData();
-      setSubmitting(false);
+      sendRegister();
+    }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isNaN(+e.key) && e.key !== "Backspace" && e.key !== "Delete") {
+      e.preventDefault();
     }
   };
   useEffect(() => {
@@ -172,22 +187,26 @@ const CreateEmployee = () => {
           </div>
 
           <div>
-            <label htmlFor="name">
-              Password<span className="text-red-500">*</span> :{" "}
+            <label htmlFor="PIN">
+              PIN<span className="text-red-500">*</span> :{" "}
             </label>
             <div className="relative">
               <input
-                onChange={({ currentTarget }) => setPassword(currentTarget.value)}
-                type={showPassword ? "text" : "password"}
+                id="PIN"
+                onChange={({ currentTarget }) => setPIN(currentTarget.value)}
+                type={showPIN ? "text" : "password"}
+                inputMode="tel"
                 className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
                   "!border-red-500": validation["password"],
                 })}
+                maxLength={6}
+                onKeyDown={handleKeyDown}
               />
               <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
-                {showPassword ? (
-                  <FaRegEyeSlash onClick={() => setShowPassword(false)} />
+                {showPIN ? (
+                  <FaRegEyeSlash onClick={() => setShowPIN(false)} />
                 ) : (
-                  <FaRegEye onClick={() => setShowPassword(true)} />
+                  <FaRegEye onClick={() => setShowPIN(true)} />
                 )}
               </span>
             </div>

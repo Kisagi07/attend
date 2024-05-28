@@ -4,6 +4,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { work_id, password, name, job_position_id, role = "employee", gender } = await req.json();
+
+  // get all users for unique checking
+  const users = await prisma.users.findMany();
+  let unique = true;
+  for (const user of users) {
+    if (await bcryptjs.compare(password, user.password!)) {
+      unique = false;
+      break;
+    }
+  }
+  // if its not unique return error
+  if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
+
   const user = await prisma.users.create({
     data: {
       work_id,

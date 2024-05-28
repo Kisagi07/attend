@@ -7,10 +7,9 @@ export const authConfig: NextAuthOptions = {
   },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      id: "credentials",
       credentials: {
-        work_id: { label: "Work Id" },
-        password: { label: "Password", type: "password" },
+        PIN: { label: "PIN", type: "password" },
       },
       async authorize(credentials) {
         const res = await fetch(`${process.env.APP_URL}/api/login`, {
@@ -25,7 +24,8 @@ export const authConfig: NextAuthOptions = {
         if (user && res.ok) {
           return user;
         }
-        return null;
+
+        throw new Error("Invalid Credentials");
       },
     }),
   ],
@@ -43,8 +43,4 @@ export const authConfig: NextAuthOptions = {
       return session;
     },
   },
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthOptions;

@@ -2,6 +2,7 @@
 import Select from "@/app/components/Select";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
 import { job_positions, users } from "@prisma/client";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -10,16 +11,19 @@ interface Option {
   label: string;
   value: string | number;
 }
-const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
+const genderOptions = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+];
+const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
   const router = useRouter();
+  const [showPIN, setShowPIN] = useState<boolean>(false);
+  const [PIN, setPIN] = useState<string>("");
+
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [fetching, setFetching] = useState<boolean>(true);
   const [jobOptions, setJobOptions] = useState<Option[]>([]);
   const [jobPosition, setJobPosition] = useState<Option>();
-  const [genderOptions, setGenderOptions] = useState<Option[]>([
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-  ]);
   const [isIntern, setIsIntern] = useState<boolean>(false);
   const [gender, setGender] = useState<Option>({
     label: "Male",
@@ -78,6 +82,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           job_position_id: jobPosition!.value,
           gender: gender.value,
           role: isIntern ? "intern" : "employee",
+          password: PIN,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -108,6 +113,11 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
       await handleUpdate();
 
       setSubmitting(false);
+    }
+  };
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isNaN(+e.key) && e.key !== "Backspace" && e.key !== "Delete") {
+      e.preventDefault();
     }
   };
   useEffect(() => {
@@ -150,7 +160,7 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
           onSubmit={handleSubmit}
           className="space-y-4 md:grid md:grid-cols-2 md:items-center md:space-y-0 md:gap-4"
         >
-          <div className="md:col-span-2">
+          <div>
             <label htmlFor="name">
               Name<span className="text-red-500">*</span> :{" "}
             </label>
@@ -162,6 +172,30 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
                 "!border-red-500": validation["name"],
               })}
             />
+          </div>
+
+          <div>
+            <label htmlFor="PIN">PIN</label>
+            <div className="relative">
+              <input
+                id="PIN"
+                onChange={({ currentTarget }) => setPIN(currentTarget.value)}
+                type={showPIN ? "text" : "password"}
+                inputMode="tel"
+                className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
+                  "!border-red-500": validation["password"],
+                })}
+                maxLength={6}
+                onKeyDown={handleKeyDown}
+              />
+              <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
+                {showPIN ? (
+                  <FaRegEyeSlash onClick={() => setShowPIN(false)} />
+                ) : (
+                  <FaRegEye onClick={() => setShowPIN(true)} />
+                )}
+              </span>
+            </div>
           </div>
           <div>
             <Select
@@ -225,4 +259,4 @@ const CreateEmployee = ({ params }: { params: { work_id: string } }) => {
     </section>
   );
 };
-export default CreateEmployee;
+export default UpdateEmployee;
