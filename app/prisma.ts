@@ -29,9 +29,7 @@ const prisma = new PrismaClient().$extends({
   model: {
     users: {
       excludePassword(user: users) {
-        return Object.fromEntries(
-          Object.entries(user).filter(([key]) => key !== "password")
-        );
+        return Object.fromEntries(Object.entries(user).filter(([key]) => key !== "password"));
       },
     },
   },
@@ -84,16 +82,14 @@ const UserWithJob = Prisma.validator<Prisma.usersDefaultArgs>()({
 });
 
 export type LogWithUser = Prisma.logsGetPayload<typeof LogWithUser>;
-export type UserJobExPassword = Prisma.usersGetPayload<
-  typeof UserJobExPassword
->;
+export type UserJobExPassword = Prisma.usersGetPayload<typeof UserJobExPassword>;
 export type UserWithJob = Prisma.usersGetPayload<typeof UserWithJob>;
 
 export type withStatus = UserJobExPassword & {
   totalAbsent: number;
   totalWorkFromHome: number;
   totalWorkFromOffice: number;
-  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent";
+  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent" | "work_with_duty";
 };
 
 async () => {

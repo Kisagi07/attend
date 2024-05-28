@@ -16,7 +16,7 @@ interface ButtonDropdownProps {
   disabled?: boolean;
   loading?: boolean;
   activeButton?: (option: Option) => void;
-  buttonChanged?: () => void;
+  buttonChanged?: (value: string | null) => void;
 }
 
 const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
@@ -55,6 +55,7 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
   const handleOptionClick = (index: number) => {
     setActiveOptionIndex(index);
     handleDropdownClick();
+    buttonChanged?.(options?.[index].label ?? null);
   };
 
   const handleButtonClick = () => {
@@ -76,10 +77,10 @@ const ButtonDropdown: React.FC<ButtonDropdownProps> = ({
         disabled={disabled}
         onClick={handleButtonClick}
         className={`${
-          optionsExists() ? options![activeOptionIndex].className : className
+          optionsExists() ? options![activeOptionIndex]?.className : className
         }  transition-colors rounded-l w-full px-3 py-2`}
       >
-        {loading ? "Loading..." : optionsExists() ? options![activeOptionIndex].label : label}
+        {loading ? "Loading..." : optionsExists() ? options![activeOptionIndex]?.label : label}
       </button>
       {options && options.length > 0 && (
         <>
