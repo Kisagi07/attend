@@ -80,6 +80,29 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
+
+  if (password) {
+    // get all users for unique checking
+    const users = await prisma.users.findMany();
+    let unique = true;
+    for (const user of users) {
+      if (await bcryptjs.compare(password, user.password!)) {
+        unique = false;
+        break;
+      }
+    }
+    // if its not unique return error
+    if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
+    await prisma.users.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: bcryptjs.hashSync(password, 10),
+      },
+    });
+  }
+
   await prisma.users.update({
     where: {
       id: user.id,
@@ -108,17 +131,6 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
       updated_at: true,
     },
   });
-
-  if (password) {
-    await prisma.users.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        password: bcryptjs.hashSync(password, 10),
-      },
-    });
-  }
 
   await prisma.timelines.create({
     data: {

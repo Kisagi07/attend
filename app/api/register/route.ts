@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
   }
   // if its not unique return error
-  if (!unique) return NextResponse.json({ error: "Password already in use" }, { status: 409 });
+  if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
 
   const user = await prisma.users.create({
     data: {
