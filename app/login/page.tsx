@@ -2,25 +2,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useSession } from "next-auth/react";
-
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { FloatingLabel } from "flowbite-react";
 
 const LoginPage = () => {
   const router = useRouter();
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [incorrect, setIncorrect] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [PIN, setPIN] = useState<string>("");
 
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     setIncorrect(false);
-    const formData = new FormData(e.currentTarget);
     const res = await signIn("credentials", {
-      work_id: formData.get("work_id"),
-      password: formData.get("password"),
+      PIN,
       redirect: false,
     });
 
@@ -39,13 +35,18 @@ const LoginPage = () => {
 
   return (
     <main className="min-h-screen bg-white text-slate-500 px-4 md:bg-slate-50 py-8 flex flex-col justify-center">
-      <section className="text-center md:bg-white max-w-sm mx-auto md:border-2 md:border-slate-200 md:rounded md:p-3 md:shadow-md">
+      <section className="text-center md:bg-white max-w-sm mx-auto w-full md:border-2 md:border-slate-200 md:rounded md:p-3 md:shadow-md">
         <h1 className=" text-5xl font-bold">Login</h1>
-        <form
-          onSubmit={handleLoginSubmit}
-          className="mt-4 space-y-4 text-start"
-        >
-          <div>
+        <form onSubmit={handleLoginSubmit} className="mt-4 space-y-4 text-start">
+          <FloatingLabel
+            variant="standard"
+            label="PIN"
+            maxLength={5}
+            type="password"
+            value={PIN}
+            onChange={(e) => setPIN(e.currentTarget.value)}
+          />
+          {/* <div>
             <label htmlFor="work_id">Work ID:</label>
             <input
               type="text"
@@ -74,12 +75,8 @@ const LoginPage = () => {
                 {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
               </span>
             </div>
-          </div>
-          {incorrect && (
-            <small className="text-red-400">
-              Make sure the Work ID and Password are correct
-            </small>
-          )}
+          </div> */}
+          {incorrect && <small className="text-red-400">Make sure the PIN are correct</small>}
           <button
             disabled={submitting}
             className="w-full disabled:bg-green-300 rounded-md bg-green-400 px-3 py-2 border hover:bg-green-500 border-accent-1 transition-all duration-300 text-white"

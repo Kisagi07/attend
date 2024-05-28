@@ -3,13 +3,9 @@ import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { work_id, password } = await req.json();
+  const { PIN } = await req.json();
 
-  const user = await prisma.users.findFirst({
-    where: {
-      work_id,
-    },
-  });
+  const user = await prisma.users.findFirst({});
   if (!user)
     return NextResponse.json(
       {

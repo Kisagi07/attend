@@ -9,8 +9,7 @@ export const authConfig: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        work_id: { label: "Work Id" },
-        password: { label: "Password", type: "password" },
+        PIN: { label: "PIN", type: "password" },
       },
       async authorize(credentials) {
         const res = await fetch(`${process.env.APP_URL}/api/login`, {
