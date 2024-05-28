@@ -1,6 +1,7 @@
 import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/[...nextauth]/auth";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const {
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
         clock_out_time: clock_out_time_object,
         clock_out_latitude,
         clock_out_longitude,
-        work: todaysWork,
+        work: [...todaysWork, ...(existingLog.work as Prisma.JsonArray)],
       },
     });
 
@@ -130,9 +131,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.timelines.create({
       data: {
-        title: `${user.name} Attendance: ${
-          log.type === "work_from_home" ? "Work From Home" : "Work From Office"
-        }`,
+        title: `${user.name} Attendance: ${log.type.replaceAll("_", " ")}`,
         description: `${user.name} has clocked in at ${clock_in_time}`,
         type: "new",
       },
