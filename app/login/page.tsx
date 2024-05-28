@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FloatingLabel } from "flowbite-react";
@@ -28,9 +28,10 @@ const LoginPage = () => {
     }
   };
 
-  const handleUppercase = (e: React.FormEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    input.value = input.value.toUpperCase();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (Number.isNaN(+e.key) && e.key !== "Backspace" && e.key !== "Delete") {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -41,41 +42,12 @@ const LoginPage = () => {
           <FloatingLabel
             variant="standard"
             label="PIN"
-            maxLength={5}
+            maxLength={6}
             type="password"
             value={PIN}
+            onKeyDown={handleKeyDown}
             onChange={(e) => setPIN(e.currentTarget.value)}
           />
-          {/* <div>
-            <label htmlFor="work_id">Work ID:</label>
-            <input
-              type="text"
-              className="w-full outline-none rounded-md px-3 py-2 bg-transparent border-2 border-slate-300 "
-              placeholder="ID..."
-              id="work_id"
-              name="work_id"
-              maxLength={5}
-              onInput={handleUppercase}
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password:</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="w-full outline-none rounded-md px-3 py-2 bg-transparent border-2 border-slate-300 "
-                placeholder="Password"
-                id="password"
-                name="password"
-              />
-              <span
-                className="absolute top-1/2 -translate-y-1/2 right-4 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
-              </span>
-            </div>
-          </div> */}
           {incorrect && <small className="text-red-400">Make sure the PIN are correct</small>}
           <button
             disabled={submitting}

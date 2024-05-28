@@ -18,6 +18,7 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
             "bg-red-100 text-red-500": user.todayStatus === "absent",
             "bg-green-100 text-green-500": user.todayStatus === "work_from_home",
             "bg-blue-100 text-blue-500": user.todayStatus === "sick",
+            "bg-rose-100 text-rose-500": user.todayStatus === "work_with_duty",
           })}
         >
           {user.todayStatus.replaceAll("_", " ") || "Hadir"}

@@ -7,7 +7,7 @@ export const authConfig: NextAuthOptions = {
   },
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      id: "credentials",
       credentials: {
         PIN: { label: "PIN", type: "password" },
       },
@@ -24,7 +24,8 @@ export const authConfig: NextAuthOptions = {
         if (user && res.ok) {
           return user;
         }
-        return null;
+
+        throw new Error("Invalid Credentials");
       },
     }),
   ],
@@ -42,8 +43,4 @@ export const authConfig: NextAuthOptions = {
       return session;
     },
   },
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthOptions;

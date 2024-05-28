@@ -6,7 +6,7 @@ async function main() {
   const admin = await prisma.users.create({
     data: {
       name: "Admin",
-      password: await bcryptjs.hash("yut6gb23", 10),
+      password: await bcryptjs.hash("290990", 10),
       role: "admin",
       gender: "male",
       work_id: "ID001",

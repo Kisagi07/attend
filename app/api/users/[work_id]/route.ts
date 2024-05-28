@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
 import prisma, { withStatus } from "@/app/prisma";
+import bcryptjs from "bcryptjs";
 
 export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const searchParams = req.nextUrl.searchParams;
@@ -69,7 +70,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
-  const { name, job_position_id, gender, role } = await req.json();
+  const { name, job_position_id, gender, role, password } = await req.json();
 
   let user = await prisma.users.findFirst({
     where: {
@@ -107,6 +108,17 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
       updated_at: true,
     },
   });
+
+  if (password) {
+    await prisma.users.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: bcryptjs.hashSync(password, 10),
+      },
+    });
+  }
 
   await prisma.timelines.create({
     data: {

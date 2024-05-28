@@ -1,24 +1,25 @@
 import prisma from "@/app/prisma";
+import { users } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { PIN } = await req.json();
 
-  const user = await prisma.users.findFirst({});
-  if (!user)
-    return NextResponse.json(
-      {
-        message: "User not found",
-      },
-      {
-        status: 404,
-      }
-    );
+  const users = await prisma.users.findMany();
 
-  const matched = await bcryptjs.compare(password, user.password!);
+  let userFound: users | null = null;
 
-  if (!matched) return NextResponse.json(null);
+  for (const user of users) {
+    if (await bcryptjs.compare(PIN, user.password!)) {
+      userFound = user;
+      break;
+    }
+  }
 
-  return NextResponse.json(user);
+  if (!userFound) {
+    return NextResponse.json(null, { status: 404 });
+  }
+
+  return NextResponse.json(userFound);
 }
