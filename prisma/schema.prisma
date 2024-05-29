@@ -82,8 +82,9 @@ model users {
   home_latitude    Decimal?       @db.Decimal(10, 8)
   home_longitude   Decimal?       @db.Decimal(11, 8)
   gender           users_gender?  @default(male)
+  profile_picture  String?        @db.VarChar(255)
   logs             logs[]
-  job_position    job_positions? @relation(fields: [job_position_id], references: [id], map: "users_job_position_id_foreign_idx")
+  job_position     job_positions? @relation(fields: [job_position_id], references: [id], map: "users_job_position_id_foreign_idx")
 
   @@index([job_position_id], map: "users_job_position_id_foreign_idx")
 }
