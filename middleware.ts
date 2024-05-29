@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 export default withAuth(async function middleware(req) {
   // if in /home but the user is admin then redirect to dashboard
   if (
-    req.nextUrl.pathname === "/home" &&
+    req.nextUrl.pathname.startsWith("/home") &&
     req.nextauth.token?.role === "admin"
   ) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -13,7 +13,7 @@ export default withAuth(async function middleware(req) {
 
   // if in /dashboard but the user is not admin then redirect to home
   if (
-    req.nextUrl.pathname === "/dashboard" &&
+    req.nextUrl.pathname.startsWith("/dashboard") &&
     req.nextauth.token?.role !== "admin"
   ) {
     return NextResponse.redirect(new URL("/home", req.url));

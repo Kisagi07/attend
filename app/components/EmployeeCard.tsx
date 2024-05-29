@@ -51,6 +51,8 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
             className=" object-cover object-center"
             alt=""
             draggable={false}
+            priority
+            sizes="20vw"
           />
         </div>
       ) : user.gender === "male" ? (
@@ -72,25 +74,6 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
           draggable={false}
         />
       )}
-      {/* {user.gender === "male" ? (
-        <Image
-          src={"/img/male.png"}
-          width={200}
-          height={200}
-          className="w-16 md:w-24 h-auto"
-          alt=""
-          draggable={false}
-        />
-      ) : (
-        <Image
-          src={"/img/female.png"}
-          width={200}
-          height={200}
-          className="w-16 md:w-24 h-5/6"
-          alt=""
-          draggable={false}
-        />
-      )} */}
     </article>
   );
 };
