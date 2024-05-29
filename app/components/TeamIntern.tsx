@@ -4,16 +4,16 @@ import useSWR from "swr";
 import { CardSkeleton } from "../skeletons";
 import { fetcher } from "../helper";
 import EmployeeCard from "./EmployeeCard";
-import { withStatus } from "../prisma";
+import { UserResultFirst } from "../prisma";
 
 const TeamIntern = () => {
-  const { data: users, isLoading: usersLoading } = useSWR<withStatus[]>(
+  const { data: users, isLoading: usersLoading } = useSWR<UserResultFirst[]>(
     "/api/users?monthly-status&role=intern",
-    fetcher
+    fetcher,
   );
   return (
     <section className="space-y-2">
-      <h1 className="text-xl uppercase font-semibold">Magang</h1>
+      <h1 className="text-xl font-semibold uppercase">Magang</h1>
       <hr />
       <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {usersLoading ? (

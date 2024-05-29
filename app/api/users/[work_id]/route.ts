@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateMonthlyStatus } from "@/app/serverhelper";
-import prisma, { withStatus } from "@/app/prisma";
+import prisma, { withStatus, UserResultFirst } from "@/app/prisma";
 import bcryptjs from "bcryptjs";
 
-export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { work_id: string } },
+) {
   const searchParams = req.nextUrl.searchParams;
   const monthlyStatus = searchParams.has("monthly-status");
 
@@ -29,7 +32,7 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
   if (!user) return NextResponse.json(null);
 
   if (monthlyStatus) {
-    const withStatus = await calculateMonthlyStatus(user as unknown as withStatus);
+    const withStatus = await calculateMonthlyStatus(user as UserResultFirst);
 
     return NextResponse.json(withStatus[0]);
   }
@@ -37,7 +40,10 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
   return NextResponse.json(user);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { work_id: string } },
+) {
   const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
@@ -49,7 +55,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
       {
         message: "User not found",
       },
-      { status: 404 }
+      { status: 404 },
     );
 
   const deleted = await prisma.users.delete({
@@ -69,7 +75,10 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
   return NextResponse.json({ message: "Deleted", data: { deleted } });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { work_id: string } },
+) {
   const { name, job_position_id, gender, role, password } = await req.json();
 
   let user = await prisma.users.findFirst({
@@ -92,7 +101,11 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
       }
     }
     // if its not unique return error
-    if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
+    if (!unique)
+      return NextResponse.json(
+        { error: "PIN already in use" },
+        { status: 409 },
+      );
     await prisma.users.update({
       where: {
         id: user.id,
