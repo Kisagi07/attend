@@ -25,6 +25,11 @@ const prisma = new PrismaClient()
             return "absent";
           },
         },
+        totalLate: {
+          compute(): number {
+            return 0;
+          },
+        },
       },
     },
     model: {
