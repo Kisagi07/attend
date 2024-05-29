@@ -122,8 +122,12 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then((res) => res.json() as Promise<job_positions[]>),
-      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<users>),
+      fetch("/api/job-positions").then(
+        (res) => res.json() as Promise<job_positions[]>,
+      ),
+      fetch(`/api/users/${params.work_id}`).then(
+        (res) => res.json() as Promise<users>,
+      ),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
@@ -134,13 +138,18 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
         setUser(data[1]);
         setWorkId(data[1].work_id!);
         setName(data[1].name!);
-        const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
+        const defaultPosition = options.find(
+          (option) => option.value === data[1].job_position_id,
+        );
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
         data[1].gender === "male"
           ? setGender({ label: "Male", value: "male" })
           : setGender({ label: "Female", value: "female" });
+        if (data[1].role === "intern") {
+          setIsIntern(true);
+        }
       })
       .catch((error) => {
         console.error(error.message);
@@ -150,7 +159,7 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
 
   return (
     <section className="space-y-4">
-      <h1 className="text-lg uppercase font-semibold">Edit Employee</h1>
+      <h1 className="text-lg font-semibold uppercase">Edit Employee</h1>
       <hr />
       {fetching ? (
         <EmployeeFormSkeleton />
@@ -158,7 +167,7 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="space-y-4 md:grid md:grid-cols-2 md:items-center md:space-y-0 md:gap-4"
+          className="space-y-4 md:grid md:grid-cols-2 md:items-center md:gap-4 md:space-y-0"
         >
           <div>
             <label htmlFor="name">
@@ -168,9 +177,12 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name!}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
-                "!border-red-500": validation["name"],
-              })}
+              className={clsx(
+                "w-full rounded border border-slate-200 p-2 outline-none",
+                {
+                  "!border-red-500": validation["name"],
+                },
+              )}
             />
           </div>
 
@@ -182,13 +194,16 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
                 onChange={({ currentTarget }) => setPIN(currentTarget.value)}
                 type={showPIN ? "text" : "password"}
                 inputMode="tel"
-                className={clsx("w-full rounded outline-none border border-slate-200 p-2", {
-                  "!border-red-500": validation["password"],
-                })}
+                className={clsx(
+                  "w-full rounded border border-slate-200 p-2 outline-none",
+                  {
+                    "!border-red-500": validation["password"],
+                  },
+                )}
                 maxLength={6}
                 onKeyDown={handleKeyDown}
               />
-              <span className="absolute text-base top-1/2 cursor-pointer -translate-y-1/2 right-2">
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-base">
                 {showPIN ? (
                   <FaRegEyeSlash onClick={() => setShowPIN(false)} />
                 ) : (
@@ -215,10 +230,10 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
               readOnly
               type="text"
               className={clsx(
-                "w-full rounded outline-none border bg-slate-100 border-slate-200 p-2",
+                "w-full rounded border border-slate-200 bg-slate-100 p-2 outline-none",
                 {
                   "border-red-500": validation["work_id"],
-                }
+                },
               )}
               value={workId}
             />
@@ -245,10 +260,10 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
           <button
             disabled={submitting}
             className={clsx(
-              "bg-black md:col-span-2 hover:bg-slate-950 w-full text-white p-4 rounded",
+              "w-full rounded bg-black p-4 text-white hover:bg-slate-950 md:col-span-2",
               {
                 "!bg-slate-700": submitting,
-              }
+              },
             )}
             type="submit"
           >
