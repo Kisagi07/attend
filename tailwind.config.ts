@@ -4,7 +4,7 @@ import flowbite from "flowbite-react/tailwind";
 
 const config: Config = {
   content: [
-    "./node_modules/@nextui-org/theme/dist/components/(button|input|link|ripple|spinner).js",
+    "./node_modules/@nextui-org/theme/dist/components/(button|date-picker|input|link|ripple|spinner|calendar|date-input|popover).js",
     "./app/**/*.{js,jsx,ts,tsx}",
     flowbite.content(),
   ],
