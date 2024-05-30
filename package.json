@@ -12,6 +12,11 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts"
   },
   "dependencies": {
+    "@nextui-org/button": "^2.0.32",
+    "@nextui-org/input": "^2.2.0",
+    "@nextui-org/link": "^2.0.30",
+    "@nextui-org/system": "^2.2.0",
+    "@nextui-org/theme": "^2.2.4",
     "@prisma/client": "^5.14.0",
     "@tanstack/react-table": "^8.11.7",
     "@types/bcryptjs": "^2.4.6",
@@ -24,6 +29,7 @@
     "file-type": "^19.0.0",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.9.0",
+    "framer-motion": "^11.2.9",
     "mysql2": "^3.8.0",
     "next": "^14.2.3",
     "next-auth": "^4.24.5",
