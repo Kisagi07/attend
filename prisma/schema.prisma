@@ -85,8 +85,23 @@ model users {
   profile_picture  String?        @db.VarChar(255)
   logs             logs[]
   job_position     job_positions? @relation(fields: [job_position_id], references: [id], map: "users_job_position_id_foreign_idx")
+  dayOffRequests   DayOffRequest[]
 
   @@index([job_position_id], map: "users_job_position_id_foreign_idx")
+}
+
+model DayOffRequest {
+  id                Int           @id @default(autoincrement())
+  userId            Int
+  requestDate       DateTime
+  leaveType         String
+  status            DayOffStatus  @default(pending)
+  comment           String?
+  leaveStartDate    DateTime
+  leaveEndDate      DateTime
+  user              users @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
 }
 
 enum logs_type {
@@ -94,6 +109,12 @@ enum logs_type {
   sick
   work_from_office @map("work-from-office")
   work_with_duty
+}
+
+enum DayOffStatus {
+  approved
+  pending
+  rejected
 }
 
 enum timelines_type {
