@@ -139,10 +139,10 @@ const calculateMonthlyStatus = async (
       let late = 0;
       // calculate how many times users clock in late
       const clockedInLog = logs.filter((log) => log.type !== "sick");
-      const lateLogs = clockedInLog.filter((log) => {
+      clockedInLog.forEach((log) => {
         const time = log.clock_in_time!;
-        const hour = time.getHours();
-        const minute = time.getMinutes();
+        const hour = time.getUTCHours();
+        const minute = time.getUTCMinutes();
         const clockInTime = hour * 60 + minute;
 
         const positionClockInTime = user.job_position?.shift_start!;
