@@ -31,6 +31,9 @@ const EmployeeCard: React.FC<Props> = ({ user }: Props) => {
           <h6 className="text-red-500">
             {user.totalAbsent || 0} hari tidak hadir
           </h6>
+          <h6 className="text-fuchsia-500">
+            {user.totalLate || 0} hari terlambat
+          </h6>
           <h6 className="text-amber-500">
             {user.totalWorkFromHome || 0} hari kerja dari rumah
           </h6>
