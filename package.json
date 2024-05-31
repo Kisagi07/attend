@@ -12,11 +12,15 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts"
   },
   "dependencies": {
+    "@internationalized/date": "^3.5.4",
     "@nextui-org/button": "^2.0.32",
     "@nextui-org/date-picker": "^2.1.0",
     "@nextui-org/input": "^2.2.0",
     "@nextui-org/link": "^2.0.30",
+    "@nextui-org/modal": "^2.0.35",
+    "@nextui-org/pagination": "^2.0.32",
     "@nextui-org/system": "^2.2.0",
+    "@nextui-org/tabs": "^2.0.31",
     "@nextui-org/theme": "^2.2.4",
     "@prisma/client": "^5.14.0",
     "@tanstack/react-table": "^8.11.7",

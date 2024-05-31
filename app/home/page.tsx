@@ -7,7 +7,7 @@ import ClockInOut from "@/app/components/ClockInOut";
 import { HomeCoordinate } from "@/app/components";
 import { FaRegCalendarTimes } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
-import { Link } from "@nextui-org/link";
+import Link from "next/link";
 
 import getUser from "@/app/libs/getUser";
 import { Button, ButtonGroup } from "@nextui-org/button";

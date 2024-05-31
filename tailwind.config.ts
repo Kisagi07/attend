@@ -1,12 +1,10 @@
 import { nextui } from "@nextui-org/theme";
 import type { Config } from "tailwindcss";
-import flowbite from "flowbite-react/tailwind";
 
 const config: Config = {
   content: [
-    "./node_modules/@nextui-org/theme/dist/components/(button|date-picker|input|link|ripple|spinner|calendar|date-input|popover).js",
-    "./app/**/*.{js,jsx,ts,tsx}",
-    flowbite.content(),
+    "./node_modules/@nextui-org/theme/dist/components/(button|date-picker|input|link|modal|pagination|tabs|ripple|spinner|calendar|date-input|popover).js",
+    "./app/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -24,6 +22,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [flowbite.plugin(), nextui()],
+  plugins: [nextui()],
 };
 export default config;

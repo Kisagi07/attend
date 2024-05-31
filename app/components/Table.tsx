@@ -26,21 +26,31 @@ const Table: FC<TableProps> = ({ data, columns }) => {
   });
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full" {...{ style: { minWidth: table.getCenterTotalSize() } }}>
+      <table
+        className="w-full"
+        {...{ style: { minWidth: table.getCenterTotalSize() } }}
+      >
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} className="bg-slate-50">
               {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ width: header.getSize() }} className="p-2 ntext-left">
+                <th
+                  key={header.id}
+                  style={{ width: header.getSize() }}
+                  className="p-2 text-sm lg:text-base"
+                >
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                 </th>
               ))}
             </tr>
           ))}
         </thead>
-        <tbody className="divide-y divdie-slate-200">
+        <tbody className="divdie-slate-200 divide-y">
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
@@ -57,12 +67,13 @@ const Table: FC<TableProps> = ({ data, columns }) => {
           type="button"
           disabled={!table.getCanPreviousPage()}
           onClick={() => table.previousPage()}
-          className="p-2 disabled:text-gray-400 hover:bg-gray-100"
+          className="p-2 hover:bg-gray-100 disabled:text-gray-400"
         >
           <FaCaretLeft />
         </button>
         <span className="p-2">
-          {table.getState().pagination.pageIndex + 1} of {table.getPageCount().toLocaleString()}
+          {data.length > 0 ? table.getState().pagination.pageIndex + 1 : 0} of{" "}
+          {table.getPageCount().toLocaleString()}
         </span>
         <button
           type="button"

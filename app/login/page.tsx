@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { FloatingLabel } from "flowbite-react";
+import { Input } from "@nextui-org/input";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -35,23 +35,30 @@ const LoginPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-500 px-4 md:bg-slate-50 py-8 flex flex-col justify-center">
-      <section className="text-center md:bg-white max-w-sm mx-auto w-full md:border-2 md:border-slate-200 md:rounded md:p-3 md:shadow-md">
+    <main className="flex min-h-screen flex-col justify-center bg-white px-4 py-8 text-slate-500 md:bg-slate-50">
+      <section className="mx-auto w-full max-w-sm text-center md:rounded md:border-2 md:border-slate-200 md:bg-white md:p-3 md:shadow-md">
         <h1 className=" text-5xl font-bold">Login</h1>
-        <form onSubmit={handleLoginSubmit} className="mt-4 space-y-4 text-start">
-          <FloatingLabel
-            variant="standard"
+        <form
+          onSubmit={handleLoginSubmit}
+          className="mt-4 space-y-4 text-start"
+        >
+          <Input
+            variant="underlined"
             label="PIN"
             maxLength={6}
             type="password"
             value={PIN}
             onKeyDown={handleKeyDown}
-            onChange={(e) => setPIN(e.currentTarget.value)}
+            onValueChange={setPIN}
           />
-          {incorrect && <small className="text-red-400">Make sure the PIN are correct</small>}
+          {incorrect && (
+            <small className="text-red-400">
+              Make sure the PIN are correct
+            </small>
+          )}
           <button
             disabled={submitting}
-            className="w-full disabled:bg-green-300 rounded-md bg-green-400 px-3 py-2 border hover:bg-green-500 border-accent-1 transition-all duration-300 text-white"
+            className="border-accent-1 w-full rounded-md border bg-green-400 px-3 py-2 text-white transition-all duration-300 hover:bg-green-500 disabled:bg-green-300"
           >
             {submitting ? "Submitting...." : "Login"}
           </button>

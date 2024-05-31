@@ -10,19 +10,16 @@ const POST = async (req: NextRequest) => {
     return NextResponse.json("Unauthorized", { status: 401 });
   }
   // extract data from the request body
-  const {
-    request_date: requestDate,
-    leave_type: leaveType,
-    comment,
-    leave_start_date: leaveStartDate,
-    leave_end_date: leaveEndDate,
-  }: {
-    request_date: string;
-    leave_type: string;
-    comment?: string;
-    leave_start_date: string;
-    leave_end_date: string;
-  } = await req.json();
+  const formData = await req.formData();
+  const requestDate = formData.get("request_date") as string;
+  const leaveType = formData.get("leave_type") as string;
+  const comment = formData.get("comment") as string;
+  const leaveStartDate = formData.get("leave_start_date") as string;
+  const leaveEndDate = formData.get("leave_end_date") as string;
+
+  if (!requestDate || !leaveType || !leaveStartDate || !leaveEndDate) {
+    return NextResponse.json("Bad Request", { status: 400 });
+  }
 
   // if id is not in session user then find user based on work_id
   let user: users | undefined;
@@ -69,8 +66,11 @@ const GET = async (req: NextRequest) => {
   // get all day off requests
   const dayOffRequests = await prisma.dayOffRequest.findMany({
     orderBy: {
-        createdAt: 'desc',        
-    }
+      createdAt: "desc",
+    },
+    include: {
+      user: true,
+    },
   });
   return NextResponse.json(dayOffRequests);
 };
