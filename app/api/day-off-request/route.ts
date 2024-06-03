@@ -66,7 +66,7 @@ const GET = async (req: NextRequest) => {
   // get all day off requests
   const dayOffRequests = await prisma.dayOffRequest.findMany({
     orderBy: {
-      createdAt: "desc",
+      leaveStartDate: "desc",
     },
     include: {
       user: true,

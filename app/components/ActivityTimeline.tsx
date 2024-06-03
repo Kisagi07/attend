@@ -2,14 +2,13 @@
 import { fetcher } from "../helper";
 import useSWR from "swr";
 import { TimelineSkeleton } from "../skeletons";
-import { CustomFlowbiteTheme, Timeline } from "flowbite-react";
-import clsx from "clsx";
+import Timeline from "./Timeline";
 import { timelines } from "@prisma/client";
 
 const ActivityTimeline = () => {
   const { data: timelines, isLoading: timelineLoading } = useSWR<timelines[]>(
     "/api/timelines?limit=4",
-    fetcher
+    fetcher,
   );
 
   function calculateTimeAgo(dateString: string): string {
@@ -39,7 +38,7 @@ const ActivityTimeline = () => {
   }
   return (
     <section className="space-y-2 md:col-span-3">
-      <h1 className="text-xl uppercase font-semibold">Activity Timeline</h1>
+      <h1 className="text-xl font-semibold uppercase">Activity Timeline</h1>
       <hr />
       {timelineLoading ? (
         <TimelineSkeleton />
@@ -47,37 +46,26 @@ const ActivityTimeline = () => {
         <Timeline>
           {timelines?.map((timeline) => {
             const date = new Date(timeline.created_at);
-            const customTheme: CustomFlowbiteTheme["timeline"] = {
-              item: {
-                point: {
-                  marker: {
-                    base: {
-                      vertical: clsx(
-                        "absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white ",
-                        {
-                          "bg-red-400 dark:border-red-900 dark:bg-red-700":
-                            timeline.type === "removed",
-                          "bg-blue-400 dark:border-blue-900 dark:bg-blue-700":
-                            timeline.type === "updated",
-                          "bg-green-400 dark:border-green-900 dark:bg-green-700":
-                            timeline.type === "new",
-                        }
-                      ),
-                    },
-                  },
-                },
-              },
-            };
             return (
-              <Timeline.Item key={timeline.id} className="mb-3">
-                <Timeline.Point theme={customTheme.item!.point} />
+              <Timeline.Item key={timeline.id}>
+                <Timeline.Point
+                  color={
+                    timeline.type === "removed"
+                      ? "red"
+                      : timeline.type === "updated"
+                        ? "blue"
+                        : "green"
+                  }
+                />
                 <Timeline.Content>
                   <div className="flex items-start justify-between gap-2">
-                    <Timeline.Title className="capitalize text-base lg:text-lg">
+                    <Timeline.Title>
                       {timeline.title.includes("Attendance") ? (
                         <>
                           <span>{timeline.title.split(":")[0]} : </span>
-                          <span className="text-red-500">{timeline.title.split(":")[1]}</span>
+                          <span className="text-red-500">
+                            {timeline.title.split(":")[1]}
+                          </span>
                         </>
                       ) : timeline.title.includes("Attendance") ? (
                         <>
@@ -86,12 +74,15 @@ const ActivityTimeline = () => {
                       ) : (
                         <span>
                           {timeline.title} (
-                          {`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`})
+                          {`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`}
+                          )
                         </span>
                       )}
                     </Timeline.Title>
                     <Timeline.Time>
-                      {calculateTimeAgo(timeline.created_at as unknown as string)}
+                      {calculateTimeAgo(
+                        timeline.created_at as unknown as string,
+                      )}
                     </Timeline.Time>
                   </div>
                   <Timeline.Body>
@@ -99,14 +90,18 @@ const ActivityTimeline = () => {
                     timeline.title.includes("Clock Out") ? (
                       <>
                         {timeline.description.split("at")[0]} at{" "}
-                        <span className="text-lime-400">{timeline.description.split("at")[1]}</span>
+                        <span className="text-lime-400">
+                          {timeline.description.split("at")[1]}
+                        </span>
                       </>
                     ) : timeline.title.includes("Working on") ? (
                       <>
-                        <ul className="list-disc ml-2 list-inside">
-                          {(JSON.parse(timeline.description) as string[]).map((job) => (
-                            <li key={job}>{job}</li>
-                          ))}
+                        <ul className="ml-2 list-inside list-disc">
+                          {(JSON.parse(timeline.description) as string[]).map(
+                            (job) => (
+                              <li key={job}>{job}</li>
+                            ),
+                          )}
                         </ul>
                       </>
                     ) : (

@@ -11,8 +11,15 @@ import {
   ModalContent,
 } from "@nextui-org/modal";
 import { DayOffRequestWithUser } from "@/app/prisma";
+import DayOffRequestCard from "@/app/components/DayOffRequestCard";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
+import { FaCircleXmark } from "react-icons/fa6";
+import { IoIosCheckmarkCircle } from "react-icons/io";
+import { FaFlag } from "react-icons/fa";
+import { toast } from "react-toastify";
 const Page = () => {
-  const { data } = useSWR<DayOffRequestWithUser[]>(
+  const { data, mutate } = useSWR<DayOffRequestWithUser[]>(
     "/api/day-off-request",
     fetcher,
   );
@@ -26,6 +33,47 @@ const Page = () => {
     rejected: [],
   });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [toBeUpdated, setToBeUpdated] =
+    React.useState<DayOffRequestWithUser | null>(null);
+  const [updating, setUpdating] = React.useState<boolean>(false);
+  const [comment, setComment] = React.useState<string>("");
+
+  const handleOnArticleClick = (id: number) => {
+    const item = data?.find((item) => item.id === id);
+    if (item) {
+      setToBeUpdated(item);
+      onOpen();
+    } else {
+      console.error("Item not found");
+    }
+  };
+
+  const handleUpdate = async (status: "approved" | "rejected" | "pending") => {
+    const formData = new FormData();
+    formData.append("status", status);
+    formData.append("comment", comment);
+    setUpdating(true);
+    try {
+      const response = await fetch(`/api/day-off-request/${toBeUpdated?.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+      if (response.ok) {
+        onOpenChange();
+        setToBeUpdated(null);
+        setComment("");
+        toast.success("Successfully updated");
+        mutate();
+      } else {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   React.useEffect(() => {
     if (data) {
@@ -41,7 +89,10 @@ const Page = () => {
         <h1 className="text-3xl font-medium">Employee Leave Request</h1>
         <Tabs aria-label="option">
           <Tab key="pending" title="Pending">
-            <DayOffRequestList data={sortedData.pending} />
+            <DayOffRequestList
+              data={sortedData.pending}
+              onArticleClick={handleOnArticleClick}
+            />
           </Tab>
           <Tab key="approved" title="Approved">
             <DayOffRequestList data={sortedData.approved} />
@@ -52,11 +103,79 @@ const Page = () => {
         </Tabs>
       </section>
       <section>
-        <button onClick={onOpen}>Open Modal</button>
-        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <Modal
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          motionProps={{
+            variants: {
+              enter: {
+                y: 0,
+                opacity: 1,
+                transition: {
+                  duration: 0.2,
+                  ease: "easeOut",
+                },
+              },
+              exit: {
+                y: -20,
+                opacity: 0,
+                transition: {
+                  duration: 0.2,
+                  ease: "easeIn",
+                },
+              },
+            },
+          }}
+        >
           <ModalContent>
             <ModalBody>
-              <h1>Modal</h1>
+              {toBeUpdated && (
+                <>
+                  <DayOffRequestCard dayOffRequest={toBeUpdated} />
+                  <div className="space-y-4">
+                    <Input
+                      variant="underlined"
+                      label="Comment"
+                      name="comment"
+                    />
+                    <div className="flex justify-center gap-4">
+                      {toBeUpdated.status !== "rejected" && (
+                        <Button
+                          color="danger"
+                          variant="flat"
+                          startContent={<FaCircleXmark />}
+                          onClick={() => handleUpdate("rejected")}
+                          isLoading={updating}
+                        >
+                          Reject
+                        </Button>
+                      )}
+                      {toBeUpdated.status !== "approved" && (
+                        <Button
+                          color="success"
+                          variant="flat"
+                          startContent={<IoIosCheckmarkCircle />}
+                          onClick={() => handleUpdate("approved")}
+                          isLoading={updating}
+                        >
+                          Approve
+                        </Button>
+                      )}
+                      {toBeUpdated.status !== "pending" && (
+                        <Button
+                          color="secondary"
+                          variant="flat"
+                          startContent={<FaFlag />}
+                          onClick={() => handleUpdate("pending")}
+                          isLoading={updating}
+                        >
+                          Pending
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </ModalBody>
           </ModalContent>
         </Modal>

@@ -42,7 +42,7 @@ const POST = async (req: NextRequest) => {
     await prisma.timelines.create({
       data: {
         title: "Holiday Created",
-        description: `Holiday ${name} created on ${date}`,
+        description: `Holiday ${name} created on ${new Date()}`,
         type: "new",
       },
     });

@@ -2,8 +2,9 @@
 import React from "react";
 import { GrHostMaintenance } from "react-icons/gr";
 import { FaGear } from "react-icons/fa6";
-import { FloatingLabel, Button, Alert } from "flowbite-react";
 import { useRouter } from "next/navigation";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
 const Maintenance = () => {
   const router = useRouter();
   const [key, setKey] = React.useState("");
@@ -27,22 +28,24 @@ const Maintenance = () => {
       .finally(() => setSubmitting(false));
   };
   return (
-    <main className="min-h-screen bg-white flex items-center justify-center flex-col p-4 gap-4">
-      <div className="relative w-full max-w-sm mx-auto">
-        <FaGear className="text-yellow-300 text-5xl animate-spin absolute top-0 right-0" />
-        <FaGear className="text-yellow-300 text-5xl animate-spin absolute left-0 top-1/2" />
-        <GrHostMaintenance className="text-9xl text-red-500 mx-auto block" />
-        <hr className="h-4 bg-blue-500 w-full mt-4" />
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white p-4">
+      <div className="relative mx-auto w-full max-w-sm">
+        <FaGear className="absolute right-0 top-0 animate-spin text-5xl text-yellow-300" />
+        <FaGear className="absolute left-0 top-1/2 animate-spin text-5xl text-yellow-300" />
+        <GrHostMaintenance className="mx-auto block text-9xl text-red-500" />
+        <hr className="mt-4 h-4 w-full bg-blue-500" />
       </div>
-      <h1 className="text-4xl font-bold text-center">Under Maintenance</h1>
-      {error && <Alert color="failure">{error}</Alert>}
-      <FloatingLabel
-        variant="outlined"
+      <h1 className="text-center text-4xl font-bold">Under Maintenance</h1>
+      {error && (
+        <div className="bg-red-300 px-2 py-1 text-sm text-red-500">{error}</div>
+      )}
+      <Input
+        variant="faded"
         label="Key"
         value={key}
         onChange={(e) => setKey(e.currentTarget.value)}
       />
-      <Button isProcessing={submitting} onClick={handleSend}>
+      <Button isLoading={submitting} onClick={handleSend}>
         Bypass Maintenance
       </Button>
     </main>

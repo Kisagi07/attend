@@ -6,9 +6,10 @@ import { toast } from "react-toastify";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, users } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { FloatingLabel } from "flowbite-react";
+import { Input } from "@nextui-org/input";
 
-const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<any, string> = (...args) =>
+  fetch(...args).then((res) => res.json());
 const ClockInOut = () => {
   // hook variable
   const [sending, setSending] = useState<boolean>(false);
@@ -22,11 +23,13 @@ const ClockInOut = () => {
   const [options1, setOptions1] = useState([
     {
       label: "Clock From Home",
-      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
+      className:
+        "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
     },
     {
       label: "Clock From Office",
-      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
+      className:
+        "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
     },
     {
       label: "Sick Day",
@@ -34,7 +37,8 @@ const ClockInOut = () => {
     },
     {
       label: "Clock With Duty",
-      className: "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
+      className:
+        "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
     },
   ]);
   const [options2, setOptions2] = useState([
@@ -46,7 +50,8 @@ const ClockInOut = () => {
   const [options3, setOptions3] = useState([
     {
       label: "Good Job",
-      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
+      className:
+        "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
     },
   ]);
   //fetched data
@@ -61,7 +66,9 @@ const ClockInOut = () => {
     error: companyError,
     isLoading: companyLoading,
   } = useSWR<company>(`/api/company`, fetcher);
-  const { data: user } = useSWR<users>(`/api/user`, fetcher, { refreshInterval: 1000 });
+  const { data: user } = useSWR<users>(`/api/user`, fetcher, {
+    refreshInterval: 1000,
+  });
 
   const buttonChanges = (value: string | null) => {
     if (value == "Clock With Duty") {
@@ -77,11 +84,15 @@ const ClockInOut = () => {
       const type = getType(value);
       const { latitude, longitude } = await getUserLocation();
       const { targetLatitude, targetLongitude } = getTargetLocation(
-        type === "work-from-home" || fromHome
+        type === "work-from-home" || fromHome,
       );
       const distance = Math.floor(
-        calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
-          1000
+        calculateDistance(
+          latitude,
+          longitude,
+          Number(targetLatitude),
+          Number(targetLongitude),
+        ) * 1000,
       );
       if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
         toast.error("You are not in the right location to clockin");
@@ -224,27 +235,29 @@ const ClockInOut = () => {
   };
 
   const getUserLocation = () => {
-    return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          resolve({ latitude, longitude });
-        },
-        (error) => {
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        }
-      );
-    });
+    return new Promise<{ latitude: number; longitude: number }>(
+      (resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            reject(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          },
+        );
+      },
+    );
   };
 
   const getTargetLocation = (
-    fromHome: boolean
+    fromHome: boolean,
   ): {
     targetLatitude: Prisma.Decimal;
     targetLongitude: Prisma.Decimal;
@@ -290,15 +303,21 @@ const ClockInOut = () => {
   }, [todayAttendance, isLoading]);
 
   return isSick ? (
-    <button className="w-full bg-sky-400  text-white cursor-default rounded p-4">Rest Well!</button>
+    <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">
+      Rest Well!
+    </button>
   ) : (
     <>
       {clockedIn && !done && (
-        <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
+        <ListInput
+          items={todaysWork}
+          addItem={handleAddItem}
+          removeItem={handleRemoveItem}
+        />
       )}
       {showDuty && (
-        <FloatingLabel
-          variant="outlined"
+        <Input
+          variant="underlined"
           label="Duty"
           value={duty}
           onChange={(e) => setDuty(e.currentTarget.value)}
@@ -309,7 +328,7 @@ const ClockInOut = () => {
         onClick={(value) => handleClockBtn(value)}
         loading={isLoading || sending}
         disabled={done || isLoading || sending}
-        className="bg-slate-900 hover:bg-black text-white"
+        className="bg-slate-900 text-white hover:bg-black"
         options={done ? options3 : clockedIn ? options2 : options1}
       />
     </>

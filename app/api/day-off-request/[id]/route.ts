@@ -34,7 +34,7 @@ const PUT = async (
   // authorize user
   const session = await auth();
   if (!session) {
-    return NextResponse.json("Unauthorized", { status: 401 });
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   // get day off based on id passed in params
@@ -49,33 +49,14 @@ const PUT = async (
     return NextResponse.json({ message: "Not Found" }, { status: 404 });
   }
 
-  // get data from body
-  const {
-    request_date: requestDate,
-    leave_type: leaveType,
-    comment,
-    leave_start_date: leaveStartDate,
-    leave_end_date: leaveEndDate,
-    status,
-  }: {
-    request_date: string;
-    leave_type: string;
-    comment?: string;
-    leave_start_date: string;
-    leave_end_date: string;
-    status: "pending" | "approved" | "rejected";
-  } = await req.json();
+  // extract data from the request body
+  const formData = await req.formData();
+  const comment = formData.get("comment") as string;
+  const status = formData.get("status") as "pending" | "approved" | "rejected";
 
   // validate everthing is not empty except comment
-  if (
-    !requestDate ||
-    !leaveType ||
-    !leaveStartDate ||
-    !leaveEndDate ||
-    !status ||
-    !["pending", "approved", "rejected"].includes(status)
-  ) {
-    return NextResponse.json("Bad Request", { status: 400 });
+  if (!status || !["pending", "approved", "rejected"].includes(status)) {
+    return NextResponse.json({ message: "Bad Request" }, { status: 400 });
   }
 
   // update day off request
@@ -84,16 +65,12 @@ const PUT = async (
       id: Number(params.id),
     },
     data: {
-      requestDate: new Date(requestDate),
-      leaveType,
       comment,
-      leaveStartDate: new Date(leaveStartDate),
-      leaveEndDate: new Date(leaveEndDate),
       status,
     },
   });
 
-  return NextResponse.json(updatedDayOffRequest);
+  return NextResponse.json({ message: "Updated", data: updatedDayOffRequest });
 };
 
 const DELETE = async (
