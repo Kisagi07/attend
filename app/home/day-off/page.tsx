@@ -9,7 +9,7 @@ const Page = () => {
   const [showRequest, setShowRequest] = React.useState<boolean>(false);
 
   return (
-    <main className="space-y-4 p-4">
+    <main className="mx-auto max-w-xl space-y-4 p-4">
       <section>
         <Button as={Link} href="/home" color="secondary" variant="ghost">
           Go Back
