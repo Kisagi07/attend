@@ -1,13 +1,14 @@
 "use client";
 import { fetcher } from "@/app/helper";
 import { UserApiProfile } from "@/app/prisma";
-import { Alert, Button, FileInput, FloatingLabel } from "flowbite-react";
 import Image from "next/image";
 import React from "react";
 import { toast } from "react-toastify";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import useSWR from "swr";
 import Link from "next/link";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
 const Page: React.FC = () => {
   const {
     data: user,
@@ -56,7 +57,7 @@ const Page: React.FC = () => {
       <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="fotn-bold text-2xl">Edit Profile</h1>
-          <Button as={Link} color="gray" href="/home">
+          <Button as={Link} color="default" href="/home">
             <RiArrowGoBackFill />
           </Button>
         </div>
@@ -97,14 +98,19 @@ const Page: React.FC = () => {
             </label>
           )}
         </div>
-        <FileInput
+        <Input
+          type="file"
           name="profile_picture"
           id="profile_picture"
           className="hidden"
           accept="image/*"
           onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
         />
-        {error && <Alert color="failure">{error}</Alert>}
+        {error && (
+          <div className="bg-red-300 px-2 py-1 text-sm text-red-500">
+            {error}
+          </div>
+        )}
         {isLoading ? (
           <>
             <div className="h-12 animate-pulse rounded bg-slate-200"></div>
@@ -112,15 +118,15 @@ const Page: React.FC = () => {
           </>
         ) : (
           <>
-            <FloatingLabel
-              variant="outlined"
+            <Input
+              variant="underlined"
               name="name"
               label="Name"
               defaultValue={user?.name!}
             />
-            <FloatingLabel
+            <Input
               ref={pinRef}
-              variant="outlined"
+              variant="underlined"
               name="pin"
               label="New PIN"
               type="password"
@@ -129,9 +135,9 @@ const Page: React.FC = () => {
         )}
         <Button
           type="submit"
-          gradientMonochrome="info"
+          color="secondary"
           className="w-full"
-          isProcessing={isSubmitting}
+          isLoading={isSubmitting}
         >
           Save
         </Button>

@@ -34,12 +34,14 @@ export const authConfig: NextAuthOptions = {
       if (user) {
         token.work_id = user.work_id;
         token.role = user.role;
+        token.id = user.id as number;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.work_id = token.work_id as any;
       session.user.role = token.role;
+      session.user.id = token.id;
       return session;
     },
   },

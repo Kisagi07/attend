@@ -5,8 +5,6 @@ import "react-toastify/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Provider from "./components/Provider";
 import { auth } from "./api/auth/[...nextauth]/auth";
-import { SWRConfig } from "swr";
-import { notFound } from "next/navigation";
 import { SWR } from "./components";
 import Maintenance from "./components/Maintenance";
 import { cookies } from "next/headers";

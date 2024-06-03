@@ -8,7 +8,8 @@ import useSWR, { Fetcher } from "swr";
 import { debounce } from "../helper";
 import { users } from "@prisma/client";
 
-const fetcher: Fetcher<users, string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<users, string> = (...args) =>
+  fetch(...args).then((res) => res.json());
 
 const HomeCoordinate = () => {
   const { data, error, isLoading } = useSWR(`/api/user`, fetcher);
@@ -22,7 +23,7 @@ const HomeCoordinate = () => {
         setLatitude(position.coords.latitude.toString());
         setLongitude(position.coords.longitude.toString());
       },
-      (error) => console.error(error)
+      (error) => console.error(error),
     );
   };
 
@@ -54,9 +55,10 @@ const HomeCoordinate = () => {
   }, [latitude, longitude, data?.home_latitude, data?.home_longitude]);
 
   //eslint-disable-next-line
-  const debouncedUpdateHomeCoordinate = useCallback(debounce(updateHomeCoordinate, 500), [
-    updateHomeCoordinate,
-  ]);
+  const debouncedUpdateHomeCoordinate = useCallback(
+    debounce(updateHomeCoordinate, 500),
+    [updateHomeCoordinate],
+  );
 
   const latitudeChanged = (value: string) => {
     const cleanValue = filterCoordinate(value);
@@ -115,25 +117,31 @@ const HomeCoordinate = () => {
   }, [debouncedUpdateHomeCoordinate]);
 
   return isLoading ? (
-    <div className="h-8 w-8 bg-gray-200 animate-pulse"></div>
+    <div className="h-8 w-8 animate-pulse bg-gray-200"></div>
   ) : (
     <>
       <button
         onClick={() => setOpen(!open)}
-        className={clsx("p-4 border border-sky-400 rounded hover:bg-sky-400 hover:text-white", {
-          "bg-sky-400 text-white": open,
-          "bg-transparent : text-sky-400": !open,
-        })}
+        className={clsx(
+          "rounded border border-sky-400 p-2 hover:bg-sky-400 hover:text-white",
+          {
+            "bg-sky-400 text-white": open,
+            ": bg-transparent text-sky-400": !open,
+          },
+        )}
       >
         <FaHome />
       </button>
       <div
-        className={clsx(`space-y-4 transition-all border-gray-300 rounded overflow-hidden h-full`, {
-          "max-h-0": !open,
-          "max-h-max p-4 border": open,
-        })}
+        className={clsx(
+          `h-full space-y-4 overflow-hidden rounded border-gray-300 transition-all`,
+          {
+            "max-h-0": !open,
+            "max-h-max border p-4": open,
+          },
+        )}
       >
-        <div className="flex justify-between items-start">
+        <div className="flex items-start justify-between">
           <h3>Home Coordinate</h3>
           <button className="p-4 text-black" onClick={getPosition}>
             <FaLocationCrosshairs />

@@ -7,6 +7,7 @@ import { GiPartyPopper } from "react-icons/gi";
 import { MdSpaceDashboard } from "react-icons/md";
 import { FaUsers, FaBriefcase, FaClock } from "react-icons/fa";
 import { IoSettingsSharp } from "react-icons/io5";
+import { GoDiscussionOutdated } from "react-icons/go";
 
 interface Layout {
   children: React.ReactNode;
@@ -16,13 +17,15 @@ const Layout: React.FC<Layout> = ({ children }) => {
   return (
     <>
       <nav
-        className={`p-4  border-b h-14 sticky top-0 left-0 z-[100]  border-slate-200 bg-white text-slate-600 shadow flex items-center`}
+        className={`sticky  left-0 top-0 z-[49] flex h-14 items-center  border-b border-slate-200 bg-white p-4 text-slate-600 shadow`}
       >
-        <h1 className="text-xl font-sixtyfour uppercase italic font-bold">Attendance</h1>
+        <h1 className="font-sixtyfour text-xl font-bold uppercase italic">
+          Attendance
+        </h1>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
-          className="ml-auto hover:bg-slate-100 p-4 lg:hidden"
+          className="ml-auto p-4 hover:bg-slate-100 lg:hidden"
           title="open sidebar"
         >
           <FaBars className="text-xl " />
@@ -33,43 +36,48 @@ const Layout: React.FC<Layout> = ({ children }) => {
         <Sidebar.LinkItem
           href="/dashboard"
           name="Dashboard"
-          icon={<MdSpaceDashboard className="w-5 h-5" />}
+          icon={<MdSpaceDashboard className="h-5 w-5" />}
         />
         <Sidebar.LinkItem
           href="/dashboard/employees"
           subMatch
           name="Employee"
-          icon={<FaUsers className="w-5 h-5" />}
+          icon={<FaUsers className="h-5 w-5" />}
         />
         <Sidebar.LinkItem
           href="/dashboard/job-positions"
           subMatch
           name="Job Position"
-          icon={<FaBriefcase className="w-5 h-5" />}
+          icon={<FaBriefcase className="h-5 w-5" />}
         />
         <Sidebar.LinkItem
           href="/dashboard/attendances"
           subMatch
           name="Attendances"
-          icon={<FaClock className="w-5 h-5" />}
+          icon={<FaClock className="h-5 w-5" />}
         />
         <Sidebar.LinkItem
           href="/dashboard/holidays"
           subMatch
           name="Holidays"
-          icon={<GiPartyPopper className="w-5 h-5" />}
+          icon={<GiPartyPopper className="h-5 w-5" />}
         />
-        {/* <Sidebar.LinkItem href="/dashboard/salary" name="Salary" /> */}
+        <Sidebar.LinkItem
+          href="/dashboard/leave-request"
+          subMatch
+          name="Leave Request"
+          icon={<GoDiscussionOutdated />}
+        />
         <Sidebar.LinkItem
           href="/dashboard/settings"
           name="Settings"
-          icon={<IoSettingsSharp className="w-5 h-5" />}
+          icon={<IoSettingsSharp className="h-5 w-5" />}
         />
         <Sidebar.Divider />
-        <Logout className="!bg-white !text-inherit hover:!bg-slate-100 w-full p-4   text-left" />
+        <Logout className="w-full !bg-white p-4 text-left !text-inherit   hover:!bg-slate-100" />
       </Sidebar>
 
-      <main className="lg:ml-[280px] p-4 space-y-4 bg-white min-h-[calc(100vh-3.5rem)]">
+      <main className="min-h-[calc(100vh-3.5rem)] space-y-4 bg-white p-4 lg:ml-[280px]">
         {children}
       </main>
     </>
