@@ -2,15 +2,20 @@
 import React from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { Datepicker, FloatingLabel, Button, Alert } from "flowbite-react";
 import { holidays } from "@prisma/client";
 import { IoIosRemoveCircle } from "react-icons/io";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
+import { DatePicker } from "@nextui-org/date-picker";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 const CompanyHoliday: React.FC = () => {
-  const { data, isLoading, mutate } = useSWR<holidays[]>("/api/company-holiday", fetcher);
+  const { data, isLoading, mutate } = useSWR<holidays[]>(
+    "/api/company-holiday",
+    fetcher,
+  );
 
-  const [companyHoliday, setCompanyHoliday] = React.useState([]);
-  const [date, setDate] = React.useState<Date>(new Date());
+  const [date, setDate] = React.useState(today(getLocalTimeZone()));
   const [holidayName, setHolidayName] = React.useState<string>("");
   const [sending, setSending] = React.useState<boolean>(false);
   const [deleting, setDeleting] = React.useState<boolean>(false);
@@ -32,7 +37,7 @@ const CompanyHoliday: React.FC = () => {
 
       if (response.ok) {
         setHolidayName("");
-        setDate(new Date());
+        setDate(today(getLocalTimeZone()));
         mutate();
       }
     } catch (error) {
@@ -66,44 +71,50 @@ const CompanyHoliday: React.FC = () => {
     <section className="space-y-2">
       <h1>Holidays</h1>
       <hr />
-      <Alert color="info">
+      <div className="bg-red-300 px-2 py-1 text-sm text-red-500">
         <span className="font-medium">
-          National Holiday are automatically counted in work attendances, this function is for
-          company vacation for example: Day off, Company Holiday etc.
+          National Holiday are automatically counted in work attendances, this
+          function is for company vacation for example: Day off, Company Holiday
+          etc.
         </span>
-      </Alert>
-      <div className="space-y-2 md:grid md:gap-2 md:space-y-0 md:grid-cols-2 md:items-center">
-        <Datepicker
-          language="in-ID"
-          weekStart={1}
-          title="Pick New Holiday Date"
-          onSelectedDateChanged={setDate}
-          defaultDate={date}
+      </div>
+      <div className="space-y-2 md:grid md:grid-cols-2 md:items-center md:gap-2 md:space-y-0">
+        <DatePicker
+          label="Pick New Holiday Date"
+          // onSelectedDateChanged={setDate}
+          // defaultDate={date}
+          value={date}
+          onChange={setDate}
         />
-        <FloatingLabel
-          variant="filled"
+        <Input
+          variant="faded"
           label="Holiday Name"
           value={holidayName}
           onChange={(e) => setHolidayName(e.currentTarget.value)}
         />
       </div>
-      <Button onClick={handleAddHoliday} gradientMonochrome="cyan" isProcessing={sending}>
+      <Button onClick={handleAddHoliday} color="secondary" isLoading={sending}>
         Add Holdiay
       </Button>
       {isLoading ? (
-        <div className="h-8 w-full bg-gray-200 animate-pulse"></div>
+        <div className="h-8 w-full animate-pulse bg-gray-200"></div>
       ) : (
-        <ul className="divide-y divide-y-slate-400">
+        <ul className="divide-y-slate-400 divide-y">
           {data?.map((holiday) => (
-            <li key={holiday.id} className="bg-slate-100 flex items-stretch justify-between">
-              <div className="py-1 px-2">
-                <small className="block">{holiday.date.toString().split("T")[0]}</small>
+            <li
+              key={holiday.id}
+              className="flex items-stretch justify-between bg-slate-100"
+            >
+              <div className="px-2 py-1">
+                <small className="block">
+                  {holiday.date.toString().split("T")[0]}
+                </small>
                 <p>{holiday.name}</p>
               </div>
               <button
                 disabled={deleting}
                 onClick={() => handleDelete(holiday.id)}
-                className="text-sm disabled:bg-red-300 aspect-square px-4 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center"
+                className="flex aspect-square items-center justify-center bg-red-500 px-4 text-sm text-white hover:bg-red-600 disabled:bg-red-300"
               >
                 <IoIosRemoveCircle />
               </button>

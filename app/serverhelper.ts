@@ -165,4 +165,12 @@ const calculateMonthlyStatus = async (
   return users;
 };
 
-export { calculateMonthlyStatus };
+// function for returning Date that has beed set to UTC 0000
+const getUTCMidnightDate = (date: Date | string) => {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+  return new Date(date.setUTCHours(0, 0, 0, 0));
+};
+
+export { calculateMonthlyStatus, getUTCMidnightDate };

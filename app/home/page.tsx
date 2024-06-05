@@ -5,12 +5,12 @@ import Logout from "@/app/components/Logout";
 import UserInfoSkeleton from "@/app/_loader/UserInfoSekleton";
 import ClockInOut from "@/app/components/ClockInOut";
 import { HomeCoordinate } from "@/app/components";
-import { RiProfileFill } from "react-icons/ri";
+import { FaRegCalendarTimes } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Link from "next/link";
 
 import getUser from "@/app/libs/getUser";
-import { Button } from "flowbite-react";
+import { Button, ButtonGroup } from "@nextui-org/button";
 
 const Home = () => {
   const promise = getUser();
@@ -19,9 +19,28 @@ const Home = () => {
     <main className="min-h-screen w-full bg-white p-4 text-slate-700">
       <div className="mx-auto max-w-md space-y-4">
         <div className="flex">
-          <Button color="gray" as={Link} href="/home/profile">
-            <ImProfile />
-          </Button>
+          <ButtonGroup>
+            <Button
+              variant="bordered"
+              color="secondary"
+              as={Link}
+              href="/home/profile"
+              title="Profile"
+              startContent={<ImProfile />}
+            >
+              Profile
+            </Button>
+            <Button
+              variant="bordered"
+              color="secondary"
+              as={Link}
+              href="/home/day-off"
+              title="Time Off"
+              startContent={<FaRegCalendarTimes />}
+            >
+              Day Off
+            </Button>
+          </ButtonGroup>
         </div>
         <div className="flex w-full">
           <div className="grow">
