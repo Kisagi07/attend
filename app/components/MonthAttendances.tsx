@@ -5,21 +5,27 @@ import { Table } from "@/app/components";
 import { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
 import clsx from "clsx";
 import { parseTime } from "@internationalized/date";
+import useSWR from "swr";
+import { fetcher } from "../helper";
 
 const columnHelper = createColumnHelper<LogWithUserWithJob>();
 const MonthAttendances = ({
   data,
   withName = false,
+  tolerance = 0,
 }: {
   data: LogWithUserWithJob[];
   withName?: boolean;
+  tolerance?: number;
 }) => {
   const isLate = (log: LogWithUserWithJob): boolean => {
     if (log.type === "sick") return false;
     const clockInTime = parseTime(
       log.clock_in_time!.toString().split("T")[1].split(".")[0],
     );
-    const workTime = parseTime(log.user?.job_position?.shift_start ?? "00:00");
+    const workTime = parseTime(
+      log.user?.job_position?.shift_start ?? "00:00",
+    ).add({ minutes: tolerance });
     return clockInTime.compare(workTime) > 0;
   };
 

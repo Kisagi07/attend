@@ -8,7 +8,7 @@ import { TableSkeleton } from "../skeletons";
 import MonthAttendances from "./MonthAttendances";
 import { notFound } from "next/navigation";
 import { FaCircleXmark } from "react-icons/fa6";
-import { logs } from "@prisma/client";
+import { company, logs } from "@prisma/client";
 import { LogWithUserWithJob } from "../prisma";
 
 const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
@@ -26,6 +26,8 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
       },
     },
   );
+
+  const { data: company } = useSWR<company>(`/api/company`, fetcher);
 
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option>();
@@ -90,7 +92,14 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
         </section>
       )}
       <section id="table">
-        {isLoading ? <TableSkeleton /> : <MonthAttendances data={tableData} />}
+        {isLoading ? (
+          <TableSkeleton />
+        ) : (
+          <MonthAttendances
+            tolerance={company?.tolerance_active ? company.tolerance_time : 0}
+            data={tableData}
+          />
+        )}
       </section>
     </section>
   );

@@ -3,7 +3,7 @@
 import MonthAttendances from "@/app/components/MonthAttendances";
 import Select from "@/app/components/Select";
 import { fetcher } from "@/app/helper";
-import { logs, users } from "@prisma/client";
+import { company, logs, users } from "@prisma/client";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { FaXmark } from "react-icons/fa6";
@@ -19,6 +19,8 @@ const Page = () => {
     `/api/users`,
     fetcher,
   );
+
+  const { data: company } = useSWR<company>(`/api/company`, fetcher);
 
   const [userOptions, setUserOptions] = useState<Option[]>([]);
   const [selectedUser, setSelectedUser] = useState<Option>();
@@ -144,7 +146,11 @@ const Page = () => {
       {logsLoading ? (
         <TableSkeleton />
       ) : (
-        <MonthAttendances withName data={tableData} />
+        <MonthAttendances
+          tolerance={company?.tolerance_active ? company.tolerance_time : 0}
+          withName
+          data={tableData}
+        />
       )}
     </div>
   );
