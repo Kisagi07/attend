@@ -4,13 +4,31 @@ import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import useSWR, { Fetcher } from "swr";
-import { logs, company, users } from "@prisma/client";
+import { logs, company } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Input } from "@nextui-org/input";
+import { UserWithJob } from "../prisma";
 
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
+
 const ClockInOut = () => {
+  //fetched data
+  const {
+    data: todayAttendance,
+    error,
+    isLoading,
+    mutate: mutateAttendance,
+  } = useSWR<logs>("/api/user/attendance", fetcher);
+  const {
+    data: company,
+    error: companyError,
+    isLoading: companyLoading,
+  } = useSWR<company>(`/api/company`, fetcher);
+  const { data: user } = useSWR<UserWithJob>(`/api/user`, fetcher, {
+    refreshInterval: 1000,
+  });
+
   // hook variable
   const [sending, setSending] = useState<boolean>(false);
   const [clockedIn, setClockedIn] = useState<boolean>(false);
@@ -20,6 +38,9 @@ const ClockInOut = () => {
   const [todaysWork, setTodaysWork] = useState<string[]>([]);
   const [duty, setDuty] = useState<string>("");
   const [showDuty, setShowDuty] = useState<boolean>(false);
+  const [isLate, setIsLate] = useState<boolean>(false);
+  const [lateReason, setLateReason] = useState<string>("");
+  const [time, setTime] = useState(0);
   const [options1, setOptions1] = useState([
     {
       label: "Clock From Home",
@@ -54,21 +75,6 @@ const ClockInOut = () => {
         "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
     },
   ]);
-  //fetched data
-  const {
-    data: todayAttendance,
-    error,
-    isLoading,
-    mutate: mutateAttendance,
-  } = useSWR<logs>("/api/user/attendance", fetcher);
-  const {
-    data: company,
-    error: companyError,
-    isLoading: companyLoading,
-  } = useSWR<company>(`/api/company`, fetcher);
-  const { data: user } = useSWR<users>(`/api/user`, fetcher, {
-    refreshInterval: 1000,
-  });
 
   const buttonChanges = (value: string | null) => {
     if (value == "Clock With Duty") {
@@ -94,18 +100,24 @@ const ClockInOut = () => {
           Number(targetLongitude),
         ) * 1000,
       );
+      // if distance is more than 50m and not sick or work with duty then warned user then return
       if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
         toast.error("You are not in the right location to clockin");
         return;
       }
-
+      // if clock out but no work filled then warned user then return
       if (type === "clock-out" && todaysWork.length === 0) {
         toast.error("You need to fill today's work in order to clockout");
         return;
       }
-
+      // if work with duty but duty is not filled then warned user then return
       if (type === "work_with_duty" && !duty) {
         toast.error("You need to fill duty in order to clockin");
+        return;
+      }
+      // if user is late but reason for late is not filled then warned user then return
+      if (isLate && !lateReason) {
+        toast.error("You need to fill reason for being late");
         return;
       }
 
@@ -193,7 +205,9 @@ const ClockInOut = () => {
         date: getDateOnly(),
         clock_in_latitude: latitude,
         clock_in_longitude: longitude,
-        todaysWork,
+        todaysWork: lateReason
+          ? [...todaysWork, `Reason for being late: ${lateReason}`]
+          : todaysWork,
       };
     }
     try {
@@ -302,12 +316,51 @@ const ClockInOut = () => {
     }
   }, [todayAttendance, isLoading]);
 
+  useEffect(() => {
+    // get time and store it to state
+    const interval = setInterval(() => {
+      setTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      const workStart = new Date();
+      const shiftStart = user.job_position?.shift_start ?? "09:00";
+      workStart.setHours(parseInt(shiftStart.split(":")[0]));
+      workStart.setMinutes(parseInt(shiftStart.split(":")[1]));
+      if (company?.tolerance_active) {
+        workStart.setMinutes(workStart.getMinutes() + company.tolerance_time);
+      }
+      const shiftStartTime = workStart.getTime();
+      if (time > shiftStartTime) {
+        setIsLate(true);
+      }
+    }
+  }, [time, user, company]);
+
   return isSick ? (
     <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">
       Rest Well!
     </button>
   ) : (
     <>
+      {isLate && !clockedIn && (
+        <>
+          <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
+            You are late! hurry up!
+          </div>
+          <Input
+            label="State your reason for coming in late"
+            color="danger"
+            variant="underlined"
+            name="late-reason"
+            value={lateReason}
+            onValueChange={setLateReason}
+          />
+        </>
+      )}
       {clockedIn && !done && (
         <ListInput
           items={todaysWork}
