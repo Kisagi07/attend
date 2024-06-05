@@ -7,17 +7,24 @@ const PUT = async (req: NextRequest) => {
     return NextResponse.json("Unauthorized", { status: 401 });
   }
 
-  const {tolerance_time, tolerance_active} : {tolerance_time:string, tolerance_active:boolean} = await req.json();
-  
+  const {
+    tolerance_time,
+    tolerance_active,
+  }: { tolerance_time: string; tolerance_active: boolean } = await req.json();
+
   await prisma.company.update({
     where: {
-        id: 1
+      id: 1,
     },
     data: {
-        tolerance_active,
-        tolerance_time: Number(tolerance_time),
-    }
-  })
+      tolerance_active,
+      tolerance_time: Number(tolerance_time),
+    },
+  });
+
+  const data = await prisma.company.findFirst();
+
+  return NextResponse.json({ message: "Updated", data });
 };
 
 export { PUT };

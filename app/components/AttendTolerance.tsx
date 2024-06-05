@@ -1,12 +1,12 @@
 "use client";
 import { CiCircleQuestion } from "react-icons/ci";
-import InputCheckbox from "./InputCheckbox";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import InputText from "./InputText";
 import AttendToleranceSkeleton from "../skeletons/AttendToleranceSkeleton";
 import { toast } from "react-toastify";
 import { company } from "@prisma/client";
+import { Checkbox } from "@nextui-org/checkbox";
 const AttendTolerance = () => {
   const [toleranceActive, setToleranceActive] = useState<boolean>(false);
   const [toleranceValue, setToleranceValue] = useState<string>("30");
@@ -14,25 +14,32 @@ const AttendTolerance = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const saveTolerance = async () => {
     setSubmitting(true);
-    const res = await fetch("/api/company/tolerance", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        tolerance_active: toleranceActive,
-        tolerance_time: toleranceValue,
-      }),
-    });
-    if (!res.ok) {
-      toast.error(
-        "Something went wrong with the server when updating attend tolerance",
-      );
+    console.log(toleranceActive);
+    try {
+      const res = await fetch("/api/company/tolerance", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tolerance_active: toleranceActive,
+          tolerance_time: toleranceValue,
+        }),
+      });
+      if (!res.ok) {
+        toast.error(
+          "Something went wrong with the server when updating attend tolerance",
+        );
+        throw new Error("Something went wrong");
+      }
+
+      const data = await res.json();
+      toast.success("Attend Tolerance Updated");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
     }
-    const data = await res.json();
-    toast.success("Attend Tolerance Updated");
-    setSubmitting(false);
-    return data;
   };
   useEffect(() => {
     fetch("/api/company")
@@ -51,9 +58,10 @@ const AttendTolerance = () => {
     <section className="spacep-y-4">
       <div className="flex justify-between">
         <h1 className="text-xl font-semibold uppercase">Attend Tolerance</h1>
-        <InputCheckbox
-          checked={toleranceActive}
-          onChange={setToleranceActive}
+        <Checkbox
+          isSelected={toleranceActive}
+          onValueChange={setToleranceActive}
+          color="success"
         />
       </div>
       <article
