@@ -116,7 +116,13 @@ const ClockInOut = () => {
         return;
       }
       // if user is late but reason for late is not filled then warned user then return
-      if (isLate && !lateReason) {
+      if (
+        isLate &&
+        !lateReason &&
+        (type === "work-from-home" ||
+          type === "work-from-office" ||
+          type === "work_with_duty")
+      ) {
         toast.error("You need to fill reason for being late");
         return;
       }
