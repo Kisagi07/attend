@@ -9,6 +9,7 @@ import MonthAttendances from "./MonthAttendances";
 import { notFound } from "next/navigation";
 import { FaCircleXmark } from "react-icons/fa6";
 import { logs } from "@prisma/client";
+import { LogWithUserWithJob } from "../prisma";
 
 const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
   const { data: monthLogs, isLoading } = useSWR<any>(
@@ -23,22 +24,22 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
         if (retryCount >= 10) return;
         setTimeout(() => revalidate({ retryCount }), 5000);
       },
-    }
+    },
   );
 
   const [options, setOptions] = useState<Option[]>([]);
   const [selectedOption, setSelectedOption] = useState<Option>();
-  const [tableData, setTableData] = useState<logs[]>([]);
+  const [tableData, setTableData] = useState<LogWithUserWithJob[]>([]);
 
   const getTotalWorkDay = (): number => {
     return tableData.filter(
-      (log) => log.type === "work_from_office" || log.type === "work_from_home"
+      (log) => log.type === "work_from_office" || log.type === "work_from_home",
     ).length;
   };
 
   const handleXmarkClick = () => {
     setSelectedOption(undefined);
-    const logs = Object.values(monthLogs).flat() as logs[];
+    const logs = Object.values(monthLogs).flat() as LogWithUserWithJob[];
     setTableData(logs);
   };
 
@@ -58,7 +59,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
         const logs = monthLogs[selectedOption.value];
         setTableData(logs);
       } else {
-        const logs = Object.values(monthLogs).flat() as logs[];
+        const logs = Object.values(monthLogs).flat() as LogWithUserWithJob[];
         setTableData(logs);
       }
     }
@@ -67,7 +68,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
   return (
     <section className="space-y-4">
       <section className="flex w-full" id="filterer">
-        <div className="w-full md:w-1/2 lg:1/3  flex gap-4 items-center">
+        <div className="lg:1/3 flex w-full  items-center gap-4 md:w-1/2">
           <Select
             placeholder="Select Month"
             options={options}
@@ -75,7 +76,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
             value={selectedOption}
             label="Attendance Month & Year :"
           />
-          <button onClick={handleXmarkClick} className="text-red-500 mt-4">
+          <button onClick={handleXmarkClick} className="mt-4 text-red-500">
             <FaCircleXmark />
           </button>
         </div>
@@ -83,7 +84,8 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
       {tableData.length > 0 && (
         <section id="total">
           <p>
-            Total Work Day : <span className="text-semibold">{getTotalWorkDay()}</span>
+            Total Work Day :{" "}
+            <span className="text-semibold">{getTotalWorkDay()}</span>
           </p>
         </section>
       )}
