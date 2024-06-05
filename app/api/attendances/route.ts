@@ -1,11 +1,11 @@
 import { monthNumberToWord } from "@/app/helper";
 import { NextRequest, NextResponse } from "next/server";
-import prisma, { LogWithUser } from "@/app/prisma";
+import prisma, { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
 
 function getTodayDate() {
   const today = new Date();
   return new Date(
-    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
   );
 }
 
@@ -15,7 +15,7 @@ function isWorkDay(date: Date, holidays: any[]) {
     date.getDay() !== 6 &&
     !holidays.some(
       (holiday) =>
-        new Date(holiday.date.split(" ")[0]).getTime() === date.getTime()
+        new Date(holiday.date.split(" ")[0]).getTime() === date.getTime(),
     )
   );
 }
@@ -63,16 +63,22 @@ export async function GET(req: NextRequest) {
           role: true,
           updated_at: true,
           created_at: true,
+          job_position: {
+            select: {
+              shift_start: true,
+            },
+          },
         },
       },
     },
     orderBy: {
       created_at: "desc",
     },
-  })) as LogWithUser[];
+  })) as LogWithUserWithJob[];
 
   if (groupedNamedDate) {
-    const grouped: { [key: string]: { [key: string]: LogWithUser[] } } = {};
+    const grouped: { [key: string]: { [key: string]: LogWithUserWithJob[] } } =
+      {};
     logs.forEach((log) => {
       const date = log.date ? new Date(log.date) : new Date();
       const month = monthNumberToWord(date.getMonth());

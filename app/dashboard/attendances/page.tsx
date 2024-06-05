@@ -8,13 +8,17 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { FaXmark } from "react-icons/fa6";
 import TableSkeleton from "@/app/_loader/TableSkeleton";
+import { LogWithUserWithJob } from "@/app/prisma";
 
 const Page = () => {
   const { data: logs, isLoading: logsLoading } = useSWR<any>(
     `/api/attendances?grouped-name-date&latest`,
-    fetcher
+    fetcher,
   );
-  const { data: users, isLoading: usersLoading } = useSWR<users[]>(`/api/users`, fetcher);
+  const { data: users, isLoading: usersLoading } = useSWR<users[]>(
+    `/api/users`,
+    fetcher,
+  );
 
   const [userOptions, setUserOptions] = useState<Option[]>([]);
   const [selectedUser, setSelectedUser] = useState<Option>();
@@ -22,7 +26,7 @@ const Page = () => {
   const [dateOptions, setDateOptions] = useState<Option[]>([]);
   const [selectedDate, setSelectedDate] = useState<Option>();
 
-  const [tableData, setTableData] = useState<logs[]>([]);
+  const [tableData, setTableData] = useState<LogWithUserWithJob[]>([]);
 
   const handleUserChange = (option: Option) => {
     setSelectedUser(option);
@@ -31,10 +35,10 @@ const Page = () => {
 
   const sortByDateAndTime = (a: logs, b: logs) => {
     const dateA = new Date(
-      `${a.date?.toString().split("T")[0]}T${a.clock_in_time?.toString().split("T")[1]}`
+      `${a.date?.toString().split("T")[0]}T${a.clock_in_time?.toString().split("T")[1]}`,
     ).getTime();
     const dateB = new Date(
-      `${b.date?.toString().split("T")[0]}T${b.clock_in_time?.toString().split("T")[1]}`
+      `${b.date?.toString().split("T")[0]}T${b.clock_in_time?.toString().split("T")[1]}`,
     ).getTime();
     return dateB - dateA;
   };
@@ -50,7 +54,9 @@ const Page = () => {
 
   useEffect(() => {
     if (users) {
-      setUserOptions(users.map((user) => ({ label: user.name!, value: user.name! })));
+      setUserOptions(
+        users.map((user) => ({ label: user.name!, value: user.name! })),
+      );
     }
   }, [users]);
 
@@ -64,7 +70,11 @@ const Page = () => {
         }
       } else if (selectedUser) {
         if (Object.hasOwn(logs, selectedUser.value)) {
-          setTableData(Object.values(logs[selectedUser.value]).flat() as logs[]);
+          setTableData(
+            Object.values(
+              logs[selectedUser.value],
+            ).flat() as LogWithUserWithJob[],
+          );
         } else {
           setTableData([]);
         }
@@ -74,7 +84,7 @@ const Page = () => {
             Object.values(logs)
               .flatMap((inner: any) => Object.values(inner))
               .flat() as logs[]
-          ).sort(sortByDateAndTime) as logs[]
+          ).sort(sortByDateAndTime) as LogWithUserWithJob[],
         );
       }
     }
@@ -84,7 +94,10 @@ const Page = () => {
     if (selectedUser) {
       if (Object.hasOwn(logs, selectedUser.value)) {
         setDateOptions(
-          Object.keys(logs[selectedUser.value]).map((date) => ({ label: date, value: date }))
+          Object.keys(logs[selectedUser.value]).map((date) => ({
+            label: date,
+            value: date,
+          })),
         );
       } else {
         setDateOptions([]);
@@ -96,12 +109,12 @@ const Page = () => {
       <section className="md:grid md:grid-cols-2 md:gap-4">
         {usersLoading ? (
           <>
-            <div className="h-8 bg-gray-200 animate-pulse"></div>
-            <div className="h-8 bg-gray-200 animate-pulse"></div>
+            <div className="h-8 animate-pulse bg-gray-200"></div>
+            <div className="h-8 animate-pulse bg-gray-200"></div>
           </>
         ) : (
           <>
-            <div className="flex items-centern gap-4">
+            <div className="items-centern flex gap-4">
               <Select
                 options={userOptions}
                 value={selectedUser}
@@ -128,7 +141,11 @@ const Page = () => {
           </>
         )}
       </section>
-      {logsLoading ? <TableSkeleton /> : <MonthAttendances withName data={tableData} />}
+      {logsLoading ? (
+        <TableSkeleton />
+      ) : (
+        <MonthAttendances withName data={tableData} />
+      )}
     </div>
   );
 };
