@@ -84,6 +84,16 @@ const LogWithUser = Prisma.validator<Prisma.logsDefaultArgs>()({
   },
 });
 
+const LogWithUserWithJob = Prisma.validator<Prisma.logsDefaultArgs>()({
+  include: {
+    user: {
+      include: {
+        job_position: true,
+      },
+    },
+  },
+});
+
 const UserJobExPassword = Prisma.validator<Prisma.usersDefaultArgs>()({
   select: {
     job_position: true,
@@ -110,6 +120,9 @@ const DayOffRequestWithUser =
       user: true,
     },
   });
+export type LogWithUserWithJob = Prisma.logsGetPayload<
+  typeof LogWithUserWithJob
+>;
 
 export type DayOffRequestWithUser = Prisma.DayOffRequestGetPayload<
   typeof DayOffRequestWithUser

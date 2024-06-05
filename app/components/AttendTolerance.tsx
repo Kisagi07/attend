@@ -1,12 +1,12 @@
 "use client";
 import { CiCircleQuestion } from "react-icons/ci";
-import InputCheckbox from "./InputCheckbox";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import InputText from "./InputText";
 import AttendToleranceSkeleton from "../skeletons/AttendToleranceSkeleton";
 import { toast } from "react-toastify";
 import { company } from "@prisma/client";
+import { Checkbox } from "@nextui-org/checkbox";
 const AttendTolerance = () => {
   const [toleranceActive, setToleranceActive] = useState<boolean>(false);
   const [toleranceValue, setToleranceValue] = useState<string>("30");
@@ -14,23 +14,32 @@ const AttendTolerance = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const saveTolerance = async () => {
     setSubmitting(true);
-    const res = await fetch("/api/company", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        tolerance_active: toleranceActive,
-        tolerance_time: toleranceValue,
-      }),
-    });
-    if (!res.ok) {
-      toast.error("Something went wrong with the server when updating attend tolerance");
+    console.log(toleranceActive);
+    try {
+      const res = await fetch("/api/company/tolerance", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tolerance_active: toleranceActive,
+          tolerance_time: toleranceValue,
+        }),
+      });
+      if (!res.ok) {
+        toast.error(
+          "Something went wrong with the server when updating attend tolerance",
+        );
+        throw new Error("Something went wrong");
+      }
+
+      const data = await res.json();
+      toast.success("Attend Tolerance Updated");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
     }
-    const data = await res.json();
-    toast.success("Attend Tolerance Updated");
-    setSubmitting(false);
-    return data;
   };
   useEffect(() => {
     fetch("/api/company")
@@ -48,17 +57,22 @@ const AttendTolerance = () => {
   ) : (
     <section className="spacep-y-4">
       <div className="flex justify-between">
-        <h1 className="text-xl uppercase font-semibold">Attend Tolerance</h1>
-        <InputCheckbox checked={toleranceActive} onChange={setToleranceActive} />
+        <h1 className="text-xl font-semibold uppercase">Attend Tolerance</h1>
+        <Checkbox
+          isSelected={toleranceActive}
+          onValueChange={setToleranceActive}
+          color="success"
+        />
       </div>
       <article
         className={clsx("space-y-4", {
-          "opacity-50 select-none": !toleranceActive,
+          "select-none opacity-50": !toleranceActive,
         })}
       >
-        <small className="text-slate-400 font-semibold">
-          <CiCircleQuestion className="inline text-xl" /> The time tolerance of when you can and
-          can&apos;t clock-in before respective start of each shift (in minute)
+        <small className="font-semibold text-slate-400">
+          <CiCircleQuestion className="inline text-xl" /> The time tolerance of
+          when you can and can&apos;t clock-in before respective start of each
+          shift (in minute)
         </small>
         <InputText
           value={toleranceValue}
@@ -70,7 +84,7 @@ const AttendTolerance = () => {
         type="button"
         onClick={saveTolerance}
         disabled={submitting}
-        className="p-4 px-8 disabled:bg-emerald-300 mt-4 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
+        className="mt-4 rounded bg-emerald-400 p-4 px-8 text-white hover:bg-emerald-500 disabled:bg-emerald-300"
       >
         {submitting ? "Saving" : "Save"}
       </button>

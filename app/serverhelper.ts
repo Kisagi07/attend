@@ -137,6 +137,8 @@ const calculateMonthlyStatus = async (
     if (user.job_position) {
       // initial late number
       let late = 0;
+      // get company data
+      const company = await prisma.company.findFirst();
       // calculate how many times users clock in late
       const clockedInLog = logs.filter((log) => log.type !== "sick");
       clockedInLog.forEach((log) => {
@@ -150,7 +152,10 @@ const calculateMonthlyStatus = async (
         const [positionHour, positionMinute] = positionClockInTime
           .split(":")
           .map(Number);
-        const positionClockIn = positionHour * 60 + positionMinute;
+        const positionClockIn =
+          positionHour * 60 +
+          positionMinute +
+          (company?.tolerance_active ? company.tolerance_time : 0);
 
         // if clockInTime is more than positionClockIn add 1 to late
         if (clockInTime > positionClockIn) {
