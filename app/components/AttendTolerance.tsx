@@ -14,7 +14,7 @@ const AttendTolerance = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const saveTolerance = async () => {
     setSubmitting(true);
-    const res = await fetch("/api/company", {
+    const res = await fetch("/api/company/tolerance", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +25,9 @@ const AttendTolerance = () => {
       }),
     });
     if (!res.ok) {
-      toast.error("Something went wrong with the server when updating attend tolerance");
+      toast.error(
+        "Something went wrong with the server when updating attend tolerance",
+      );
     }
     const data = await res.json();
     toast.success("Attend Tolerance Updated");
@@ -48,17 +50,21 @@ const AttendTolerance = () => {
   ) : (
     <section className="spacep-y-4">
       <div className="flex justify-between">
-        <h1 className="text-xl uppercase font-semibold">Attend Tolerance</h1>
-        <InputCheckbox checked={toleranceActive} onChange={setToleranceActive} />
+        <h1 className="text-xl font-semibold uppercase">Attend Tolerance</h1>
+        <InputCheckbox
+          checked={toleranceActive}
+          onChange={setToleranceActive}
+        />
       </div>
       <article
         className={clsx("space-y-4", {
-          "opacity-50 select-none": !toleranceActive,
+          "select-none opacity-50": !toleranceActive,
         })}
       >
-        <small className="text-slate-400 font-semibold">
-          <CiCircleQuestion className="inline text-xl" /> The time tolerance of when you can and
-          can&apos;t clock-in before respective start of each shift (in minute)
+        <small className="font-semibold text-slate-400">
+          <CiCircleQuestion className="inline text-xl" /> The time tolerance of
+          when you can and can&apos;t clock-in before respective start of each
+          shift (in minute)
         </small>
         <InputText
           value={toleranceValue}
@@ -70,7 +76,7 @@ const AttendTolerance = () => {
         type="button"
         onClick={saveTolerance}
         disabled={submitting}
-        className="p-4 px-8 disabled:bg-emerald-300 mt-4 rounded bg-emerald-400 hover:bg-emerald-500 text-white"
+        className="mt-4 rounded bg-emerald-400 p-4 px-8 text-white hover:bg-emerald-500 disabled:bg-emerald-300"
       >
         {submitting ? "Saving" : "Save"}
       </button>
