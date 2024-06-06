@@ -1,0 +1,26 @@
+model logs {
+  id                  Int       @id @default(autoincrement())
+  type                logs_type @default(work_from_office)
+  user_id             Int?
+  date                DateTime? @db.Date
+  clock_in_time       DateTime? @db.Time(0)
+  clock_in_latitude   Decimal?  @db.Decimal(10, 8)
+  clock_in_longitude  Decimal?  @db.Decimal(11, 8)
+  created_at          DateTime  @db.DateTime(0) @default(now())
+  updated_at          DateTime  @db.DateTime(0) @updatedAt
+  work                Json?   @db.Json
+  clock_out_time      DateTime? @db.Time(0)
+  clock_out_latitude  Decimal?  @db.Decimal(10, 8)
+  clock_out_longitude Decimal?  @db.Decimal(11, 8)
+  user               users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "logs_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+
+enum logs_type {
+  work_from_home   @map("work-from-home")
+  sick
+  work_from_office @map("work-from-office")
+  work_with_duty
+}
