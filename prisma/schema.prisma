@@ -83,9 +83,10 @@ model users {
   home_longitude   Decimal?       @db.Decimal(11, 8)
   gender           users_gender?  @default(male)
   profile_picture  String?        @db.VarChar(255)
-  logs             logs[]
+  logs             logs[]  
   job_position     job_positions? @relation(fields: [job_position_id], references: [id], map: "users_job_position_id_foreign_idx")
   dayOffRequests   DayOffRequest[]
+  tasks            Task[]
 
   @@index([job_position_id], map: "users_job_position_id_foreign_idx")
 }
@@ -104,6 +105,48 @@ model DayOffRequest {
   updatedAt         DateTime @default(now()) @updatedAt
 
   @@map("dayoffrequest")
+}
+model Task {
+  id Int @id @default(autoincrement())
+  title String
+  description String?
+  status TaskStatus
+  priority TaskPriority
+  dueDate DateTime
+  userId Int
+  user users @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  subTasks  SubTask[]
+
+  @@map("task")
+}
+
+model SubTask {
+  id          Int         @id @default(autoincrement())
+  taskId      Int
+  task        Task        @relation(fields: [taskId], references: [id])
+  title       String
+  description String?
+  status      TaskStatus
+  dueDate     DateTime
+  createdAt   DateTime    @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+
+  @@map("sub_task")
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+enum TaskStatus {
+  pending
+  in_progress
+  completed
+  uploaded
 }
 
 enum logs_type {
