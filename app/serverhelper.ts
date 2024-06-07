@@ -1,6 +1,7 @@
 import Holidays from "date-holidays";
 import { UserResultMany, UserResultFirst } from "./prisma";
 import prisma from "@/app/prisma";
+import { auth } from "./api/auth/[...nextauth]/auth";
 
 const calculateMonthlyStatus = async (
   data: UserResultFirst | UserResultMany,
@@ -178,4 +179,9 @@ const getUTCMidnightDate = (date: Date | string) => {
   return new Date(date.setUTCHours(0, 0, 0, 0));
 };
 
-export { calculateMonthlyStatus, getUTCMidnightDate };
+const authorized = async (): Promise<boolean> => {
+  const session = await auth();
+  return !!session;
+};
+
+export { calculateMonthlyStatus, getUTCMidnightDate, authorized };
