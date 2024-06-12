@@ -57,7 +57,7 @@ const prisma = new PrismaClient()
       },
     },
   });
-
+// validators
 const LogWithUser = Prisma.validator<Prisma.logsDefaultArgs>()({
   select: {
     date: true,
@@ -120,6 +120,20 @@ const DayOffRequestWithUser =
       user: true,
     },
   });
+
+const ProjectWithLeadWithJobAndMembers =
+  Prisma.validator<Prisma.ProjectDefaultArgs>()({
+    include: {
+      projectLead: {
+        include: {
+          job_position: true,
+        },
+      },
+      projectMembers: true,
+    },
+  });
+
+// types from validator
 export type LogWithUserWithJob = Prisma.logsGetPayload<
   typeof LogWithUserWithJob
 >;
@@ -144,6 +158,12 @@ export type withStatus = UserJobExPassword & {
     | "absent"
     | "work_with_duty";
 };
+
+export type ProjectWithLeadWithJobAndMembers = Prisma.ProjectGetPayload<
+  typeof ProjectWithLeadWithJobAndMembers
+>;
+
+// type results
 
 export type UserApiProfile = Prisma.Result<
   typeof prisma.users,

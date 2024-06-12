@@ -3,8 +3,10 @@ import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
 import { users } from "@prisma/client";
 import React from "react";
-import { Key } from "@react-types/shared";
+import { Key, Selection } from "@react-types/shared";
 import { Button } from "@nextui-org/button";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 interface ProjectFormProps {
   users: {
@@ -14,27 +16,78 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ users }) => {
+  const router = useRouter();
   const [title, setTitle] = React.useState("");
   const [fund, setFund] = React.useState("0");
   const [lead, setLead] = React.useState<Set<Key> | "all" | undefined>(
     new Set([]),
   );
-  const [members, setMembers] = React.useState<Set<Key> | "all" | undefined>(
-    new Set([]),
-  );
+  const [members, setMembers] = React.useState<Set<Key> | "all">(new Set([]));
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validate()) return;
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    // console.log(lead?.[entries]);
+    try {
+      setIsSubmitting(true);
+      const res = await fetch(`/api/projects`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const error: CustomError = new Error("Failed something went wrong");
+        error.info = await res.json();
+        error.status = res.status;
+        throw error;
+      }
+      toast.success("Project created");
+      router.push("/dashboard/projects");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  React.useEffect(() => {
-    const [firstValue] = lead as Set<Key>;
-    // console.log(Number((lead as Set<Key>).values().next().value));
-    console.log(firstValue);
-  }, [lead]);
+  const validate = () => {
+    if (!title) {
+      toast.error("Title is required");
+      return false;
+    }
+
+    if (!fund) {
+      toast.error("Fund is invalid");
+      return false;
+    }
+
+    if ((lead as Set<Key>).size === 0) {
+      toast.error("Leader needed");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleLeaderChange = (value: Selection) => {
+    value = value as Set<Key>;
+    if (value.size > 0) {
+      removeLeaderFromMembers(value.values().next().value);
+    }
+    setLead(value);
+  };
+
+  const removeLeaderFromMembers = (value: string) => {
+    //  Step 2 & 3: Convert the Set to an array and filter out the value to remove
+    const valueToRemove = value;
+    const filteredArray = Array.from(members as Set<Key>).filter(
+      (value) => value !== valueToRemove,
+    );
+
+    // Step 4: Create a new Set from the filtered array
+    const newSet = new Set(filteredArray);
+    setMembers(newSet);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
@@ -62,23 +115,26 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ users }) => {
         selectedKeys={lead}
         className="max-w-xs"
         variant="underlined"
-        onSelectionChange={setLead}
+        onSelectionChange={handleLeaderChange}
         name="project-lead-id"
         isLoading={users.isLoading}
         isRequired
+        description="If the leader is the only one working on this project, members is not needed"
       >
         {users.data.map((animal) => (
           <SelectItem key={animal.id}>{animal.name}</SelectItem>
         ))}
       </Select>
       <Select
-        label="Project Lead"
-        placeholder="Select Project Leader"
+        label="Project Members"
+        placeholder="Select Project Members"
         className="max-w-xs"
         variant="underlined"
         selectionMode="multiple"
         selectedKeys={members}
         onSelectionChange={setMembers}
+        isLoading={users.isLoading}
+        name="project-members-id[]"
       >
         {users.data
           .filter(
@@ -89,7 +145,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ users }) => {
             <SelectItem key={user.id}>{user.name}</SelectItem>
           ))}
       </Select>
-      <Button color="primary" variant="flat" type="submit">
+      <Button
+        isLoading={isSubmitting}
+        color="primary"
+        variant="flat"
+        type="submit"
+      >
         Send
       </Button>
     </form>

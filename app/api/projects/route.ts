@@ -99,12 +99,19 @@ const GET = async (req: NextRequest): Promise<NextResponse> => {
       id: true,
       title: true,
       fund: true,
+      status: true,
+      priority: true,
       projectLead: {
         select: {
           id: true,
           name: true,
           api_profile_picture: true,
           profile_picture: true,
+          job_position: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
       projectMembers: {

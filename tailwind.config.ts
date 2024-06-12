@@ -3,9 +3,9 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{ts,js,tsx,jsx}",
-    "./node_modules/@nextui-org/theme/dist/components/(button|checkbox|date-picker|input|link|modal|pagination|select|tabs|ripple|spinner|calendar|date-input|popover|listbox|divider|scroll-shadow).js",
-  ],
+    "./node_modules/@nextui-org/theme/dist/components/(button|checkbox|date-picker|input|link|modal|pagination|select|tabs|user|ripple|spinner|calendar|date-input|popover|listbox|divider|scroll-shadow|avatar).js",
+    "./app/**/*.{tsx,jsx,js,ts}"
+],
   theme: {
     extend: {
       backgroundImage: {
