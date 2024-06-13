@@ -3,8 +3,10 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/components/(button|checkbox|date-picker|input|link|modal|pagination|select|tabs|user|ripple|spinner|calendar|date-input|popover|listbox|divider|scroll-shadow|avatar).js",
-    "./app/**/*.{tsx,jsx,js,ts}"
 ],
   theme: {
     extend: {
