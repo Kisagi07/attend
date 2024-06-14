@@ -1,4 +1,5 @@
-import { auth } from "../api/auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
+
 import prisma from "@/app/prisma";
 
 export default async function getUser() {

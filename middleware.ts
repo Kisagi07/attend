@@ -1,21 +1,19 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-export default withAuth(async function middleware(req) {
+export default auth(async function middleware(req) {
+  if (!req.auth && req.nextUrl.pathname !== "/login") {
+    const newUrl = new URL("/login", req.nextUrl.origin);
+    return NextResponse.redirect(newUrl);
+  }
+
   // if in /home but the user is admin then redirect to dashboard
-  if (
-    req.nextUrl.pathname.startsWith("/home") &&
-    req.nextauth.token?.role === "admin"
-  ) {
+  if (req.nextUrl.pathname.startsWith("/home") && req.auth?.user.role === "admin") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   // if in /dashboard but the user is not admin then redirect to home
-  if (
-    req.nextUrl.pathname.startsWith("/dashboard") &&
-    req.nextauth.token?.role !== "admin"
-  ) {
+  if (req.nextUrl.pathname.startsWith("/dashboard") && req.auth?.user.role !== "admin") {
     return NextResponse.redirect(new URL("/home", req.url));
   }
 
