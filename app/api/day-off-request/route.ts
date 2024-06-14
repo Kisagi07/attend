@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
+
 import prisma from "@/app/prisma";
 import { getUTCMidnightDate } from "@/app/serverhelper";
 import { users } from "@prisma/client";

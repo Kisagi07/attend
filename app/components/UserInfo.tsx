@@ -7,7 +7,6 @@ interface UserInfoProps {
 }
 
 const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
-  // const session = await getServerSession();
   const user = (await promise) as UserWithJob;
   return (
     <Card>

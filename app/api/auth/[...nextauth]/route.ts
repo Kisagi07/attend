@@ -1,8 +1,3 @@
-import { GetServerSidePropsContext, NextApiRequest } from "next";
-import NextAuth from "next-auth/next";
-import { NextRequest, NextResponse } from "next/server";
-import { authConfig } from "./authConfig";
+import { handlers } from "./authConfig";
 
-const handler = NextAuth(authConfig);
-
-export { handler as GET, handler as POST };
+export const { GET, POST } = handlers;

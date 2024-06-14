@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/prisma";
-import { auth } from "../../auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
 const GET = async (req: NextRequest) => {
   // authorize user
@@ -10,10 +10,7 @@ const GET = async (req: NextRequest) => {
   }
   // if new data id in session are not found then return and inform user to relogin
   if (!session.user.id) {
-    return NextResponse.json(
-      { message: "Please Re-login again to continue" },
-      { status: 400 },
-    );
+    return NextResponse.json({ message: "Please Re-login again to continue" }, { status: 400 });
   }
   // get all day off request from the user
   const dayOffRequests = await prisma.dayOffRequest.findMany({
