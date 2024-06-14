@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../../auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import prisma from "@/app/prisma";
 
 const DELETE = async (req: NextRequest, { params }: { params: { id: number } }) => {

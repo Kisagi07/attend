@@ -1,13 +1,10 @@
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 
-export const authConfig: NextAuthOptions = {
-  pages: {
-    signIn: `${process.env.APP_URL}/login`,
-  },
+export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [
-    CredentialsProvider({
-      id: "credentials",
+    Credentials({
+      name: "PIN",
       credentials: {
         PIN: { label: "PIN", type: "password" },
       },
@@ -34,15 +31,18 @@ export const authConfig: NextAuthOptions = {
       if (user) {
         token.work_id = user.work_id;
         token.role = user.role;
-        token.id = user.id as number;
+        // token.id = user.id as number;
       }
       return token;
     },
     async session({ session, token }) {
       session.user.work_id = token.work_id as any;
       session.user.role = token.role;
-      session.user.id = token.id;
+      // session.user.id = token.id;
       return session;
     },
   },
-} satisfies NextAuthOptions;
+  pages: {
+    signIn: "/login",
+  },
+});

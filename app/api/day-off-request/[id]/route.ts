@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../../auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
+
 import prisma from "@/app/prisma";
 
-const GET = async (
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) => {
+const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   // authorize user
   const session = await auth();
   if (!session) {
@@ -27,10 +25,7 @@ const GET = async (
   return NextResponse.json(dayOffRequests);
 };
 
-const PUT = async (
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) => {
+const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
   // authorize user
   const session = await auth();
   if (!session) {
@@ -73,10 +68,7 @@ const PUT = async (
   return NextResponse.json({ message: "Updated", data: updatedDayOffRequest });
 };
 
-const DELETE = async (
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) => {
+const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
   // authorize user
   const session = await auth();
   if (!session) {

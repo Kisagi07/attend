@@ -1,4 +1,5 @@
-import { auth } from "@/app/api/auth/[...nextauth]/auth";
+import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
+
 import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
