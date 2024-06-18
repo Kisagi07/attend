@@ -23,14 +23,14 @@ const LoginPage = () => {
       callbackUrl: searchParams.get("callbackUrl") ?? "/home",
       redirect: false,
     });
+    setSubmitting(false);
 
     if (res && res.error) {
       setIncorrect(true);
     } else {
       router.push(res?.url!);
+      setRedirecting(true);
     }
-    setSubmitting(false);
-    setRedirecting(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -43,7 +43,10 @@ const LoginPage = () => {
     <main className="flex min-h-screen flex-col justify-center bg-white px-4 py-8 text-slate-500 md:bg-slate-50">
       <section className="mx-auto w-full max-w-sm text-center md:rounded md:border-2 md:border-slate-200 md:bg-white md:p-3 md:shadow-md">
         <h1 className=" text-5xl font-bold">Login</h1>
-        <form onSubmit={handleLoginSubmit} className="mt-4 space-y-4 text-start">
+        <form
+          onSubmit={handleLoginSubmit}
+          className="mt-4 space-y-4 text-start"
+        >
           <Input
             disabled={submitting}
             variant="underlined"
@@ -54,7 +57,11 @@ const LoginPage = () => {
             onKeyDown={handleKeyDown}
             onValueChange={setPIN}
           />
-          {incorrect && <small className="text-red-400">Make sure the PIN are correct</small>}
+          {incorrect && (
+            <small className="text-red-400">
+              Make sure the PIN are correct
+            </small>
+          )}
           <Button
             fullWidth
             type="submit"
