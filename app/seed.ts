@@ -3,6 +3,15 @@ import bcryptjs from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  const administrator = await prisma.job_positions.create({
+    data: {
+      name: "Administrator",
+      salary: 0,
+      shift_end: "16:00",
+      shift_start: "08:00",
+    },
+  });
+
   const admin = await prisma.users.create({
     data: {
       name: "Admin",
@@ -10,6 +19,11 @@ async function main() {
       role: "admin",
       gender: "male",
       work_id: "ID001",
+      job_position: {
+        connect: {
+          id: administrator.id,
+        },
+      },
     },
   });
 }
