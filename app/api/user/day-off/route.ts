@@ -15,7 +15,7 @@ const GET = async (req: NextRequest) => {
   // get all day off request from the user
   const dayOffRequests = await prisma.dayOffRequest.findMany({
     where: {
-      userId: session.user.id,
+      userId: +session.user.id,
     },
     orderBy: {
       createdAt: "desc",

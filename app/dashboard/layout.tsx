@@ -8,6 +8,7 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { FaUsers, FaBriefcase, FaClock } from "react-icons/fa";
 import { IoSettingsSharp } from "react-icons/io5";
 import { GoDiscussionOutdated } from "react-icons/go";
+import { VscGithubProject } from "react-icons/vsc";
 
 interface Layout {
   children: React.ReactNode;
@@ -19,9 +20,7 @@ const Layout: React.FC<Layout> = ({ children }) => {
       <nav
         className={`sticky  left-0 top-0 z-[49] flex h-14 items-center  border-b border-slate-200 bg-white p-4 text-slate-600 shadow`}
       >
-        <h1 className="font-sixtyfour text-xl font-bold uppercase italic">
-          Attendance
-        </h1>
+        <h1 className="font-sixtyfour text-xl font-bold uppercase italic">Attendance</h1>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           type="button"
@@ -67,6 +66,12 @@ const Layout: React.FC<Layout> = ({ children }) => {
           subMatch
           name="Leave Request"
           icon={<GoDiscussionOutdated />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/projects"
+          subMatch
+          name="Projects"
+          icon={<VscGithubProject />}
         />
         <Sidebar.LinkItem
           href="/dashboard/settings"

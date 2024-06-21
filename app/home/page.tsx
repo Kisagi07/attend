@@ -1,10 +1,10 @@
 import Time from "@/app/components/Time";
 import UserInfo from "@/app/components/UserInfo";
+import HomeOptions from "@/app/components/HomeOptions";
 import { Suspense } from "react";
 import Logout from "@/app/components/Logout";
 import UserInfoSkeleton from "@/app/_loader/UserInfoSekleton";
 import ClockInOut from "@/app/components/ClockInOut";
-import { HomeCoordinate } from "@/app/components";
 import { FaRegCalendarTimes } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Link from "next/link";
@@ -52,7 +52,7 @@ const Home = () => {
           <UserInfo promise={promise} />
         </Suspense>
         <ClockInOut />
-        <HomeCoordinate />
+        <HomeOptions />
       </div>
     </main>
   );

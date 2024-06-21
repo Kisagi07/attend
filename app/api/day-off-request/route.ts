@@ -23,17 +23,16 @@ const POST = async (req: NextRequest) => {
   }
 
   // if id is not in session user then find user based on work_id
-  let user: users | undefined;
+  const user = (await prisma.users.findFirst({
+    where: {
+      work_id: session.user.work_id,
+    },
+  })) as users;
+  if (!user) {
+    return NextResponse.json("Unauthorized", { status: 401 });
+  }
   if (!session.user.id) {
-    user = (await prisma.users.findFirst({
-      where: {
-        work_id: session.user.work_id,
-      },
-    })) as users;
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-    session.user.id = user.id;
+    session.user.id = user.id.toString();
   }
 
   // validate everthing is not empty except comment
@@ -50,7 +49,7 @@ const POST = async (req: NextRequest) => {
       leaveEndDate: getUTCMidnightDate(leaveEndDate),
       user: {
         connect: {
-          id: session.user.id ?? user!.id,
+          id: user.id,
         },
       },
     },
