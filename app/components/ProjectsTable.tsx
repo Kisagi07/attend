@@ -176,27 +176,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, isLoading, muta
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        size="sm"
-        motionProps={{
-          variants: {
-            enter: {
-              transition: {
-                duration: 0.2,
-                ease: "easeOut",
-              },
-            },
-            exit: {
-              transition: {
-                duration: 0.2,
-                ease: "easeIn",
-              },
-            },
-          },
-        }}
-      >
+      <Modal disableAnimation isOpen={isOpen} onOpenChange={onOpenChange} size="sm">
         <ModalContent>
           <ModalHeader>
             <h2>
@@ -225,7 +205,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, isLoading, muta
           </ModalBody>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isOpenConfirmation} onOpenChange={onOpenChangeConfirmation}>
+      <Modal disableAnimation isOpen={isOpenConfirmation} onOpenChange={onOpenChangeConfirmation}>
         <ModalContent>
           <ModalHeader>Delete {selectedProject?.title}</ModalHeader>
           <ModalFooter>

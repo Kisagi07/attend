@@ -46,13 +46,21 @@ const HomeProjectLeading: React.FC<HomeProjectLeading> = ({ project }) => {
       console.log(error.info);
       toast.error("Failed updating project status");
     }
-  }, []);
+  }, [
+    project.fund,
+    project.id,
+    project.priority,
+    project.projectLeadId,
+    project.projectMembers,
+    project.title,
+    value,
+  ]);
 
   React.useEffect(() => {
     if (value[0] !== project.status) {
       handleStatusUpdate();
     }
-  }, [status]);
+  }, [value, handleStatusUpdate, project.status]);
   return (
     <article key={project.id} className="shadow-md p-2 border border-slate-100 space-y-2">
       <div className="flex justify-between">

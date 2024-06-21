@@ -13,10 +13,12 @@ const GET = async (req: NextRequest): Promise<NextResponse> => {
     include: {
       projectsLed: {
         select: {
+          id: true,
           title: true,
           fund: true,
           priority: true,
           status: true,
+          projectLeadId: true,
           projectMembers: {
             select: {
               name: true,
@@ -30,6 +32,7 @@ const GET = async (req: NextRequest): Promise<NextResponse> => {
       },
       projectsMembered: {
         select: {
+          id: true,
           title: true,
           fund: true,
           priority: true,

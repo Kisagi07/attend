@@ -15,6 +15,7 @@ const ProjectsPage = () => {
     mutate,
   } = useSWR<ProjectWithLeadWithJobAndMembers[]>(`/api/projects`, fetcher, {
     revalidateOnMount: true,
+    refreshInterval: 1000,
   });
   return (
     <section className="space-y-2 p-2">

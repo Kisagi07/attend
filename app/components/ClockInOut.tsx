@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { ButtonDropdown, ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect } from "react";
@@ -9,8 +10,7 @@ import { Prisma } from "@prisma/client";
 import { Input } from "@nextui-org/input";
 import { UserWithJob } from "../prisma";
 
-const fetcher: Fetcher<any, string> = (...args) =>
-  fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 
 const ClockInOut = () => {
   //fetched data
@@ -44,13 +44,11 @@ const ClockInOut = () => {
   const [options1, setOptions1] = useState([
     {
       label: "Clock From Home",
-      className:
-        "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
+      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
     },
     {
       label: "Clock From Office",
-      className:
-        "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
+      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
     },
     {
       label: "Sick Day",
@@ -58,8 +56,7 @@ const ClockInOut = () => {
     },
     {
       label: "Clock With Duty",
-      className:
-        "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
+      className: "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
     },
   ]);
   const [options2, setOptions2] = useState([
@@ -71,8 +68,7 @@ const ClockInOut = () => {
   const [options3, setOptions3] = useState([
     {
       label: "Good Job",
-      className:
-        "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
+      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
     },
   ]);
 
@@ -93,12 +89,8 @@ const ClockInOut = () => {
         type === "work-from-home" || fromHome
       );
       const distance = Math.floor(
-        calculateDistance(
-          latitude,
-          longitude,
-          Number(targetLatitude),
-          Number(targetLongitude)
-        ) * 1000
+        calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
+          1000
       );
       // if distance is more than 50m and not sick or work with duty then warned user then return
       if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
@@ -119,9 +111,7 @@ const ClockInOut = () => {
       if (
         isLate &&
         !lateReason &&
-        (type === "work-from-home" ||
-          type === "work-from-office" ||
-          type === "work_with_duty")
+        (type === "work-from-home" || type === "work-from-office" || type === "work_with_duty")
       ) {
         toast.error("You need to fill reason for being late");
         return;
@@ -255,26 +245,24 @@ const ClockInOut = () => {
   };
 
   const getUserLocation = () => {
-    return new Promise<{ latitude: number; longitude: number }>(
-      (resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            handleGeolocationError(error);
-            reject(error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          }
-        );
-      }
-    );
+    return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          resolve({ latitude, longitude });
+        },
+        (error) => {
+          handleGeolocationError(error);
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    });
   };
 
   const getTargetLocation = (
@@ -306,11 +294,11 @@ const ClockInOut = () => {
     setTodaysWork((prev) => prev.filter((pre) => pre !== value));
   };
 
-  const requestLocationPermission = () => {
+  const requestLocationPermission = React.useCallback(() => {
     navigator.geolocation.getCurrentPosition((position) => {
       console.log("Permission granted");
     }, handleGeolocationError);
-  };
+  }, []);
 
   const handleGeolocationError = (error: PositionErrorCallback | any) => {
     if (error.code === error.PERMISSION_DENIED) {
@@ -361,9 +349,7 @@ const ClockInOut = () => {
           if (result.state === "denied") {
             toast.error("GPS/Location permission is denied");
           } else if (result.state === "prompt") {
-            toast.info(
-              "Please allow us to access your gps location for attendances"
-            );
+            toast.info("Please allow us to access your gps location for attendances");
             requestLocationPermission();
           }
         })
@@ -371,7 +357,7 @@ const ClockInOut = () => {
           console.error("Error checking location permission: ", error);
         });
     }
-  }, []);
+  }, [requestLocationPermission]);
 
   useEffect(() => {
     if (user) {
@@ -390,9 +376,7 @@ const ClockInOut = () => {
   }, [time, user, company]);
 
   return isSick ? (
-    <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">
-      Rest Well!
-    </button>
+    <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">Rest Well!</button>
   ) : (
     <>
       {isLate && !clockedIn && (
@@ -411,11 +395,7 @@ const ClockInOut = () => {
         </>
       )}
       {clockedIn && !done && (
-        <ListInput
-          items={todaysWork}
-          addItem={handleAddItem}
-          removeItem={handleRemoveItem}
-        />
+        <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
       {showDuty && (
         <Input

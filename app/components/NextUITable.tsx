@@ -2,7 +2,7 @@
 import React, { FC, Key, ReactNode } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/table";
 import { Pagination } from "@nextui-org/pagination";
-import { useAsyncList } from "@react-stately/data";
+import { AsyncListData, useAsyncList } from "@react-stately/data";
 import { Input } from "@nextui-org/input";
 
 interface NextUITableProps {
@@ -60,8 +60,12 @@ const NextUITable: FC<NextUITableProps> = ({
   }, [page, list.items]);
 
   React.useEffect(() => {
-    list.reload();
+    if (data) {
+      list.reload();
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
   return (
     <Table
       selectionMode={hasSelection ? "single" : "none"}
