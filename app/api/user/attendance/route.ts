@@ -155,15 +155,6 @@ export async function GET(req: NextRequest) {
       }
     );
 
-  if (!session)
-    return NextResponse.json(
-      {
-        status: 401,
-      },
-      {
-        status: 401,
-      }
-    );
   const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
@@ -173,7 +164,7 @@ export async function GET(req: NextRequest) {
   if (!user)
     return NextResponse.json(
       {
-        status: 404,
+        message: "User not found",
       },
       {
         status: 404,

@@ -9,27 +9,23 @@ import React from "react";
 import useSWR from "swr";
 
 const ProjectsPage = () => {
-  const { data: projects, isLoading } = useSWR<
-    ProjectWithLeadWithJobAndMembers[]
-  >(`/api/projects`, fetcher);
+  const {
+    data: projects,
+    isLoading,
+    mutate,
+  } = useSWR<ProjectWithLeadWithJobAndMembers[]>(`/api/projects`, fetcher, {
+    revalidateOnMount: true,
+  });
   return (
     <section className="space-y-2 p-2">
       <h3 className="text-2xl font-semibold">Projects</h3>
       <div className="flex justify-end">
-        <Button
-          as={Link}
-          href="/dashboard/projects/create"
-          color="secondary"
-          variant="flat"
-        >
+        <Button as={Link} href="/dashboard/projects/create" color="secondary" variant="flat">
           Add Project
         </Button>
       </div>
-      {isLoading ? (
-        <TableSkeleton />
-      ) : (
-        <ProjectsTable projects={projects ?? []} />
-      )}
+
+      <ProjectsTable projects={projects ?? []} isLoading={isLoading} mutateProjects={mutate} />
     </section>
   );
 };

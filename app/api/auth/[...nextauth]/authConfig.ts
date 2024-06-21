@@ -31,14 +31,15 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (user) {
         token.work_id = user.work_id;
         token.role = user.role;
-        // token.id = user.id as number;
+        token.id = user.id ?? "-1";
+        // token.id = user.id!.toString();
       }
       return token;
     },
     async session({ session, token }) {
       session.user.work_id = token.work_id as any;
       session.user.role = token.role;
-      // session.user.id = token.id;
+      session.user.id = token.id;
       return session;
     },
   },

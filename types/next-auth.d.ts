@@ -6,16 +6,11 @@ declare module "next-auth" {
     name: string;
     work_id: string;
     role: "admin" | "employee" | "intern";
-    id: number;
+    id: string;
   }
 
   interface Session {
-    user: {
-      name: string;
-      work_id: string;
-      role: "admin" | "employee" | "intern";
-      id: number;
-    };
+    user: User;
   }
 }
 
@@ -23,6 +18,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     work_id: string;
     role: "admin" | "employee" | "intern";
-    id: number;
+    id: string;
   }
 }

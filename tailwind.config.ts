@@ -3,17 +3,14 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/components/(button|checkbox|date-picker|input|link|modal|pagination|select|tabs|user|ripple|spinner|calendar|date-input|popover|listbox|divider|scroll-shadow|avatar).js",
-],
+    "./node_modules/@nextui-org/theme/dist/components/(accordion|button|checkbox|chip|date-picker|divider|dropdown|input|link|modal|pagination|select|spinner|table|tabs|popover|user|ripple|calendar|date-input|menu|listbox|scroll-shadow|spacer|avatar).js",
+    "./app/**/*.{jsx,tsx,ts,js}",
+  ],
   theme: {
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       animation: {
         "fade-up": "fade-up 150ms forwards",

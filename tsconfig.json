@@ -24,6 +24,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "models/user.js", "migrations/20240124085644-create-user.ts", "migrations/20240125041904-create-user.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "models/user.js",
+    "migrations/20240124085644-create-user.ts",
+    "migrations/20240125041904-create-user.js"
+  ],
   "exclude": ["node_modules"]
 }

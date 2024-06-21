@@ -14,8 +14,8 @@ model Project {
 }
 
 enum ProjectStatus {
-    pending
     in_progress
+    pending
     completed
 }
 

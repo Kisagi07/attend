@@ -23,12 +23,9 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
   const formData = await req.formData();
   const title = formData.get("title") as string;
   const fund = Number(formData.get("fund") as string);
-  const priority =
-    (formData.get("priority") as "low" | "normal" | "high") || "urgent";
+  const priority = (formData.get("priority") as "low" | "normal" | "high") || "urgent";
   const projectLeadId = Number(formData.get("project-lead-id") as string);
-  const projectMembersId = (
-    formData.getAll("project-members-id[]") as string[]
-  ).map(Number);
+  const projectMembersId = (formData.getAll("project-members-id[]") as string[]).map(Number);
 
   // validation
   if (!title) {
@@ -49,10 +46,7 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
     return NextResponse.json({ message: "Invalid members" });
   }
   if (!(await checkIfAllIdsExists(projectMembersId))) {
-    return NextResponse.json(
-      { message: "Some members are not found" },
-      { status: 422 },
-    );
+    return NextResponse.json({ message: "Some members are not found" }, { status: 422 });
   }
 
   const project = await prisma.project.create({
@@ -101,6 +95,7 @@ const GET = async (req: NextRequest): Promise<NextResponse> => {
       fund: true,
       status: true,
       priority: true,
+      projectLeadId: true,
       projectLead: {
         select: {
           id: true,
