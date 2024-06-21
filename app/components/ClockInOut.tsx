@@ -90,15 +90,15 @@ const ClockInOut = () => {
       const type = getType(value);
       const { latitude, longitude } = await getUserLocation();
       const { targetLatitude, targetLongitude } = getTargetLocation(
-        type === "work-from-home" || fromHome,
+        type === "work-from-home" || fromHome
       );
       const distance = Math.floor(
         calculateDistance(
           latitude,
           longitude,
           Number(targetLatitude),
-          Number(targetLongitude),
-        ) * 1000,
+          Number(targetLongitude)
+        ) * 1000
       );
       // if distance is more than 50m and not sick or work with duty then warned user then return
       if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
@@ -264,20 +264,21 @@ const ClockInOut = () => {
             resolve({ latitude, longitude });
           },
           (error) => {
+            handleGeolocationError(error);
             reject(error);
           },
           {
             enableHighAccuracy: true,
             timeout: 5000,
             maximumAge: 0,
-          },
+          }
         );
-      },
+      }
     );
   };
 
   const getTargetLocation = (
-    fromHome: boolean,
+    fromHome: boolean
   ): {
     targetLatitude: Prisma.Decimal;
     targetLongitude: Prisma.Decimal;
@@ -305,6 +306,24 @@ const ClockInOut = () => {
     setTodaysWork((prev) => prev.filter((pre) => pre !== value));
   };
 
+  const requestLocationPermission = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log("Permission granted");
+    }, handleGeolocationError);
+  };
+
+  const handleGeolocationError = (error: PositionErrorCallback | any) => {
+    if (error.code === error.PERMISSION_DENIED) {
+      toast.error("Location permission denied by user.");
+    } else if (error.code === error.POSITION_UNAVAILABLE) {
+      toast.error("Location information is unavailable.");
+    } else if (error.code === error.TIMEOUT) {
+      toast.error("The request to get user location timed out.");
+    } else {
+      toast.error("An unknown error occurred.");
+    }
+  };
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const type = todayAttendance?.type;
@@ -328,6 +347,30 @@ const ClockInOut = () => {
       setTime(Date.now());
     }, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // check if gps is supported or activated
+    if (!navigator.geolocation) {
+      toast.info("GPS is not supported by your device or browser!");
+    } else {
+      navigator.permissions
+        .query({ name: "geolocation" })
+        .then((result) => {
+          // handles the permission state
+          if (result.state === "denied") {
+            toast.error("GPS/Location permission is denied");
+          } else if (result.state === "prompt") {
+            toast.info(
+              "Please allow us to access your gps location for attendances"
+            );
+            requestLocationPermission();
+          }
+        })
+        .catch((error) => {
+          console.error("Error checking location permission: ", error);
+        });
+    }
   }, []);
 
   useEffect(() => {
