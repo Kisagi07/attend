@@ -1,7 +1,7 @@
 "use client";
 import InputText from "@/app/components/InputText";
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import JobFormSkeleton from "@/app/skeletons/JobFormSkeleton";
 import { useRouter } from "next/navigation";
@@ -51,12 +51,10 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
           return res;
         }),
         {
-          pending: "Updating job position...",
-          success: {
-            render() {
-              router.push("/dashboard/job-positions");
-              return "Job position updated!";
-            },
+          loading: "Updating job position...",
+          success: (data) => {
+            router.push("/dashboard/job-positions");
+            return "Job position updated!";
           },
           error: "Something went wrong when updating job position",
         }

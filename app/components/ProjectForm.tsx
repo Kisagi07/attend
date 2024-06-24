@@ -5,7 +5,7 @@ import { users } from "@prisma/client";
 import React from "react";
 import { Key, Selection } from "@react-types/shared";
 import { Button } from "@nextui-org/button";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 interface ProjectFormProps {

@@ -4,12 +4,7 @@ import useSWR from "swr";
 import React from "react";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import DayOffRequestList from "@/app/components/DayOffRequestList";
-import {
-  Modal,
-  ModalBody,
-  useDisclosure,
-  ModalContent,
-} from "@nextui-org/modal";
+import { Modal, ModalBody, useDisclosure, ModalContent } from "@nextui-org/modal";
 import { DayOffRequestWithUser } from "@/app/prisma";
 import DayOffRequestCard from "@/app/components/DayOffRequestCard";
 import { Input } from "@nextui-org/input";
@@ -17,12 +12,9 @@ import { Button } from "@nextui-org/button";
 import { FaCircleXmark } from "react-icons/fa6";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { FaFlag } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 const Page = () => {
-  const { data, mutate } = useSWR<DayOffRequestWithUser[]>(
-    "/api/day-off-request",
-    fetcher,
-  );
+  const { data, mutate } = useSWR<DayOffRequestWithUser[]>("/api/day-off-request", fetcher);
   const [sortedData, setSortedData] = React.useState<{
     pending: DayOffRequestWithUser[];
     approved: DayOffRequestWithUser[];
@@ -33,8 +25,7 @@ const Page = () => {
     rejected: [],
   });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [toBeUpdated, setToBeUpdated] =
-    React.useState<DayOffRequestWithUser | null>(null);
+  const [toBeUpdated, setToBeUpdated] = React.useState<DayOffRequestWithUser | null>(null);
   const [updating, setUpdating] = React.useState<boolean>(false);
   const [comment, setComment] = React.useState<string>("");
 
@@ -89,10 +80,7 @@ const Page = () => {
         <h1 className="text-3xl font-medium">Employee Leave Request</h1>
         <Tabs aria-label="option">
           <Tab key="pending" title="Pending">
-            <DayOffRequestList
-              data={sortedData.pending}
-              onArticleClick={handleOnArticleClick}
-            />
+            <DayOffRequestList data={sortedData.pending} onArticleClick={handleOnArticleClick} />
           </Tab>
           <Tab key="approved" title="Approved">
             <DayOffRequestList data={sortedData.approved} />
@@ -133,11 +121,7 @@ const Page = () => {
                 <>
                   <DayOffRequestCard dayOffRequest={toBeUpdated} />
                   <div className="space-y-4">
-                    <Input
-                      variant="underlined"
-                      label="Comment"
-                      name="comment"
-                    />
+                    <Input variant="underlined" label="Comment" name="comment" />
                     <div className="flex justify-center gap-4">
                       {toBeUpdated.status !== "rejected" && (
                         <Button

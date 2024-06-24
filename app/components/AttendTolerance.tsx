@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import clsx from "clsx";
 import InputText from "./InputText";
 import AttendToleranceSkeleton from "../skeletons/AttendToleranceSkeleton";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { company } from "@prisma/client";
 import { Checkbox } from "@nextui-org/checkbox";
 const AttendTolerance = () => {
@@ -27,9 +27,7 @@ const AttendTolerance = () => {
         }),
       });
       if (!res.ok) {
-        toast.error(
-          "Something went wrong with the server when updating attend tolerance",
-        );
+        toast.error("Something went wrong with the server when updating attend tolerance");
         throw new Error("Something went wrong");
       }
 
@@ -58,11 +56,7 @@ const AttendTolerance = () => {
     <section className="spacep-y-4">
       <div className="flex justify-between">
         <h1 className="text-xl font-semibold uppercase">Attend Tolerance</h1>
-        <Checkbox
-          isSelected={toleranceActive}
-          onValueChange={setToleranceActive}
-          color="success"
-        />
+        <Checkbox isSelected={toleranceActive} onValueChange={setToleranceActive} color="success" />
       </div>
       <article
         className={clsx("space-y-4", {
@@ -70,9 +64,8 @@ const AttendTolerance = () => {
         })}
       >
         <small className="font-semibold text-slate-400">
-          <CiCircleQuestion className="inline text-xl" /> The time tolerance of
-          when you can and can&apos;t clock-in before respective start of each
-          shift (in minute)
+          <CiCircleQuestion className="inline text-xl" /> The time tolerance of when you can and
+          can&apos;t clock-in before respective start of each shift (in minute)
         </small>
         <InputText
           value={toleranceValue}

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Table from "./Table";
 import { FaUserAltSlash, FaUserEdit, FaClock } from "react-icons/fa";
 import Confirmation from "@/app/components/Confirmation";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import Link from "next/link";
 import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
 import { UserWithJob } from "../prisma";
@@ -90,12 +90,10 @@ const EmployeeTable = () => {
         setWorkIdDelete("");
       }),
       {
-        pending: "Deleting user...",
-        success: {
-          render() {
-            handleFilterAfterDelete();
-            return "User deleted!";
-          },
+        loading: "Deleting user...",
+        success: (data) => {
+          handleFilterAfterDelete();
+          return "User deleted!";
         },
         error: "Failed on deleting user!",
       }

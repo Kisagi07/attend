@@ -18,7 +18,7 @@ import {
 import { FaRegTrashCan } from "react-icons/fa6";
 import { MdOutlineEditNote } from "react-icons/md";
 import { Button } from "@nextui-org/button";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { KeyedMutator } from "swr";
 import Link from "next/link";
 

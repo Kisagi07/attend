@@ -3,18 +3,14 @@ import { fetcher } from "@/app/helper";
 import { UserApiProfile } from "@/app/prisma";
 import Image from "next/image";
 import React from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import useSWR from "swr";
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 const Page: React.FC = () => {
-  const {
-    data: user,
-    isLoading,
-    mutate,
-  } = useSWR<UserApiProfile>("/api/user", fetcher);
+  const { data: user, isLoading, mutate } = useSWR<UserApiProfile>("/api/user", fetcher);
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -106,11 +102,7 @@ const Page: React.FC = () => {
           accept="image/*"
           onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
         />
-        {error && (
-          <div className="bg-red-300 px-2 py-1 text-sm text-red-500">
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-red-300 px-2 py-1 text-sm text-red-500">{error}</div>}
         {isLoading ? (
           <>
             <div className="h-12 animate-pulse rounded bg-slate-200"></div>
@@ -118,27 +110,11 @@ const Page: React.FC = () => {
           </>
         ) : (
           <>
-            <Input
-              variant="underlined"
-              name="name"
-              label="Name"
-              defaultValue={user?.name!}
-            />
-            <Input
-              ref={pinRef}
-              variant="underlined"
-              name="pin"
-              label="New PIN"
-              type="password"
-            />
+            <Input variant="underlined" name="name" label="Name" defaultValue={user?.name!} />
+            <Input ref={pinRef} variant="underlined" name="pin" label="New PIN" type="password" />
           </>
         )}
-        <Button
-          type="submit"
-          color="secondary"
-          className="w-full"
-          isLoading={isSubmitting}
-        >
+        <Button type="submit" color="secondary" className="w-full" isLoading={isSubmitting}>
           Save
         </Button>
       </form>

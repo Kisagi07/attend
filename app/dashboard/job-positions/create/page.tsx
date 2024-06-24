@@ -1,7 +1,7 @@
 "use client";
 import InputText from "@/app/components/InputText";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import { extractNumber } from "@/app/helper";
 const JobCreatePage = () => {
@@ -42,7 +42,7 @@ const JobCreatePage = () => {
       setSubmitting(true);
 
       toast.promise(storeJobPosition(), {
-        pending: "Creating job position...",
+        loading: "Creating job position...",
         success: "Job position created!",
         error: "Something went wrong when creating job position",
       });
