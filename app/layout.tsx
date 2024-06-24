@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "react-toastify/ReactToastify.css";
 import "./object-extension/StringExtension";
-import { ToastContainer } from "react-toastify";
 import Provider from "./components/Provider";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { SWR } from "./components";
 import Maintenance from "./components/Maintenance";
 import { cookies } from "next/headers";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,7 +42,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-white`}>
         <Provider session={session}>
-          <ToastContainer />
+          <Toaster richColors />
           <SWR>{children}</SWR>
         </Provider>
       </body>

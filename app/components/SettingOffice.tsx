@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import InputText from "./InputText";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { company } from "@prisma/client";
 import SettingOfficeSkeleton from "../skeletons/SettingOfficeSkeleton";
 import Confirmation from "./Confirmation";
@@ -52,7 +52,7 @@ const SettingOffice = () => {
       return data;
     };
     toast.promise(sendNewOffice, {
-      pending: "Updating Office",
+      loading: "Updating Office",
       success: "Office Location Updated!",
       error: "Something went wrong when updating office location",
     });

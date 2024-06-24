@@ -1,6 +1,7 @@
 import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
+import { CalendarDate } from "@internationalized/date";
 
 const GET = async (req: NextRequest) => {
   const session = await auth();
@@ -28,11 +29,11 @@ const POST = async (req: NextRequest) => {
     date,
   }: {
     name: string;
-    date: string;
+    date: CalendarDate;
   } = await req.json();
 
   try {
-    const dateObject = new Date(date);
+    const dateObject = new Date(date.year, date.month - 1, date.day);
     const holiday = await prisma.holidays.create({
       data: {
         name,
@@ -48,6 +49,7 @@ const POST = async (req: NextRequest) => {
     });
     return NextResponse.json(holiday, { status: 201 });
   } catch (error) {
+    console.log(error);
     return NextResponse.json("Internal Server Error", { status: 500 });
   }
 };

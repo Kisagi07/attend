@@ -6,7 +6,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 interface Option {
   label: string;
   value: string | number;
@@ -90,12 +90,10 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
       });
     };
     toast.promise(sendUpdate, {
-      pending: "Updating",
-      success: {
-        render() {
-          router.push("/dashboard/employees");
-          return "User Updated";
-        },
+      loading: "Updating",
+      success: (data) => {
+        router.push("/dashboard/employees");
+        return "User Updated";
       },
       error: "Failed on updating user",
     });
@@ -122,12 +120,8 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
   };
   useEffect(() => {
     Promise.all([
-      fetch("/api/job-positions").then(
-        (res) => res.json() as Promise<job_positions[]>,
-      ),
-      fetch(`/api/users/${params.work_id}`).then(
-        (res) => res.json() as Promise<users>,
-      ),
+      fetch("/api/job-positions").then((res) => res.json() as Promise<job_positions[]>),
+      fetch(`/api/users/${params.work_id}`).then((res) => res.json() as Promise<users>),
     ])
       .then((data) => {
         const options: Option[] = data[0].map((position) => ({
@@ -138,9 +132,7 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
         setUser(data[1]);
         setWorkId(data[1].work_id!);
         setName(data[1].name!);
-        const defaultPosition = options.find(
-          (option) => option.value === data[1].job_position_id,
-        );
+        const defaultPosition = options.find((option) => option.value === data[1].job_position_id);
         if (defaultPosition) {
           setJobPosition(defaultPosition);
         }
@@ -177,12 +169,9 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
               defaultValue={user?.name!}
               type="text"
               onChange={({ currentTarget }) => setName(currentTarget.value)}
-              className={clsx(
-                "w-full rounded border border-slate-200 p-2 outline-none",
-                {
-                  "!border-red-500": validation["name"],
-                },
-              )}
+              className={clsx("w-full rounded border border-slate-200 p-2 outline-none", {
+                "!border-red-500": validation["name"],
+              })}
             />
           </div>
 
@@ -194,12 +183,9 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
                 onChange={({ currentTarget }) => setPIN(currentTarget.value)}
                 type={showPIN ? "text" : "password"}
                 inputMode="tel"
-                className={clsx(
-                  "w-full rounded border border-slate-200 p-2 outline-none",
-                  {
-                    "!border-red-500": validation["password"],
-                  },
-                )}
+                className={clsx("w-full rounded border border-slate-200 p-2 outline-none", {
+                  "!border-red-500": validation["password"],
+                })}
                 maxLength={6}
                 onKeyDown={handleKeyDown}
               />
@@ -233,7 +219,7 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
                 "w-full rounded border border-slate-200 bg-slate-100 p-2 outline-none",
                 {
                   "border-red-500": validation["work_id"],
-                },
+                }
               )}
               value={workId}
             />
@@ -263,7 +249,7 @@ const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
               "w-full rounded bg-black p-4 text-white hover:bg-slate-950 md:col-span-2",
               {
                 "!bg-slate-700": submitting,
-              },
+              }
             )}
             type="submit"
           >

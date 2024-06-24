@@ -9,7 +9,7 @@ import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Avatar } from "@nextui-org/avatar";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface HomeProjectLeading {
   project: ProjectWithMembers;

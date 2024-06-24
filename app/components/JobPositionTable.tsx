@@ -8,7 +8,7 @@ import { IoBagRemoveSharp } from "react-icons/io5";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import Link from "next/link";
 import { Confirmation } from "@/app/components";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { formatRupiah } from "@/app/helper";
 import { job_positions } from "@prisma/client";
 
@@ -33,12 +33,10 @@ const JobPositionTable = () => {
 
   const handleDelete = () => {
     toast.promise(deleteJobPosition(), {
-      pending: "Deleting",
-      success: {
-        render() {
-          setData((prev) => prev.filter((pr) => pr.id !== idDelete));
-          return "Job position deleted";
-        },
+      loading: "Deleting",
+      success: (data) => {
+        setData((prev) => prev.filter((pr) => pr.id !== idDelete));
+        return "Job position deleted";
       },
       error: "Failed on deleting job position",
     });

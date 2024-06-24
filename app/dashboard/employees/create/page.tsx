@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import Select from "@/app/components/Select";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
 import clsx from "clsx";
 import { job_positions } from "@prisma/client";
