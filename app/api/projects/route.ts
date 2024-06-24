@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authorized } from "@/app/serverhelper";
 import prisma from "@/app/prisma";
+import { formatRupiah } from "@/app/helper";
 
 const checkIfAllIdsExists = async (numbers: number[]): Promise<boolean> => {
   const allRecords = await prisma.users.findMany({
@@ -59,25 +60,36 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
           id: projectLeadId,
         },
       },
+      projectMembers: {
+        connect: projectMembersId.map((num) => ({ id: num })),
+      },
+    },
+    select: {
+      title: true,
+      status: true,
+      priority: true,
+      fund: true,
+      projectLead: {
+        select: {
+          name: true,
+        },
+      },
+      projectMembers: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
-  if (await checkIfAllIdsExists(projectMembersId)) {
-    const updateProject = await prisma.project.update({
-      where: {
-        id: project.id,
-      },
-      data: {
-        projectMembers: {
-          connect: projectMembersId.map((num) => ({ id: num })),
-        },
-      },
-    });
-    return NextResponse.json({
-      message: "Created and Connected",
-      data: updateProject,
-    });
-  }
+  // create timeline
+  await prisma.timelines.create({
+    data: {
+      title: `Project : ${project.title}`,
+      description: `Status: ${project.status.replaceToSpaceAndCapitalize("_")} \n Priority: ${project.priority.capitalize()} \n Fund: ${formatRupiah(project.fund)} \n Leader: ${project.projectLead.name} \n Members: ${project.projectMembers.map((member) => " " + member.name)}`,
+      type: "new",
+    },
+  });
 
   return NextResponse.json({ message: "Created", data: project });
 };
