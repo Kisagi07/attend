@@ -4,11 +4,12 @@ import useSWR from "swr";
 import { TimelineSkeleton } from "../skeletons";
 import Timeline from "./Timeline";
 import { timelines } from "@prisma/client";
+import { convertNewLine } from "@/app/react-helper";
 
 const ActivityTimeline = () => {
   const { data: timelines, isLoading: timelineLoading } = useSWR<timelines[]>(
     "/api/timelines?limit=4",
-    fetcher,
+    fetcher
   );
 
   function calculateTimeAgo(dateString: string): string {
@@ -60,29 +61,26 @@ const ActivityTimeline = () => {
                 <Timeline.Content>
                   <div className="flex items-start justify-between gap-2">
                     <Timeline.Title>
-                      {timeline.title.includes("Attendance") ? (
-                        <>
-                          <span>{timeline.title.split(":")[0]} : </span>
-                          <span className="text-red-500">
-                            {timeline.title.split(":")[1]}
+                      <div className="text-base">
+                        {timeline.title.includes("Attendance") ? (
+                          <>
+                            <span>{timeline.title.split(":")[0]} : </span>
+                            <span className="text-red-500">{timeline.title.split(":")[1]}</span>
+                          </>
+                        ) : timeline.title.includes("Attendance") ? (
+                          <>
+                            <span>{timeline.title}</span>
+                          </>
+                        ) : (
+                          <span>
+                            {timeline.title} (
+                            {`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`})
                           </span>
-                        </>
-                      ) : timeline.title.includes("Attendance") ? (
-                        <>
-                          <span>{timeline.title}</span>
-                        </>
-                      ) : (
-                        <span>
-                          {timeline.title} (
-                          {`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`}
-                          )
-                        </span>
-                      )}
+                        )}
+                      </div>
                     </Timeline.Title>
                     <Timeline.Time>
-                      {calculateTimeAgo(
-                        timeline.created_at as unknown as string,
-                      )}
+                      {calculateTimeAgo(timeline.created_at as unknown as string)}
                     </Timeline.Time>
                   </div>
                   <Timeline.Body>
@@ -90,22 +88,18 @@ const ActivityTimeline = () => {
                     timeline.title.includes("Clock Out") ? (
                       <>
                         {timeline.description.split("at")[0]} at{" "}
-                        <span className="text-lime-400">
-                          {timeline.description.split("at")[1]}
-                        </span>
+                        <span className="text-lime-400">{timeline.description.split("at")[1]}</span>
                       </>
                     ) : timeline.title.includes("Working on") ? (
                       <>
                         <ul className="ml-2 list-inside list-disc">
-                          {(JSON.parse(timeline.description) as string[]).map(
-                            (job) => (
-                              <li key={job}>{job}</li>
-                            ),
-                          )}
+                          {(JSON.parse(timeline.description) as string[]).map((job) => (
+                            <li key={job}>{job}</li>
+                          ))}
                         </ul>
                       </>
                     ) : (
-                      <>{timeline.description}</>
+                      <>{convertNewLine(timeline.description)}</>
                     )}
                   </Timeline.Body>
                 </Timeline.Content>
