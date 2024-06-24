@@ -1,4 +1,5 @@
 import { Fetcher } from "swr";
+import React from "react";
 
 export function getWordDay() {
   const today = new Date();
