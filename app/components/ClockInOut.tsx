@@ -338,25 +338,7 @@ const ClockInOut = () => {
   }, []);
 
   useEffect(() => {
-    // check if gps is supported or activated
-    if (!navigator.geolocation) {
-      toast.info("GPS is not supported by your device or browser!");
-    } else {
-      navigator.permissions
-        .query({ name: "geolocation" })
-        .then((result) => {
-          // handles the permission state
-          if (result.state === "denied") {
-            toast.error("GPS/Location permission is denied");
-          } else if (result.state === "prompt") {
-            toast.info("Please allow us to access your gps location for attendances");
-            requestLocationPermission();
-          }
-        })
-        .catch((error) => {
-          console.error("Error checking location permission: ", error);
-        });
-    }
+    requestLocationPermission();
   }, [requestLocationPermission]);
 
   useEffect(() => {
