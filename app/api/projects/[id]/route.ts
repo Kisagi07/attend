@@ -1,3 +1,4 @@
+import { formatRupiah } from "@/app/helper";
 import prisma, { ProjectWithLeadAndMembers } from "@/app/prisma";
 import { authorized } from "@/app/serverhelper";
 import { $Enums } from "@prisma/client";
@@ -144,7 +145,33 @@ const PUT = async (
           disconnect: removedMembers.map((num) => ({ id: num })),
         },
       },
+      select: {
+        projectLead: {
+          select: {
+            name: true,
+          },
+        },
+        projectMembers: {
+          select: {
+            name: true,
+          },
+        },
+        title: true,
+        fund: true,
+        status: true,
+        priority: true,
+      },
     });
+
+    // create timelines
+    await prisma.timelines.create({
+      data: {
+        title: `Project updated: ${updatedProject.title}`,
+        description: `Status: ${updatedProject.status.replaceToSpaceAndCapitalize("_")} \n Priority: ${updatedProject.priority.capitalize()} \n Fund: ${formatRupiah(updatedProject.fund)} \n Leader: ${updatedProject.projectLead.name} \n Members: ${updatedProject.projectMembers.map((member) => " " + member.name)}`,
+        type: "updated",
+      },
+    });
+
     return NextResponse.json({ message: "Updated", data: updatedProject });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError && error.code === "P2025") {
@@ -171,6 +198,31 @@ const DELETE = async (
     const deleted = await prisma.project.delete({
       where: {
         id: Number(params.id),
+      },
+      select: {
+        projectLead: {
+          select: {
+            name: true,
+          },
+        },
+        projectMembers: {
+          select: {
+            name: true,
+          },
+        },
+        title: true,
+        priority: true,
+        fund: true,
+        status: true,
+      },
+    });
+
+    // create timeline
+    await prisma.timelines.create({
+      data: {
+        title: `Project deleted: ${deleted.title}`,
+        description: `Status: ${deleted.status.replaceToSpaceAndCapitalize("_")} \n Priority: ${deleted.priority.capitalize()} \n Fund: ${formatRupiah(deleted.fund)} \n Leader: ${deleted.projectLead.name} \n Members: ${deleted.projectMembers.map((member) => " " + member.name)}`,
+        type: "removed",
       },
     });
     return NextResponse.json({ data: deleted });
