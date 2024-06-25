@@ -1,14 +1,18 @@
 model Project {
-    id             Int           @id @default(autoincrement())
-    fund           Int
-    title          String
-    status         ProjectStatus @default(pending)
-    priority       Priority
-    projectLeadId  Int
-    projectLead    users         @relation(fields: [projectLeadId], references: [id], name: "Leader")
-    projectMembers users[]
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @default(now()) @updatedAt
+    id                     Int           @id @default(autoincrement())
+    fund                   Int
+    title                  String
+    status                 ProjectStatus @default(pending)
+    priority               Priority
+    projectLeadId          Int
+    projectLead            users         @relation(fields: [projectLeadId], references: [id], name: "Leader")
+    projectMembers         users[]
+    transportationSpending Int           @default(0) @map("transportation_spending")
+    foodSpending           Int           @default(0) @map("food_spending")
+    lodgingSpending        Int           @default(0) @map("lodging_spending")
+    entertainmentSpending  Int           @default(0) @map("entertainment_spending")
+    createdAt              DateTime      @default(now())
+    updatedAt              DateTime      @default(now()) @updatedAt
 
     @@map("projects")
 }
