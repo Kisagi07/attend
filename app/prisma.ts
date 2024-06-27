@@ -1,6 +1,12 @@
 import { Prisma, PrismaClient, users } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  omit: {
+    users: {
+      password: true,
+    },
+  },
+})
   .$extends({
     name: "status",
     result: {
@@ -136,26 +142,9 @@ const ProjectWithMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
 });
 
 const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
-  select: {
-    id: true,
-    title: true,
-    fund: true,
-    priority: true,
-    status: true,
-    projectLead: {
-      select: {
-        id: true,
-        name: true,
-        profile_picture: true,
-      },
-    },
-    projectMembers: {
-      select: {
-        id: true,
-        name: true,
-        profile_picture: true,
-      },
-    },
+  include: {
+    projectLead: true,
+    projectMembers: true,
   },
 });
 
@@ -221,6 +210,12 @@ export type UserResultFirst = Prisma.Result<
     };
   },
   "findFirstOrThrow"
+>;
+
+export type ProjectResult = Prisma.Result<
+  typeof prisma.project,
+  { include: { projectLead: true; projectMembers: true } },
+  "findFirst"
 >;
 
 async () => {

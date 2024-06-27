@@ -16,7 +16,7 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { MdOutlineEditNote } from "react-icons/md";
+import { MdOutlineEditNote, MdOutlineReadMore } from "react-icons/md";
 import { Button } from "@nextui-org/button";
 import { toast } from "sonner";
 import { KeyedMutator } from "swr";
@@ -130,7 +130,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, isLoading, muta
           return cellValue as unknown as string | number | Date;
       }
     },
-    []
+    [projects]
   );
 
   const handleRowAction = (key: Key) => {
@@ -199,6 +199,17 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, isLoading, muta
                   variant="flat"
                 >
                   <MdOutlineEditNote className="w-6 h-6" />
+                </Button>
+              </Tooltip>
+              <Tooltip content="See Detail" color="primary">
+                <Button
+                  as={Link}
+                  href={`/dashboard/projects/${selectedProject?.id}/detail`}
+                  isIconOnly
+                  color="primary"
+                  variant="flat"
+                >
+                  <MdOutlineReadMore className="w-6 h-6" />
                 </Button>
               </Tooltip>
             </div>

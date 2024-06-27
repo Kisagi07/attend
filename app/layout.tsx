@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "./object-extension/StringExtension";
+import "./object-extension/DateExtension";
 import Provider from "./components/Provider";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { SWR } from "./components";

@@ -1,9 +1,13 @@
 import { formatRupiah } from "@/app/helper";
-import prisma, { ProjectWithLeadAndMembers } from "@/app/prisma";
+import prisma from "@/app/prisma";
 import { authorized } from "@/app/serverhelper";
 import { $Enums } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "../../auth/[...nextauth]/authConfig";
+import "@/initExtension";
+
+const localDate = new Date().getLocalZonedDate("asia/jakarta");
 
 const checkIfAllIdsExists = async (numbers: number[]): Promise<boolean> => {
   const allRecords = await prisma.users.findMany({
@@ -21,37 +25,19 @@ const GET = async (
   { params }: { params: { id: string } }
 ): Promise<NextResponse> => {
   // authorized
+
   if (!(await authorized())) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 402 });
   }
 
   // get
-  const project: ProjectWithLeadAndMembers | null = await prisma.project.findFirst({
+  const project = await prisma.project.findFirst({
     where: {
       id: Number(params.id),
     },
-    select: {
-      id: true,
-      title: true,
-      fund: true,
-      priority: true,
-      status: true,
-      projectLead: {
-        select: {
-          id: true,
-          name: true,
-          api_profile_picture: true,
-          profile_picture: true,
-        },
-      },
-      projectMembers: {
-        select: {
-          id: true,
-          name: true,
-          api_profile_picture: true,
-          profile_picture: true,
-        },
-      },
+    include: {
+      projectLead: true,
+      projectMembers: true,
     },
   });
 
@@ -67,7 +53,8 @@ const PUT = async (
   { params }: { params: { id: string } }
 ): Promise<NextResponse> => {
   // authorized
-  if (!(await authorized())) {
+  const session = await auth();
+  if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 402 });
   }
 
@@ -118,11 +105,10 @@ const PUT = async (
   const newMembers: number[] = projectMembersId.filter(
     (newMember) => !oldMembers.includes(newMember)
   );
+
   const removedMembers: number[] = oldMembers.filter(
     (oldMember) => !projectMembersId.includes(oldMember)
   );
-
-  // if status exists that mean status is updated
 
   // update major update
   try {
@@ -172,11 +158,142 @@ const PUT = async (
       },
     });
 
+    // setup for project activity
+    // fetch new members and removed members data
+    if (removedMembers.length > 0) {
+      const removeMembers = await prisma.users.findMany({
+        where: {
+          id: {
+            in: removedMembers,
+          },
+        },
+      });
+      await prisma.projectActivity.create({
+        data: {
+          dateTime: localDate.toDate(),
+          description: `Removed members${removeMembers.map((user) => " " + user.name)}}`,
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+        },
+      });
+    }
+    if (newMembers.length > 0) {
+      const addedMembers = await prisma.users.findMany({
+        where: {
+          id: {
+            in: newMembers,
+          },
+        },
+      });
+      await prisma.projectActivity.create({
+        data: {
+          dateTime: localDate.toDate(),
+          description: `Added new members${addedMembers.map((user) => " " + user.name)}}`,
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+        },
+      });
+    }
+
+    // for fund change
+    if (fund !== project.fund) {
+      await prisma.projectActivity.create({
+        data: {
+          description: `Fund changed to ${formatRupiah(fund)}`,
+          dateTime: localDate.toDate(),
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+        },
+      });
+    }
+    // for status change
+    if (status !== project.status) {
+      await prisma.projectActivity.create({
+        data: {
+          description: `Status has been changed to ${status?.capitalize()}`,
+          dateTime: localDate.toDate(),
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+        },
+      });
+    }
+    // for priority change
+    if (priority !== project.priority) {
+      await prisma.projectActivity.create({
+        data: {
+          dateTime: localDate.toDate(),
+          description: `Priority changed to ${priority.replaceToSpaceAndCapitalize("_")}`,
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+        },
+      });
+    }
+    // for title change
+    if (title !== project.title) {
+      await prisma.projectActivity.create({
+        data: {
+          dateTime: localDate.toDate(),
+          description: `Title changed to ${title.capitalize()}`,
+          project: {
+            connect: {
+              id: project.id,
+            },
+          },
+          user: {
+            connect: {
+              id: Number(session.user.id),
+            },
+          },
+        },
+      });
+    }
+
     return NextResponse.json({ message: "Updated", data: updatedProject });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError && error.code === "P2025") {
       return NextResponse.json({ message: "Project not found" }, { status: 404 });
     } else {
+      console.log(error);
       return NextResponse.json({ message: "Something unexpected happen" }, { status: 500 });
     }
   }

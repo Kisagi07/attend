@@ -4,8 +4,7 @@
 
 @font-face {
   font-family: Sixtyfour;
-  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf")
-    format("truetype");
+  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf") format("truetype");
 }
 
 :root {
@@ -30,6 +29,12 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer base {
+  section {
+    @apply space-y-4;
   }
 }
 
