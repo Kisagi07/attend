@@ -17,6 +17,7 @@ model users {
   projectsLed      Project[]         @relation(name: "Leader")
   projectsMembered Project[]
   projectActivity  ProjectActivity[]
+  projectHistories ProjectHistory[]
 
   @@index([job_position_id], map: "users_job_position_id_foreign_idx")
 }

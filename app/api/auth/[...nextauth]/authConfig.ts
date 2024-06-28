@@ -32,7 +32,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.work_id = user.work_id;
         token.role = user.role;
         token.id = user.id ?? "-1";
-        // token.id = user.id!.toString();
       }
       return token;
     },

@@ -12,20 +12,20 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+  LineElement
+);
+
 type Props = {};
 
 const ProjectDetailSpendingChart = (props: Props) => {
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    Title,
-    Tooltip,
-    Filler,
-    Legend,
-    LineElement
-  );
-
   const options = {
     responsive: true,
     plugins: {

@@ -14,6 +14,7 @@ model Project {
     createdAt              DateTime          @default(now())
     updatedAt              DateTime          @default(now()) @updatedAt
     activity               ProjectActivity[]
+    histories              ProjectHistory[]
 
     @@map("projects")
 }
@@ -30,6 +31,19 @@ model ProjectActivity {
     updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
 
     @@map("projects_activity")
+}
+
+model ProjectHistory {
+    id          Int      @id @default(autoincrement())
+    projectId   Int      @map("project_id")
+    project     Project  @relation(fields: [projectId], references: [id])
+    userId      Int      @map("user_id")
+    user        users    @relation(fields: [userId], references: [id])
+    dateTime    DateTime @map("date_time")
+    description String
+    file        String?
+
+    @@map("project_histories")
 }
 
 enum ProjectStatus {

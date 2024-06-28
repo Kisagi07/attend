@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
   const users = await prisma.users.findMany({
     select: {
       password: true,
+      name: true,
+      work_id: true,
+      id: true,
+      role: true,
     },
   });
 

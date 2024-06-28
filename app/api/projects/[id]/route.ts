@@ -38,6 +38,11 @@ const GET = async (
     include: {
       projectLead: true,
       projectMembers: true,
+      activity: {
+        include: {
+          user: true,
+        },
+      },
     },
   });
 

@@ -148,6 +148,13 @@ const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()(
   },
 });
 
+// activities
+const ActivityWithUser = Prisma.validator<Prisma.ProjectActivityDefaultArgs>()({
+  include: {
+    user: true,
+  },
+});
+
 // types from validator
 export type LogWithUserWithJob = Prisma.logsGetPayload<typeof LogWithUserWithJob>;
 
@@ -170,6 +177,8 @@ export type ProjectWithLeadWithJobAndMembers = Prisma.ProjectGetPayload<
 export type ProjectWithMembers = Prisma.ProjectGetPayload<typeof ProjectWithMembers>;
 export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<typeof ProjectWithLeadAndMembers>;
 
+// activities
+export type ActivityWithUser = Prisma.ProjectActivityGetPayload<typeof ActivityWithUser>;
 // type results
 
 export type UserApiProfile = Prisma.Result<
@@ -212,9 +221,11 @@ export type UserResultFirst = Prisma.Result<
   "findFirstOrThrow"
 >;
 
+export type UserResult = Prisma.Result<typeof prisma.users, {}, "findFirst">;
+
 export type ProjectResult = Prisma.Result<
   typeof prisma.project,
-  { include: { projectLead: true; projectMembers: true } },
+  { include: { projectLead: true; projectMembers: true; activity: { include: { user: true } } } },
   "findFirst"
 >;
 
