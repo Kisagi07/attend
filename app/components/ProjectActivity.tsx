@@ -38,7 +38,7 @@ const ProjectActivity = (props: Props) => {
                 <div>
                   <div>
                     <span className="font-medium">{activity.user.name}</span>{" "}
-                    <time>{formatDate(activity.dateTime.toString())}</time>
+                    <time className="text-sm">{formatDate(activity.dateTime.toString())}</time>
                   </div>
                   <p className="p-2 bg-gray-200 text-sm">{activity.description}</p>
                 </div>

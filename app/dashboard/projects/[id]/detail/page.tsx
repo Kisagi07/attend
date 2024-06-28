@@ -10,6 +10,7 @@ import ProjectDetailMonthlyRecap from "@/app/components/ProjectDetailMonthlyReca
 import ProjectActivity from "@/app/components/ProjectActivity";
 import ProjectDetailMembers from "@/app/components/ProjectDetailMembers";
 import ProjectDetailLead from "@/app/components/ProjectDetailLead";
+import ProjectHistories from "@/app/components/ProjectHistories";
 type Props = {
   params: {
     id: string;
@@ -17,13 +18,13 @@ type Props = {
 };
 
 const page = (props: Props) => {
-  const { data: project, isLoading } = useSWR<ProjectResult>(
-    `/api/projects/${props.params.id}`,
-    fetcher
-  );
-  if (!project && !isLoading) {
+  const {
+    data: project,
+    isLoading,
+    error,
+  } = useSWR<ProjectResult>(`/api/projects/${props.params.id}`, fetcher);
+  if ((error && error.status === 404) || (!isLoading && !project)) {
     notFound();
-    return null;
   }
 
   return isLoading ? (
@@ -34,11 +35,12 @@ const page = (props: Props) => {
     <>
       <ProjectDetailStatus project={project} />
       <ProjectDetailMonthlyRecap project={project} />
-      <section className="grid gap-4 space-y-0 md:grid-cols-2 lg:grid-cols-3">
-        <ProjectDetailLead leader={project?.projectLead} />
-        <ProjectDetailMembers members={project?.projectMembers ?? []} />
-        <ProjectActivity activities={project?.activity ?? []} />
+      <section className="grid gap-4 space-y-0 md:grid-cols-2 xl:grid-cols-3">
+        <ProjectDetailLead leader={project!.projectLead} />
+        <ProjectDetailMembers members={project!.projectMembers} />
+        <ProjectActivity activities={project!.activity} />
       </section>
+      <ProjectHistories histories={project!.histories} />
     </>
   );
 };

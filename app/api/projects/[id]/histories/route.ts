@@ -68,5 +68,25 @@ const POST = async (
   });
   return NextResponse.json({ message: "History created", history });
 };
+const GET = async (
+  req: NextRequest,
+  { params }: { params: { id: string } }
+): Promise<NextResponse> => {
+  // authorized
+  const session = await auth();
+  if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  // authorize project
+  const project = await prisma.project.findFirst({
+    where: {
+      id: Number(params.id),
+    },
+    include: {
+      histories: true,
+    },
+  });
+  if (!project) return NextResponse.json({ message: "Project not found" }, { status: 404 });
+  // return histories only
+  return NextResponse.json(project.histories);
+};
 
-export { POST };
+export { POST, GET };

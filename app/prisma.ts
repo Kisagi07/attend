@@ -155,6 +155,13 @@ const ActivityWithUser = Prisma.validator<Prisma.ProjectActivityDefaultArgs>()({
   },
 });
 
+// histories
+const HistoryWithUser = Prisma.validator<Prisma.ProjectHistoryDefaultArgs>()({
+  include: {
+    user: true,
+  },
+});
+
 // types from validator
 export type LogWithUserWithJob = Prisma.logsGetPayload<typeof LogWithUserWithJob>;
 
@@ -179,6 +186,10 @@ export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<typeof ProjectW
 
 // activities
 export type ActivityWithUser = Prisma.ProjectActivityGetPayload<typeof ActivityWithUser>;
+
+// histories
+export type HistoryWithUser = Prisma.ProjectHistoryGetPayload<typeof HistoryWithUser>;
+
 // type results
 
 export type UserApiProfile = Prisma.Result<
@@ -225,7 +236,18 @@ export type UserResult = Prisma.Result<typeof prisma.users, {}, "findFirst">;
 
 export type ProjectResult = Prisma.Result<
   typeof prisma.project,
-  { include: { projectLead: true; projectMembers: true; activity: { include: { user: true } } } },
+  {
+    include: {
+      projectLead: true;
+      projectMembers: true;
+      activity: { include: { user: true } };
+      histories: {
+        include: {
+          user: true;
+        };
+      };
+    };
+  },
   "findFirst"
 >;
 
