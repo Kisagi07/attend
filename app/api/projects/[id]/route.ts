@@ -1,5 +1,5 @@
 import { formatRupiah } from "@/app/helper";
-import prisma, { ProjectResult } from "@/app/prisma";
+import prisma, { HistoryWithUser, ProjectResult } from "@/app/prisma";
 import { authorized } from "@/app/serverhelper";
 import { $Enums } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -31,7 +31,7 @@ const GET = async (
   }
 
   // get
-  const project = (await prisma.project.findFirst({
+  let project = (await prisma.project.findFirst({
     where: {
       id: Number(params.id),
     },
@@ -42,16 +42,29 @@ const GET = async (
         include: {
           user: true,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
       },
       histories: {
         include: {
           user: true,
         },
+        orderBy: {
+          dateTime: "desc",
+        },
       },
+      spendings: {
+        orderBy: {
+          createdAt: "desc"
+        }
+      }
     },
   })) as ProjectResult;
 
   if (!project) return NextResponse.json({ message: "Not Found" }, { status: 404 });
+
+  project.histories = project.histories.map((history) => prisma.projectHistory.routeToAPI(history));
 
   return NextResponse.json(project);
 };

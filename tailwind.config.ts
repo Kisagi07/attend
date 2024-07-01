@@ -20,7 +20,7 @@ const config: Config = {
       },
       fontFamily: {
         sixtyfour: ["Sixtyfour", "Helvetica"],
-      },
+      },     
     },
   },
   plugins: [nextui()],

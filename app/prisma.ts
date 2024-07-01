@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, users } from "@prisma/client";
+import { Prisma, PrismaClient, ProjectHistory, users } from "@prisma/client";
 
 const prisma = new PrismaClient({
   omit: {
@@ -57,6 +57,18 @@ const prisma = new PrismaClient({
               ? `${process.env.APP_URL}/api/images${user.profile_picture}`
               : null;
           },
+        },
+      },
+    },
+  })
+  .$extends({
+    model: {
+      projectHistory: {
+        routeToAPI(history: ProjectHistory) {
+          return {
+            ...history,
+            file: history.file ? `${process.env.APP_URL}/api/public${history.file}` : null,
+          } as any;
         },
       },
     },
@@ -246,6 +258,7 @@ export type ProjectResult = Prisma.Result<
           user: true;
         };
       };
+      spendings: true;
     };
   },
   "findFirst"

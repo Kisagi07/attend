@@ -25,7 +25,7 @@ const ProjectActivity = (props: Props) => {
     return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
   };
   return (
-    <section className="h-full">
+    <article className="h-full">
       <Card shadow="sm">
         <CardHeader>
           <h3 className="font-semibold">Activities</h3>
@@ -38,7 +38,7 @@ const ProjectActivity = (props: Props) => {
                 <div>
                   <div>
                     <span className="font-medium">{activity.user.name}</span>{" "}
-                    <time className="text-sm">{formatDate(activity.dateTime.toString())}</time>
+                    <time className="md:text-sm text-xs">{formatDate(activity.dateTime.toString())}</time>
                   </div>
                   <p className="p-2 bg-gray-200 text-sm">{activity.description}</p>
                 </div>
@@ -47,7 +47,7 @@ const ProjectActivity = (props: Props) => {
           </div>
         </CardBody>
       </Card>
-    </section>
+    </article>
   );
 };
 

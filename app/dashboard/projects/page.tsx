@@ -18,7 +18,7 @@ const ProjectsPage = () => {
     refreshInterval: 1000,
   });
   return (
-    <section className="space-y-2 p-2">
+    <section className="space-y-2">
       <h3 className="text-2xl font-semibold">Projects</h3>
       <div className="flex justify-end">
         <Button as={Link} href="/dashboard/projects/create" color="secondary" variant="flat">

@@ -18,6 +18,7 @@ model users {
   projectsMembered Project[]
   projectActivity  ProjectActivity[]
   projectHistories ProjectHistory[]
+  projectSpendings ProjectSpending[]
 
   @@index([job_position_id], map: "users_job_position_id_foreign_idx")
 }

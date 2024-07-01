@@ -4,13 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 import "@/initExtension";
 import { storeFile } from "@/app/file";
 
-const localDate = new Date().getLocalZonedDate("asia/jakarta");
-
 const POST = async (
   req: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> => {
-  // authorize
+  // authorizew
   const session = await auth();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -45,7 +43,7 @@ const POST = async (
     return NextResponse.json({ message: "Description is required" }, { status: 422 });
   }
   if (file && file.size > 0) {
-    const path = await storeFile(file, { uniqueName: true, storePath: "/history" });
+    const path = await storeFile(file, { storePath: "/history" });
     storePath = path;
   }
   // create history data
@@ -53,7 +51,24 @@ const POST = async (
     data: {
       description,
       file: storePath,
-      dateTime: localDate.toDate(),
+      dateTime: new Date(),
+      project: {
+        connect: {
+          id: project.id,
+        },
+      },
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
+    },
+  });
+  // create activity
+  await prisma.projectActivity.create({
+    data: {
+      dateTime: new Date(),
+      description: `Added new history ${history.description}`,
       project: {
         connect: {
           id: project.id,

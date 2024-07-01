@@ -1,3 +1,4 @@
+"use server";
 import Time from "@/app/components/Time";
 import UserInfo from "@/app/components/UserInfo";
 import HomeOptions from "@/app/components/HomeOptions";
@@ -16,8 +17,8 @@ const Home = () => {
   const promise = getUser();
 
   return (
-    <main className="min-h-screen w-full bg-white p-4 text-slate-700">
-      <div className="mx-auto max-w-md space-y-4">
+    <>
+      <section className="mx-auto max-w-md space-y-4">
         <div className="flex">
           <ButtonGroup>
             <Button
@@ -53,8 +54,8 @@ const Home = () => {
         </Suspense>
         <ClockInOut />
         <HomeOptions />
-      </div>
-    </main>
+      </section>
+    </>
   );
 };
 export default Home;

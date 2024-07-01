@@ -73,7 +73,7 @@ const ProjectDetailSpendingChart = (props: Props) => {
   };
 
   return (
-    <article>
+    <article className="md:px-4 min-h-60">
       <Line data-testid="spending-chart" options={options} data={data} updateMode="resize" />
     </article>
   );

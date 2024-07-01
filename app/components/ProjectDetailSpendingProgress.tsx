@@ -11,18 +11,19 @@ const ProjectDetailSpendingProgress = ({ project }: Props) => {
   const [percentageValue, setPercentageValue] = React.useState<number[]>();
   React.useEffect(() => {
     if (project) {
-      setPercentageValue(
-        calculatePercentageValue([
-          project.transportationSpending,
-          project.foodSpending,
-          project.lodgingSpending,
-          project.entertainmentSpending,
-        ])
+      const { food, transportation, lodging, entertainment } = project.spendings.reduce(
+        (acc, spending) => {
+          acc[spending.type] += spending.amount;
+
+          return acc;
+        },
+        { food: 0, transportation: 0, lodging: 0, entertainment: 0 }
       );
+      setPercentageValue(calculatePercentageValue([transportation, food, lodging, entertainment]));
     }
   }, [project]);
   return (
-    <article className="space-y-4">
+    <article className="space-y-4 px-4">
       <h4 className="text-center font-semibold">Necessity</h4>
       <Progress
         data-testid="progress-transportation"

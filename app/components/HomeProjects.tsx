@@ -12,6 +12,9 @@ import clsx from "clsx";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Avatar } from "@nextui-org/avatar";
 import { User } from "@nextui-org/user";
+import Link from "next/link";
+import { Button } from "@nextui-org/button";
+import { IoIosOpen } from "react-icons/io";
 
 interface Projects {
   projectLeading: ProjectWithMembers[];
@@ -78,6 +81,18 @@ const HomeProjects = () => {
                   </Tooltip>
                 ))}
               </div>
+              <Tooltip content="Open Project" color="primary">
+                <Button
+                  className="w-full"
+                  as={Link}
+                  href={`/home/projects/${project.id}`}
+                  variant="flat"
+                  color="secondary"
+                  isIconOnly
+                >
+                  <IoIosOpen className="w-6 h-6" />
+                </Button>
+              </Tooltip>
             </article>
           ))}
         </AccordionItem>

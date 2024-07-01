@@ -11,7 +11,7 @@ type Props = {
   project: undefined | ProjectResult;
 };
 
-const ProjectDetailStatus = ({ project }: Props) => {
+const ProjectDetailStatus = ({ project }: Props) => {  
   return (
     <section>
       <h3 className="text-xl font-bold">Detail Regarding : {project?.title}</h3>
@@ -24,7 +24,7 @@ const ProjectDetailStatus = ({ project }: Props) => {
               </div>
               <div>
                 <h4 className="text-lg font-medium">Status</h4>
-                <p data-testid="status">{project?.status}</p>
+                <p data-testid="status">{project?.status.replaceToSpaceAndCapitalize("_")}</p>
               </div>
             </div>
           </CardHeader>
@@ -37,7 +37,7 @@ const ProjectDetailStatus = ({ project }: Props) => {
               </div>
               <div>
                 <h4 className="text-lg font-medium">Priority</h4>
-                <p data-testid="priority">{project?.priority}</p>
+                <p data-testid="priority">{project?.priority.replaceToSpaceAndCapitalize("_")}</p>
               </div>
             </div>
           </CardHeader>
