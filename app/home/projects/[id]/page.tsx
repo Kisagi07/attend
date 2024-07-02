@@ -11,6 +11,9 @@ import ProjectActivity from "@/app/components/ProjectActivity";
 import ProjectDetailMembers from "@/app/components/ProjectDetailMembers";
 import ProjectDetailLead from "@/app/components/ProjectDetailLead";
 import ProjectHistories from "@/app/components/ProjectHistories";
+import { Button } from "@nextui-org/button";
+import Link from "next/link";
+import { FaHome } from "react-icons/fa";
 type Props = {
   params: {
     id: string;
@@ -35,6 +38,11 @@ const page = (props: Props) => {
     </div>
   ) : (
     <>
+      <section>
+        <Button as={Link} href="/home" variant="flat" color="secondary" startContent={<FaHome />}>
+          Go Back Home
+        </Button>
+      </section>
       <ProjectDetailStatus project={project} />
       <ProjectDetailMonthlyRecap project={project} />
       <section className="grid gap-4 space-y-0 md:grid-cols-2 xl:grid-cols-3">

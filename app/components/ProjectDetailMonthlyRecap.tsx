@@ -62,7 +62,7 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
     <article>
       <h3 className="text-xl font-bold px-4">Monthly Recap</h3>
       <div className="grid gap-4 md:grid-cols-2">
-        <ProjectDetailSpendingChart />
+        <ProjectDetailSpendingChart spendings={project?.spendings ?? []} />
         <ProjectDetailSpendingProgress project={project} />
       </div>
       <article className="mt-4 space-y-4  px-4 ">
@@ -95,30 +95,39 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
             "max-h-0": !open,
           })}
         >
-          <Input
-            type="number"
-            variant="flat"
-            fullWidth
-            name="amount"
-            label="Amount Spent"
-            isRequired
-            value={amount}
-            onValueChange={setAmount}
-          />
-          <Select
-            isRequired
-            variant="flat"
-            name="type"
-            defaultSelectedKeys={new Set(["food"])}
-            disallowEmptySelection
-            label="Spending Type"
-          >
-            <SelectItem key="food">Food</SelectItem>
-            <SelectItem key="entertainment">Entertainmnet</SelectItem>
-            <SelectItem key="lodging">Lodging</SelectItem>
-            <SelectItem key="transportation">Tranportation</SelectItem>
-          </Select>
-          <Input variant="flat" fullWidth name="description" label="Description" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input
+              type="number"
+              variant="flat"
+              fullWidth
+              name="amount"
+              label="Amount Spent"
+              isRequired
+              value={amount}
+              onValueChange={setAmount}
+            />
+            <Select
+              isRequired
+              variant="flat"
+              name="type"
+              defaultSelectedKeys={new Set(["food"])}
+              disallowEmptySelection
+              label="Spending Type"
+              fullWidth
+            >
+              <SelectItem key="food">Food</SelectItem>
+              <SelectItem key="entertainment">Entertainmnet</SelectItem>
+              <SelectItem key="lodging">Lodging</SelectItem>
+              <SelectItem key="transportation">Tranportation</SelectItem>
+            </Select>
+            <Input
+              variant="flat"
+              fullWidth
+              name="description"
+              label="Description"
+              className="md:col-span-2"
+            />
+          </div>
           <Button type="submit" isLoading={submitting} fullWidth variant="flat" color="primary">
             Log Spending
           </Button>

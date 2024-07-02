@@ -21,6 +21,7 @@ const ProjectDetailLead = (props: Props) => {
               src={props.leader?.api_profile_picture ?? undefined}
               name={props.leader?.name!}
               size="lg"
+              className="xl:w-40 xl:h-40"
             />
             <p className="font-medium text-lg" data-testid="project-lead-name">
               {props.leader?.name}
