@@ -3,10 +3,7 @@ import { calculateMonthlyStatus } from "@/app/serverhelper";
 import prisma, { withStatus, UserResultFirst } from "@/app/prisma";
 import bcryptjs from "bcryptjs";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { work_id: string } },
-) {
+export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const searchParams = req.nextUrl.searchParams;
   const monthlyStatus = searchParams.has("monthly-status");
 
@@ -40,10 +37,7 @@ export async function GET(
   return NextResponse.json(user);
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { work_id: string } },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
   const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
@@ -55,7 +49,7 @@ export async function DELETE(
       {
         message: "User not found",
       },
-      { status: 404 },
+      { status: 404 }
     );
 
   const deleted = await prisma.users.delete({
@@ -75,10 +69,7 @@ export async function DELETE(
   return NextResponse.json({ message: "Deleted", data: { deleted } });
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { work_id: string } },
-) {
+export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
   const { name, job_position_id, gender, role, password } = await req.json();
 
   let user = await prisma.users.findFirst({
@@ -92,7 +83,11 @@ export async function PUT(
 
   if (password) {
     // get all users for unique checking
-    const users = await prisma.users.findMany();
+    const users = await prisma.users.findMany({
+      omit: {
+        password: false,
+      },
+    });
     let unique = true;
     for (const user of users) {
       if (await bcryptjs.compare(password, user.password!)) {
@@ -101,11 +96,7 @@ export async function PUT(
       }
     }
     // if its not unique return error
-    if (!unique)
-      return NextResponse.json(
-        { error: "PIN already in use" },
-        { status: 409 },
-      );
+    if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
     await prisma.users.update({
       where: {
         id: user.id,

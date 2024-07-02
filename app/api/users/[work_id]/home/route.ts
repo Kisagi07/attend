@@ -33,6 +33,6 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
 
   return NextResponse.json({
     message: "User home coordinate updated",
-    data: prisma.users.excludePassword(user),
+    data: user,
   });
 }
