@@ -1,6 +1,12 @@
-import { Prisma, PrismaClient, users } from "@prisma/client";
+import { Prisma, PrismaClient, ProjectHistory, users } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  omit: {
+    users: {
+      password: true,
+    },
+  },
+})
   .$extends({
     name: "status",
     result: {
@@ -51,6 +57,18 @@ const prisma = new PrismaClient()
               ? `${process.env.APP_URL}/api/images${user.profile_picture}`
               : null;
           },
+        },
+      },
+    },
+  })
+  .$extends({
+    model: {
+      projectHistory: {
+        routeToAPI(history: ProjectHistory) {
+          return {
+            ...history,
+            file: history.file ? `${process.env.APP_URL}/api/public${history.file}` : null,
+          } as any;
         },
       },
     },
@@ -136,26 +154,23 @@ const ProjectWithMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
 });
 
 const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
-  select: {
-    id: true,
-    title: true,
-    fund: true,
-    priority: true,
-    status: true,
-    projectLead: {
-      select: {
-        id: true,
-        name: true,
-        profile_picture: true,
-      },
-    },
-    projectMembers: {
-      select: {
-        id: true,
-        name: true,
-        profile_picture: true,
-      },
-    },
+  include: {
+    projectLead: true,
+    projectMembers: true,
+  },
+});
+
+// activities
+const ActivityWithUser = Prisma.validator<Prisma.ProjectActivityDefaultArgs>()({
+  include: {
+    user: true,
+  },
+});
+
+// histories
+const HistoryWithUser = Prisma.validator<Prisma.ProjectHistoryDefaultArgs>()({
+  include: {
+    user: true,
   },
 });
 
@@ -180,6 +195,12 @@ export type ProjectWithLeadWithJobAndMembers = Prisma.ProjectGetPayload<
 
 export type ProjectWithMembers = Prisma.ProjectGetPayload<typeof ProjectWithMembers>;
 export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<typeof ProjectWithLeadAndMembers>;
+
+// activities
+export type ActivityWithUser = Prisma.ProjectActivityGetPayload<typeof ActivityWithUser>;
+
+// histories
+export type HistoryWithUser = Prisma.ProjectHistoryGetPayload<typeof HistoryWithUser>;
 
 // type results
 
@@ -221,6 +242,26 @@ export type UserResultFirst = Prisma.Result<
     };
   },
   "findFirstOrThrow"
+>;
+
+export type UserResult = Prisma.Result<typeof prisma.users, {}, "findFirst">;
+
+export type ProjectResult = Prisma.Result<
+  typeof prisma.project,
+  {
+    include: {
+      projectLead: true;
+      projectMembers: true;
+      activity: { include: { user: true } };
+      histories: {
+        include: {
+          user: true;
+        };
+      };
+      spendings: true;
+    };
+  },
+  "findFirst"
 >;
 
 async () => {

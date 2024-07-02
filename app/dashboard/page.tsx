@@ -4,10 +4,10 @@ const Dashboard = () => {
     <>
       <TeamBgroup />
       <TeamIntern />
-      <div className="md:grid md:gap-4 md:grid-cols-5">
+      <section className="md:grid md:gap-4 md:grid-cols-5">
         <ActivityTimeline />
         <VisitChart />
-      </div>
+      </section>
     </>
   );
 };

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "./object-extension/StringExtension";
 import Provider from "./components/Provider";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { SWR } from "./components";
 import Maintenance from "./components/Maintenance";
 import { cookies } from "next/headers";
 import { Toaster } from "sonner";
+
 
 const inter = Inter({ subsets: ["latin"] });
 

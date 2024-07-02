@@ -20,7 +20,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "attend.melianetworkid.com",
         pathname: "/api/images/**",
-      }
+      },
     ],
   },
 };

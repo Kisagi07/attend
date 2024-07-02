@@ -9,6 +9,7 @@ import { FaUsers, FaBriefcase, FaClock } from "react-icons/fa";
 import { IoSettingsSharp } from "react-icons/io5";
 import { GoDiscussionOutdated } from "react-icons/go";
 import { VscGithubProject } from "react-icons/vsc";
+import "@/initExtension";
 
 interface Layout {
   children: React.ReactNode;
@@ -82,7 +83,7 @@ const Layout: React.FC<Layout> = ({ children }) => {
         <Logout className="w-full !bg-white p-4 text-left !text-inherit   hover:!bg-slate-100" />
       </Sidebar>
 
-      <main className="min-h-[calc(100vh-3.5rem)] space-y-4 bg-white p-4 lg:ml-[280px]">
+      <main className="min-h-[calc(100vh-3.5rem)] space-y-8 bg-white py-4 lg:ml-[280px]">
         {children}
       </main>
     </>

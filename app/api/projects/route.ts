@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authorized } from "@/app/serverhelper";
 import prisma from "@/app/prisma";
 import { formatRupiah } from "@/app/helper";
+import { auth } from "../auth/[...nextauth]/authConfig";
 
 const checkIfAllIdsExists = async (numbers: number[]): Promise<boolean> => {
   const allRecords = await prisma.users.findMany({
@@ -19,6 +20,8 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
   if (!(await authorized())) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 402 });
   }
+
+  const session = await auth();
 
   // get formData and its value
   const formData = await req.formData();
@@ -65,6 +68,7 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
       },
     },
     select: {
+      id: true,
       title: true,
       status: true,
       priority: true,
@@ -88,6 +92,24 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
       title: `Project : ${project.title}`,
       description: `Status: ${project.status.replaceToSpaceAndCapitalize("_")} \n Priority: ${project.priority.capitalize()} \n Fund: ${formatRupiah(project.fund)} \n Leader: ${project.projectLead.name} \n Members: ${project.projectMembers.map((member) => " " + member.name)}`,
       type: "new",
+    },
+  });
+
+  // create projects activity
+  await prisma.projectActivity.create({
+    data: {
+      dateTime: new Date(),
+      user: {
+        connect: {
+          id: Number(session!.user.id),
+        },
+      },
+      project: {
+        connect: {
+          id: project.id,
+        },
+      },
+      description: `Project Created ${project.title}`,
     },
   });
 

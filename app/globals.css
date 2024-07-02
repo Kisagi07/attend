@@ -4,8 +4,7 @@
 
 @font-face {
   font-family: Sixtyfour;
-  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf")
-    format("truetype");
+  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf") format("truetype");
 }
 
 :root {
@@ -30,6 +29,12 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer base {
+  main > section {
+    @apply space-y-4 px-4;
   }
 }
 
@@ -63,4 +68,8 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: white;
   border-radius: 2px;
+}
+
+.translateZ0 {
+  transform: translateZ(0);
 }

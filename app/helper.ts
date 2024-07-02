@@ -1,5 +1,5 @@
 import { Fetcher } from "swr";
-import React from "react";
+import { ZonedDateTime } from "@internationalized/date";
 
 export function getWordDay() {
   const today = new Date();
@@ -117,4 +117,60 @@ const monthNumberToWord = (month: number): string => {
   return monthName[month];
 };
 
-export { fetcher, monthNumberToWord };
+const calculatePercentageValue = (numbers: number[]): number[] => {
+  if (numbers.every((number) => number === 0)) {
+    return [0, 0, 0, 0];
+  }
+
+  const total = numbers.reduce((a, b) => a + b);
+  const percentages = numbers.map((number) => {
+    if (number == 0) {
+      return 0;
+    } else {
+      return (number / total) * 100;
+    }
+  });
+  return percentages;
+};
+const getLocalZoneDate = function (timezone: string): ZonedDateTime {
+  const baseDate = new Date();
+  const localDate = new ZonedDateTime(
+    baseDate.getFullYear(),
+    baseDate.getMonth() + 1,
+    baseDate.getDate(),
+    "asia/jakarta",
+    baseDate.getTimezoneOffset(),
+    baseDate.getHours(),
+    baseDate.getMinutes(),
+    baseDate.getSeconds()
+  );
+
+  return localDate;
+};
+const replaceToSpaceAndCapitalize = function (text: string, target: string): string {
+  if (typeof text !== "string") {
+    throw Error("Invalid type: expected a string");
+  }
+  if (typeof target !== "string") {
+    throw Error(`Invalid Argument Type: expected "target" to be string ${typeof target} received`);
+  }
+  return text
+    .split(target)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+const capitalize = function (text: string): string {
+  if (typeof text !== "string") {
+    throw Error("Invaild type: expected a string");
+  }
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+export {
+  fetcher,
+  monthNumberToWord,
+  calculatePercentageValue,
+  getLocalZoneDate,
+  replaceToSpaceAndCapitalize,
+  capitalize,
+};
