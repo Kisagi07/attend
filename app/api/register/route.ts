@@ -6,7 +6,11 @@ export async function POST(req: NextRequest) {
   const { work_id, password, name, job_position_id, role = "employee", gender } = await req.json();
 
   // get all users for unique checking
-  const users = await prisma.users.findMany();
+  const users = await prisma.users.findMany({
+    select: {
+      password: true,
+    },
+  });
   let unique = true;
   for (const user of users) {
     if (await bcryptjs.compare(password, user.password!)) {
