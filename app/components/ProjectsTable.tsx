@@ -130,7 +130,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, isLoading, muta
           return cellValue as unknown as string | number | Date;
       }
     },
-    [projects]
+    []
   );
 
   const handleRowAction = (key: Key) => {

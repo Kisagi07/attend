@@ -38,7 +38,7 @@ const ProjectDetailSpendingChart = (props: Props) => {
     },
     maintainAspectRatio: false,
   };
-  const currentDate = new Date();
+  const currentDate = React.useMemo(() => new Date(), []);
   const labels = React.useMemo(() => {
     const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDate();
     const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
@@ -47,7 +47,7 @@ const ProjectDetailSpendingChart = (props: Props) => {
       labels.push(`${i.toString()}`);
     }
     return labels;
-  }, []);
+  }, [currentDate]);
 
   const groupedSpendings = React.useMemo(() => {
     const grouped = props.spendings.reduce<{ [key: string]: ProjectSpending[] }>(
