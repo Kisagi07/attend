@@ -17,7 +17,7 @@ type Props = {
   };
 };
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const {
     data: project,
     isLoading,
@@ -47,4 +47,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
