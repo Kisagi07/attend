@@ -23,11 +23,11 @@ const POST = async (req: NextRequest) => {
   }
 
   // if id is not in session user then find user based on work_id
-  const user = (await prisma.users.findFirst({
+  const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
     },
-  })) as users;
+  });
   if (!user) {
     return NextResponse.json("Unauthorized", { status: 401 });
   }
