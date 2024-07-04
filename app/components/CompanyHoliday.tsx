@@ -10,10 +10,7 @@ import { DatePicker } from "@nextui-org/date-picker";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 const CompanyHoliday: React.FC = () => {
-  const { data, isLoading, mutate } = useSWR<holidays[]>(
-    "/api/company-holiday",
-    fetcher,
-  );
+  const { data, isLoading, mutate } = useSWR<holidays[]>("/api/holidays", fetcher);
 
   const [date, setDate] = React.useState(today(getLocalTimeZone()));
   const [holidayName, setHolidayName] = React.useState<string>("");
@@ -24,7 +21,7 @@ const CompanyHoliday: React.FC = () => {
     if (!isNameValid()) return;
     setSending(true);
     try {
-      const response = await fetch("/api/company-holiday", {
+      const response = await fetch("/api/holidays", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,13 +68,6 @@ const CompanyHoliday: React.FC = () => {
     <section className="space-y-2">
       <h1>Holidays</h1>
       <hr />
-      <div className="bg-red-300 px-2 py-1 text-sm text-red-500">
-        <span className="font-medium">
-          National Holiday are automatically counted in work attendances, this
-          function is for company vacation for example: Day off, Company Holiday
-          etc.
-        </span>
-      </div>
       <div className="space-y-2 md:grid md:grid-cols-2 md:items-center md:gap-2 md:space-y-0">
         <DatePicker
           label="Pick New Holiday Date"
@@ -101,14 +91,9 @@ const CompanyHoliday: React.FC = () => {
       ) : (
         <ul className="divide-y-slate-400 divide-y">
           {data?.map((holiday) => (
-            <li
-              key={holiday.id}
-              className="flex items-stretch justify-between bg-slate-100"
-            >
+            <li key={holiday.id} className="flex items-stretch justify-between bg-slate-100">
               <div className="px-2 py-1">
-                <small className="block">
-                  {holiday.date.toString().split("T")[0]}
-                </small>
+                <small className="block">{holiday.date.toString().split("T")[0]}</small>
                 <p>{holiday.name}</p>
               </div>
               <button

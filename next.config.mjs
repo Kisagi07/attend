@@ -14,12 +14,10 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        pathname: "/api/images/**",
       },
       {
         protocol: "https",
         hostname: "attend.melianetworkid.com",
-        pathname: "/api/images/**",
       },
     ],
   },

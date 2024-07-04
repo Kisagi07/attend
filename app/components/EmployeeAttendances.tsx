@@ -13,7 +13,7 @@ import { LogWithUserWithJob } from "../prisma";
 
 const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
   const { data: monthLogs, isLoading } = useSWR<any>(
-    `/api/users/${params.work_id}/attendances`,
+    `/api/users/${params.work_id}/attendances?grouped`,
     fetcher,
     {
       onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
