@@ -34,18 +34,25 @@ const GET = async (
     },
   })) as LogWithUserWithJob[];
 
-  const groupedByMonth: { [key: string]: LogWithUserWithJob[] } = {};
-  logs.forEach((log) => {
-    const date = new Date(log.date!);
-    const month = monthNumberToWord(date.getMonth());
-    const year = date.getFullYear();
-    if (Object.hasOwn(groupedByMonth, `${month} ${year}`)) {
-      groupedByMonth[`${month} ${year}`].push(log);
-    } else {
-      groupedByMonth[`${month} ${year}`] = [log];
-    }
-  });
-  return NextResponse.json(groupedByMonth);
+  const searchParams = req.nextUrl.searchParams;
+  const grouped = searchParams.has("grouped");
+
+  if(grouped) {
+    const groupedByMonth: { [key: string]: LogWithUserWithJob[] } = {};
+    logs.forEach((log) => {
+      const date = new Date(log.date!);
+      const month = monthNumberToWord(date.getMonth());
+      const year = date.getFullYear();
+      if (Object.hasOwn(groupedByMonth, `${month} ${year}`)) {
+        groupedByMonth[`${month} ${year}`].push(log);
+      } else {
+        groupedByMonth[`${month} ${year}`] = [log];
+      }
+    });
+
+    return NextResponse.json(groupedByMonth);
+  }
+  return NextResponse.json(logs);
 };
 
 export { GET };

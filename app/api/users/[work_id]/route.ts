@@ -23,17 +23,15 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
       updated_at: true,
       gender: true,
       job_position: true,
+      profile_picture: true,
     },
   });
 
   if (!user) return NextResponse.json(null);
 
-  if (monthlyStatus) {
-    const withStatus = await calculateMonthlyStatus(user as UserResultFirst);
-
-    return NextResponse.json(withStatus[0]);
-  }
-
+  user.profile_picture = user.profile_picture
+    ? `${process.env.APP_URL}/api/public${user.profile_picture}`
+    : null;
   return NextResponse.json(user);
 }
 

@@ -4,19 +4,14 @@ import prisma, { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
 
 function getTodayDate() {
   const today = new Date();
-  return new Date(
-    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
-  );
+  return new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
 }
 
 function isWorkDay(date: Date, holidays: any[]) {
   return (
     date.getDay() !== 0 &&
     date.getDay() !== 6 &&
-    !holidays.some(
-      (holiday) =>
-        new Date(holiday.date.split(" ")[0]).getTime() === date.getTime(),
-    )
+    !holidays.some((holiday) => new Date(holiday.date.split(" ")[0]).getTime() === date.getTime())
   );
 }
 
@@ -25,6 +20,31 @@ export async function GET(req: NextRequest) {
   // get all allowed search params
   const limit = searchParams.get("limit");
   const groupedNamedDate = searchParams.has("grouped-name-date");
+  const of = searchParams.get("of")?.split(",").map(Number);
+  const month = searchParams.get("month") ?? undefined;
+  let year = searchParams.get("year") ?? undefined;
+  let startDate: Date | undefined = undefined;
+  let endDate: Date | undefined = undefined;
+
+  if (!month && year) {
+    year = new Date().getFullYear().toString();
+  }
+
+  if (year && isNaN(Number(year))) {
+    return NextResponse.json({ message: "Invalid year" });
+  }
+  if (month && isNaN(Number(month))) {
+    return NextResponse.json({ message: "Invalid month" });
+  }
+
+  if (month && (Number(month) < 0 || Number(month) > 12)) {
+    return NextResponse.json({ message: "Month must be between 1 and 12" });
+  }
+
+  if (month) {
+    startDate = new Date(Number(year), Number(month) - 1, 1);
+    endDate = new Date(Number(year), Number(month), 0);
+  }
   // set base options
 
   // if search params contain last-seven day
@@ -43,42 +63,29 @@ export async function GET(req: NextRequest) {
   }
 
   let logs = (await prisma.logs.findMany({
-    select: {
-      date: true,
-      work: true,
-      clock_in_latitude: true,
-      clock_in_longitude: true,
-      clock_out_latitude: true,
-      clock_out_longitude: true,
-      clock_in_time: true,
-      clock_out_time: true,
-      type: true,
-      created_at: true,
-      updated_at: true,
-      user_id: true,
+    include: {
       user: {
-        select: {
-          name: true,
-          work_id: true,
-          role: true,
-          updated_at: true,
-          created_at: true,
-          job_position: {
-            select: {
-              shift_start: true,
-            },
-          },
+        include: {
+          job_position: true,
         },
       },
     },
     orderBy: {
       created_at: "desc",
     },
+    where: {
+      user_id: {
+        in: of,
+      },
+      date: {
+        lte: endDate,
+        gte: startDate,
+      },
+    },
   })) as LogWithUserWithJob[];
 
   if (groupedNamedDate) {
-    const grouped: { [key: string]: { [key: string]: LogWithUserWithJob[] } } =
-      {};
+    const grouped: { [key: string]: { [key: string]: LogWithUserWithJob[] } } = {};
     logs.forEach((log) => {
       const date = log.date ? new Date(log.date) : new Date();
       const month = monthNumberToWord(date.getMonth());

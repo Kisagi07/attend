@@ -4,18 +4,30 @@ import { fetcher } from "../helper";
 import { CardSkeleton } from "../skeletons";
 import EmployeeCard from "./EmployeeCard";
 import { UserResultMany } from "../prisma";
+import { holidays, logs } from "@prisma/client";
 
 const TeamBgroup = () => {
+  const date = new Date();
   const { data: users, isLoading: usersLoading } = useSWR<UserResultMany>(
-    "/api/users?monthly-status&role=employee",
+    "/api/users?role=employee",
+    fetcher
+  );
+  const { data: attendances, isLoading: attendancesLoading } = useSWR<logs[]>(
+    () =>
+      `/api/attendances?of=${users?.map((user) => user.id).toString()}&year=${date.getFullYear()}&month=${date.getMonth() + 1}`,
+    fetcher
+  );
+  const { data: holidays, isLoading: holidaysLoading } = useSWR<holidays[]>(
+    `/api/holidays/${date.getMonth() + 1}-${date.getFullYear()}`,
     fetcher,
+    { fallbackData: [] }
   );
   return (
     <section className="space-y-2">
       <h1 className="text-xl font-semibold uppercase">Team BGroup</h1>
       <hr />
       <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {usersLoading ? (
+        {usersLoading || !attendances || holidaysLoading ? (
           <>
             <CardSkeleton />
             <CardSkeleton />
@@ -25,7 +37,15 @@ const TeamBgroup = () => {
         ) : (
           users
             ?.filter((user) => user.role === "employee")
-            .map((user) => <EmployeeCard key={user.id} user={user} />)
+            .map((user) => (
+              <EmployeeCard
+                attendances={attendances?.filter((log) => log.user_id === user.id) ?? []}
+                key={user.id}
+                user={user}
+                holidays={holidays!}
+                date={date}
+              />
+            ))
         )}
       </div>
     </section>
