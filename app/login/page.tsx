@@ -18,6 +18,12 @@ const LoginPage = () => {
     e.preventDefault();
     setSubmitting(true);
     setIncorrect(false);
+
+    if (PIN.length === 0) {
+      setIncorrect(true);
+      return;
+    }
+
     const res = await signIn("credentials", {
       PIN,
       callbackUrl: searchParams.get("callbackUrl") ?? "/home",
@@ -54,7 +60,11 @@ const LoginPage = () => {
             onKeyDown={handleKeyDown}
             onValueChange={setPIN}
           />
-          {incorrect && <small className="text-red-400">Make sure the PIN are correct</small>}
+          {incorrect && (
+            <small data-testid="incorrent" className="text-red-400">
+              {incorrect && "Make sure the PIN are correct"}
+            </small>
+          )}
           <Button
             fullWidth
             type="submit"
