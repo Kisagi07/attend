@@ -32,7 +32,8 @@
     ".next/types/**/*.ts",
     "models/user.js",
     "migrations/20240124085644-create-user.ts",
-    "migrations/20240125041904-create-user.js"
+    "migrations/20240125041904-create-user.js",
+    "babel.config.js"
   ],
   "exclude": ["node_modules"]
 }
