@@ -20,12 +20,10 @@ const MonthAttendances = ({
 }) => {
   const isLate = (log: LogWithUserWithJob): boolean => {
     if (log.type === "sick") return false;
-    const clockInTime = parseTime(
-      log.clock_in_time!.toString().split("T")[1].split(".")[0],
-    );
-    const workTime = parseTime(
-      log.user?.job_position?.shift_start ?? "00:00",
-    ).add({ minutes: tolerance });
+    const clockInTime = parseTime(log.clock_in_time!.toString().split("T")[1].split(".")[0]);
+    const workTime = parseTime(log.user?.job_position?.shift_start ?? "00:00").add({
+      minutes: tolerance,
+    });
     return clockInTime.compare(workTime) > 0;
   };
 
@@ -67,9 +65,7 @@ const MonthAttendances = ({
       header: "Clock Out Time",
       cell: (info) => (
         <span className={clsx({ "text-red-500": isLate(info.row.original) })}>
-          {info.getValue()
-            ? (info.getValue() as unknown as string).split("T")[1].slice(0, 7)
-            : "-"}
+          {info.getValue() ? (info.getValue() as unknown as string).split("T")[1].slice(0, 7) : "-"}
         </span>
       ),
       size: 150,
@@ -82,9 +78,7 @@ const MonthAttendances = ({
             "text-red-500": isLate(info.row.original),
           })}
         >
-          {(info.getValue() as string[])?.map((work) => (
-            <li key={work}>{work}</li>
-          ))}
+          {(info.getValue() as string[])?.map((work) => <li key={work}>{work}</li>)}
         </ul>
       ),
       size: 200,
@@ -100,7 +94,7 @@ const MonthAttendances = ({
             {info.getValue()}
           </span>
         ),
-      }),
+      })
     );
   }
   return <Table data={data} columns={columns} />;
