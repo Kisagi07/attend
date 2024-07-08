@@ -72,18 +72,15 @@ const EmployeeCard: React.FC<Props> = ({
     // Calculate total late
     let totalLate = 0;
     if (company) {
+      const [jobStartHours, jobStartMinutes] = (
+        user.job_position?.shift_start.split(":") ?? ["08", "00"]
+      ).map(Number);
+      const jobStartTime = jobStartHours * 36000 + jobStartMinutes * 60 + company.tolerance_time;
       totalLate = workFromOffices.filter((work) => {
-        const clockInDate = new Date(work.clock_in_time!);
-        const clockInHours = clockInDate.getHours();
-        const clockInMinutes = clockInDate.getMinutes();
-        const clockInSeconds = clockInDate.getSeconds();
-        const [jobStartHours, jobStartMinutes] = (
-          user.job_position?.shift_start.split(":") ?? ["08", "00"]
-        ).map(Number);
+        const clockInDate = (work.clock_in_time as unknown as string)!.split("T")[0].split("Z")[0];
+        const [clockInHours, clockInMinutes, clockInSeconds] = clockInDate.split(":").map(Number);
 
         const clockInTime = clockInHours * 36000 + clockInMinutes * 60 + clockInSeconds;
-        const jobStartTime = jobStartHours * 36000 + jobStartMinutes * 60 + company.tolerance_time;
-
         return clockInTime > jobStartTime;
       }).length;
     }
