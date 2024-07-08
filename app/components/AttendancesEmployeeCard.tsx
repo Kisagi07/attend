@@ -71,7 +71,7 @@ const AttendancesEmployeeCard = ({ params }: { params: { work_id: string } }) =>
     }
 
     return {};
-  }, [user, attendances, holidays]);
+  }, [attendances, holidays]);
 
   const getGroupName = (date: Date) => {
     return `${monthNumberToWord(date.getMonth())}-${date.getFullYear()}`;

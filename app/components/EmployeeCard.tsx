@@ -105,7 +105,7 @@ const EmployeeCard: React.FC<Props> = ({
       (totalWeekendDays + totalHolidays.length + workFromOffices.length + workFromHomes.length);
 
     return { todayStatus, totalWorkFromOffice, totalWorkFromHome, totalLate, totalAbsent };
-  }, [attendances, holidays, company, user]);
+  }, [attendances, holidays, company, user, date]);
 
   return isLoading ? (
     <div className="w-full justify-center">
