@@ -63,7 +63,7 @@ const EmployeeCard: React.FC<Props> = ({
 
     // Calculate total work from office and home
     const workFromOffices = attendances.filter(
-      (attendance) => attendance.type === "work_from_office"
+      (attendance) => attendance.type === "work_from_office" || attendance.type === "work_with_duty"
     );
     const workFromHomes = attendances.filter((attendance) => attendance.type === "work_from_home");
     const totalWorkFromHome = workFromHomes.length;
@@ -73,20 +73,18 @@ const EmployeeCard: React.FC<Props> = ({
     let totalLate = 0;
     if (company) {
       totalLate = workFromOffices.filter((work) => {
-        const workTime = new Date(work.clock_in_time!).setFullYear(
-          passedDate.getFullYear(),
-          passedDate.getMonth(),
-          passedDate.getDate()
-        );
-        const [job_hours, job_minutes] = (
+        const clockInDate = new Date(work.clock_in_time!);
+        const clockInHours = clockInDate.getHours();
+        const clockInMinutes = clockInDate.getMinutes();
+        const clockInSeconds = clockInDate.getSeconds();
+        const [jobStartHours, jobStartMinutes] = (
           user.job_position?.shift_start.split(":") ?? ["08", "00"]
         ).map(Number);
-        const jobClockInTime = new Date().setHours(
-          job_hours,
-          job_minutes + company.tolerance_time,
-          0
-        );
-        return workTime > jobClockInTime;
+
+        const clockInTime = clockInHours * 36000 + clockInMinutes * 60 + clockInSeconds;
+        const jobStartTime = jobStartHours * 36000 + jobStartMinutes * 60 + company.tolerance_time;
+
+        return clockInTime > jobStartTime;
       }).length;
     }
 
@@ -94,12 +92,15 @@ const EmployeeCard: React.FC<Props> = ({
     const totalDaysToToday = passedDate.getDate();
     let totalWeekendDays = 0;
     for (let i = totalDaysToToday; i > 0; i--) {
-      passedDate.setDate(i - 1);
-      if (passedDate.getDay() === 6 || passedDate.getDay() === 0) {
+      const date = new Date(passedDate.getFullYear(), passedDate.getMonth(), i);
+      if (date.getDay() === 6 || date.getDay() === 0) {
         totalWeekendDays++;
       }
     }
-    const totalHolidays = holidays.filter((holiday) => new Date(holiday.date) < passedDate);
+    const totalHolidays = holidays.filter((holiday) => {
+      const holidayDate = new Date(holiday.date);
+      return holidayDate < passedDate && holidayDate.getDay() !== 6 && holidayDate.getDay() !== 0;
+    });
     const totalAbsent =
       totalDaysToToday -
       (totalWeekendDays + totalHolidays.length + workFromOffices.length + workFromHomes.length);
