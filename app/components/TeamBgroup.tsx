@@ -14,7 +14,14 @@ const TeamBgroup = () => {
   );
   const { data: attendances, isLoading: attendancesLoading } = useSWR<logs[]>(
     () =>
-      `/api/attendances?of=${users?.map((user) => user.id).toString()}&year=${date.getFullYear()}&month=${date.getMonth() + 1}`,
+      "/api/attendances?of=" +
+      users?.map((user) => user.id).toString() +
+      "&year=" +
+      date.getFullYear() +
+      "&month=" +
+      date.getMonth() +
+      1,
+    // `/api/attendances?of=${users?.map((user) => user.id).toString()}&year=${date.getFullYear()}&month=${date.getMonth() + 1}`
     fetcher
   );
   const { data: holidays, isLoading: holidaysLoading } = useSWR<holidays[]>(

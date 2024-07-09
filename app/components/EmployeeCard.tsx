@@ -9,6 +9,7 @@ import { fetcher, monthNumberToWord } from "../helper";
 import { Spinner } from "@nextui-org/spinner";
 import { UserWithJob } from "../prisma";
 import { Chip } from "@nextui-org/chip";
+import { parseTime } from "@internationalized/date";
 
 interface Props {
   user: UserWithJob;
@@ -61,48 +62,71 @@ const EmployeeCard: React.FC<Props> = ({
       todayStatus = "holiday";
     }
 
-    // Calculate total work from office and home
-    const workFromOffices = attendances.filter(
-      (attendance) => attendance.type === "work_from_office" || attendance.type === "work_with_duty"
+    // calculate totalWofkFromOffice (include work_with_duty)
+    const workFromOffice = attendances.filter(
+      (log) => log.type === "work_with_duty" || log.type === "work_from_office"
     );
-    const workFromHomes = attendances.filter((attendance) => attendance.type === "work_from_home");
-    const totalWorkFromHome = workFromHomes.length;
-    const totalWorkFromOffice = workFromOffices.length;
+    const workFromHome = attendances.filter((log) => log.type === "work_from_home");
 
-    // Calculate total late
-    let totalLate = 0;
-    if (company) {
-      const [jobStartHours, jobStartMinutes] = (
-        user.job_position?.shift_start.split(":") ?? ["08", "00"]
-      ).map(Number);
-      const jobStartTime = jobStartHours * 36000 + jobStartMinutes * 60 + company.tolerance_time;
-      totalLate = workFromOffices.filter((work) => {
-        const clockInDate = (work.clock_in_time as unknown as string)!.split("T")[0].split("Z")[0];
-        const [clockInHours, clockInMinutes, clockInSeconds] = clockInDate.split(":").map(Number);
+    // calculate totalLate
+    let late = 0;
+    // parse job shift start time
+    let jobStartTime = parseTime(user.job_position?.shift_start ?? "08:00");
+    // add company tolerance time
+    jobStartTime = jobStartTime.add({ minutes: company?.tolerance_time ?? 0 });
+    jobStartTime.add({ hours: 5 });
+    // filter late work
+    late = attendances.filter((work) => {
+      if (work.type === "sick") {
+        return false;
+      }
+      // parse the time
+      const clockInTime = parseTime(String(work.clock_in_time).split("T")[1].split("Z")[0]);
 
-        const clockInTime = clockInHours * 36000 + clockInMinutes * 60 + clockInSeconds;
-        return clockInTime > jobStartTime;
-      }).length;
-    }
+      // compare if more than 0 mean greater
+      return clockInTime.compare(jobStartTime) > 0;
+    }).length;
 
-    // Calculate total absent
-    const totalDaysToToday = passedDate.getDate();
-    let totalWeekendDays = 0;
-    for (let i = totalDaysToToday; i > 0; i--) {
+    // initialize late as total days first
+    let totalAbsent = passedDate.getDate();
+    // get the date of passed date
+    const finalPassedDate = passedDate.getDate();
+    // initialize totalWeekend as 0 first
+    let totalWeekend = 0;
+    // check every date start from finalPassedDate to 0 for weekend
+    for (let i = finalPassedDate; i > 0; i--) {
       const date = new Date(passedDate.getFullYear(), passedDate.getMonth(), i);
-      if (date.getDay() === 6 || date.getDay() === 0) {
-        totalWeekendDays++;
+      if ([0, 6].includes(date.getDay())) {
+        totalWeekend++;
       }
     }
-    const totalHolidays = holidays.filter((holiday) => {
-      const holidayDate = new Date(holiday.date);
-      return holidayDate < passedDate && holidayDate.getDay() !== 6 && holidayDate.getDay() !== 0;
+    // substract totalAbsent with totalWeekend
+    totalAbsent -= totalWeekend;
+    // filter holiday that is not weekend
+    let totalHolidays = holidays.filter((holiday) => {
+      const date = new Date(holiday.date);
+      return date.getDay() !== 0 || date.getDay() !== 6;
+    }).length;
+    // substract total absent with total holidays that is not weekend
+    totalAbsent -= totalHolidays;
+    // filter attendance that's on weekdays
+    const weekdaysAttendances = attendances.filter((work) => {
+      const date = new Date(work.date!);
+      console.log([date, work.date]);
+      return date.getDay() !== 0 || date.getDay() !== 6;
     });
-    const totalAbsent =
-      totalDaysToToday -
-      (totalWeekendDays + totalHolidays.length + workFromOffices.length + workFromHomes.length);
+    // substract total absent with total work on weekdays
+    totalAbsent -= weekdaysAttendances.length;
+    // use Math.max incase total absent are less than 0, if so asign it 0
+    totalAbsent = Math.max(totalAbsent, 0);
 
-    return { todayStatus, totalWorkFromOffice, totalWorkFromHome, totalLate, totalAbsent };
+    return {
+      todayStatus,
+      totalWorkFromOffice: workFromOffice.length,
+      totalWorkFromHome: workFromHome.length,
+      totalLate: late,
+      totalAbsent,
+    };
   }, [attendances, holidays, company, user, date]);
 
   return isLoading ? (
