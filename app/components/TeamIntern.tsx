@@ -20,8 +20,7 @@ const TeamIntern = () => {
       "&year=" +
       date.getFullYear() +
       "&month=" +
-      date.getMonth() +
-      1,
+      (date.getMonth() + 1),
 
     fetcher
   );

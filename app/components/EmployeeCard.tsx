@@ -112,7 +112,6 @@ const EmployeeCard: React.FC<Props> = ({
     // filter attendance that's on weekdays
     const weekdaysAttendances = attendances.filter((work) => {
       const date = new Date(work.date!);
-      console.log([date, work.date]);
       return date.getDay() !== 0 || date.getDay() !== 6;
     });
     // substract total absent with total work on weekdays
