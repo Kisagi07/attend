@@ -24,7 +24,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
         if (retryCount >= 10) return;
         setTimeout(() => revalidate({ retryCount }), 5000);
       },
-    },
+    }
   );
 
   const { data: company } = useSWR<company>(`/api/company`, fetcher);
@@ -34,8 +34,8 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
   const [tableData, setTableData] = useState<LogWithUserWithJob[]>([]);
 
   const getTotalWorkDay = (): number => {
-    return tableData.filter(
-      (log) => log.type === "work_from_office" || log.type === "work_from_home",
+    return tableData.filter((log) =>
+      ["work_from_office", "work_from_home", "work_with_duty"].includes(log.type)
     ).length;
   };
 
@@ -86,8 +86,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
       {tableData.length > 0 && (
         <section id="total">
           <p>
-            Total Work Day :{" "}
-            <span className="text-semibold">{getTotalWorkDay()}</span>
+            Total Work Day : <span className="text-semibold">{getTotalWorkDay()}</span>
           </p>
         </section>
       )}

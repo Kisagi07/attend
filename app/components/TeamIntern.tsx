@@ -14,13 +14,19 @@ const TeamIntern = () => {
     fetcher
   );
   const { data: attendances, isLoading: attendancesLoading } = useSWR<logs[]>(
-    () =>
-      "/api/attendances?of=" +
-      users?.map((user) => user.id).toString() +
-      "&year=" +
-      date.getFullYear() +
-      "&month=" +
-      (date.getMonth() + 1),
+    () => {
+      if (!users) {
+        return false;
+      }
+      return (
+        "/api/attendances?of=" +
+        users?.map((user) => user.id).toString() +
+        "&year=" +
+        date.getFullYear() +
+        "&month=" +
+        (date.getMonth() + 1)
+      );
+    },
 
     fetcher
   );
