@@ -46,8 +46,6 @@ export async function GET(req: NextRequest) {
     endDate = new Date(Date.UTC(Number(year), Number(month), 0));
   }
 
-  console.log(startDate, endDate);
-
   let logs = (await prisma.logs.findMany({
     take: limit,
     include: {
