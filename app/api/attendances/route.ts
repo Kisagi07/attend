@@ -18,7 +18,7 @@ function isWorkDay(date: Date, holidays: any[]) {
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   // get all allowed search params
-  const limit = searchParams.get("limit");
+  let limit = Number(searchParams.get("limit")) || undefined;
   const groupedNamedDate = searchParams.has("grouped-name-date");
   const of = searchParams.get("of")?.split(",").map(Number);
   const month = searchParams.get("month") ?? undefined;
@@ -42,27 +42,14 @@ export async function GET(req: NextRequest) {
   }
 
   if (month) {
-    startDate = new Date(Number(year), Number(month) - 1, 1);
-    endDate = new Date(Number(year), Number(month), 0);
+    startDate = new Date(Date.UTC(Number(year), Number(month) - 1));
+    endDate = new Date(Date.UTC(Number(year), Number(month), 0));
   }
-  // set base options
 
-  // if search params contain last-seven day
-
-  if (limit) {
-    const logs = await prisma.logs.findMany({
-      take: parseInt(limit),
-      include: {
-        user: true,
-      },
-      orderBy: {
-        created_at: "desc",
-      },
-    });
-    return NextResponse.json(logs);
-  }
+  console.log(startDate, endDate);
 
   let logs = (await prisma.logs.findMany({
+    take: limit,
     include: {
       user: {
         include: {
@@ -83,6 +70,44 @@ export async function GET(req: NextRequest) {
       },
     },
   })) as LogWithUserWithJob[];
+  // set base options
+
+  // if search params contain last-seven day
+
+  // if (limit) {
+  //   const logs = await prisma.logs.findMany({
+  //     take: parseInt(limit),
+  //     include: {
+  //       user: true,
+  //     },
+  //     orderBy: {
+  //       created_at: "desc",
+  //     },
+  //   });
+  //   return NextResponse.json(logs);
+  // }
+
+  // let logs = (await prisma.logs.findMany({
+  //   include: {
+  //     user: {
+  //       include: {
+  //         job_position: true,
+  //       },
+  //     },
+  //   },
+  //   orderBy: {
+  //     created_at: "desc",
+  //   },
+  //   where: {
+  //     user_id: {
+  //       in: of,
+  //     },
+  //     date: {
+  //       lte: endDate,
+  //       gte: startDate,
+  //     },
+  //   },
+  // })) as LogWithUserWithJob[];
 
   if (groupedNamedDate) {
     const grouped: { [key: string]: { [key: string]: LogWithUserWithJob[] } } = {};

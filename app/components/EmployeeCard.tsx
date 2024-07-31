@@ -41,9 +41,11 @@ const EmployeeCard: React.FC<Props> = ({
 
     // Check if today's attendance is logged
     if (todayStatus === "absent") {
-      const todayAttendance = attendances.find(
-        (log) => new Date(log.date!).toLocaleDateString() === passedDateString
-      );
+      const todayAttendance = attendances.find((log, index) => {
+        if (index == 0) {
+        }
+        return new Date(log.date!).toLocaleDateString() === passedDateString;
+      });
       if (todayAttendance) {
         todayStatus = todayAttendance.type;
       }
