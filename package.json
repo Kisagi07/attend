@@ -42,7 +42,7 @@
     "@types/uuid": "^9.0.8",
     "@types/validator": "^13.11.8",
     "bcryptjs": "^2.4.3",
-    "chart.js": "^4.4.2",
+    "chart.js": "^4.4.3",
     "clsx": "^2.1.0",
     "date-holidays": "^3.23.12",
     "file-type": "^19.0.0",

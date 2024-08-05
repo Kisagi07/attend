@@ -9,6 +9,7 @@ import { FaUsers, FaBriefcase, FaClock } from "react-icons/fa";
 import { IoSettingsSharp } from "react-icons/io5";
 import { GoDiscussionOutdated } from "react-icons/go";
 import { VscGithubProject } from "react-icons/vsc";
+import { MdFastfood } from "react-icons/md";
 import "@/initExtension";
 
 interface Layout {
@@ -78,6 +79,11 @@ const Layout: React.FC<Layout> = ({ children }) => {
           href="/dashboard/settings"
           name="Settings"
           icon={<IoSettingsSharp className="h-5 w-5" />}
+        />
+        <Sidebar.LinkItem
+          href="/dashboard/food-and-drink-cost"
+          name="Food and Drink Cost"
+          icon={<MdFastfood className="h-5 w-5" />}
         />
         <Sidebar.Divider />
         <Logout className="w-full !bg-white p-4 text-left !text-inherit   hover:!bg-slate-100" />
