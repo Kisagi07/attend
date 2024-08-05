@@ -21,6 +21,15 @@ const useForm = (
   const [failedMessage, setFailedMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const sendToast = (type: "success" | "failed", message: string) => {
+    if (type === "success") {
+      toast.success(message);
+    }
+    if (type === "failed") {
+      toast.error(message);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -52,11 +61,13 @@ const useForm = (
           error.status = res.status;
           error.info = await res.json();
           setFailedMessage(error.info.message ?? "Something went wrong");
+          sendToast("failed", error.info.message ?? "Something went wrong");
           throw error;
         }
         const responseData = await res.json();
         setResData(responseData);
         setSuccessMessage(responseData.message ?? "Success");
+        sendToast("success", responseData.message ?? "Success");
         setSuccess(true);
         setFailed(false);
       } catch (error: any) {
@@ -68,15 +79,6 @@ const useForm = (
     }
   };
 
-  useEffect(() => {
-    if (success) {
-      toast.success(successMessage);
-    }
-    if (failed) {
-      toast.error(failedMessage);
-    }
-  }, [success, failed, successMessage, failedMessage]);
-
-  return { handleSubmit, validated, errors, resData, resError, isSubmitting };
+  return { handleSubmit, validated, errors, resData, resError, isSubmitting, success, failed };
 };
 export default useForm;
