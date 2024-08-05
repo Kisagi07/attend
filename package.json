@@ -1,6 +1,6 @@
 {
   "name": "attend",
-  "version": "2.1.0",
+  "version": "2.11.0",
   "private": true,
   "scripts": {
     "dev": "set NODE_OPTIONS=--max_old_space_size=2048 && next dev",
