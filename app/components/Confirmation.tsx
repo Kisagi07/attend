@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { FC } from "react";
+import { Button } from "@nextui-org/button";
 interface CProps {
   show?: boolean;
   text?: string;
@@ -22,22 +23,20 @@ const Confirmation: FC<CProps> = ({ show, text, title, onClose, onConfirm }) => 
         <p className="mt-2 mb-8 text-sm font-semibold">
           {text || "Are you sure you want to do this?"}
         </p>
-        <div className="flex justify-end">
-          <button
-            onClick={() => onClose && onClose(false)}
-            className="bg-slate-100 p-4 hover:bg-slate-200"
-          >
+        <div className="flex justify-end gap-2">
+          <Button variant="flat" color="default" onClick={() => onClose?.(false)}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="flat"
+            color="success"
             onClick={() => {
-              onClose && onClose(false);
-              onConfirm && onConfirm();
+              onClose?.(false);
+              onConfirm?.();
             }}
-            className="bg-emerald-400 p-4 ms-4 hover:bg-emerald-500 text-white"
           >
             Confirm
-          </button>
+          </Button>
         </div>
       </div>
     </div>

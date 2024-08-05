@@ -166,6 +166,23 @@ const capitalize = function (text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+const groupByDate = (field: string, data: any[]): { [key: string]: any[] } => {
+  const grouped = data.reduce((acc, curr) => {
+    const date = new Date(curr[field]);
+    const month = date.getMonth();
+    const monthName = monthNumberToWord(month);
+    if (!acc[monthName]) {
+      acc[monthName] = [];
+    }
+
+    acc[monthName].push(curr);
+
+    return acc;
+  }, {});
+
+  return grouped;
+};
+
 export {
   fetcher,
   monthNumberToWord,
@@ -173,4 +190,5 @@ export {
   getLocalZoneDate,
   replaceToSpaceAndCapitalize,
   capitalize,
+  groupByDate,
 };
