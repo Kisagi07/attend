@@ -68,44 +68,6 @@ export async function GET(req: NextRequest) {
       },
     },
   })) as LogWithUserWithJob[];
-  // set base options
-
-  // if search params contain last-seven day
-
-  // if (limit) {
-  //   const logs = await prisma.logs.findMany({
-  //     take: parseInt(limit),
-  //     include: {
-  //       user: true,
-  //     },
-  //     orderBy: {
-  //       created_at: "desc",
-  //     },
-  //   });
-  //   return NextResponse.json(logs);
-  // }
-
-  // let logs = (await prisma.logs.findMany({
-  //   include: {
-  //     user: {
-  //       include: {
-  //         job_position: true,
-  //       },
-  //     },
-  //   },
-  //   orderBy: {
-  //     created_at: "desc",
-  //   },
-  //   where: {
-  //     user_id: {
-  //       in: of,
-  //     },
-  //     date: {
-  //       lte: endDate,
-  //       gte: startDate,
-  //     },
-  //   },
-  // })) as LogWithUserWithJob[];
 
   if (groupedNamedDate) {
     const grouped: { [key: string]: { [key: string]: LogWithUserWithJob[] } } = {};
