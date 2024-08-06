@@ -41,3 +41,6 @@ next-env.d.ts
 # local uploaded file
 /public/upload/*
 /public/history/*
+types/DrinkAndFoodNote.ts
+types/Log.ts
+types/types.rar

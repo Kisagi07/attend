@@ -3,7 +3,6 @@ import prisma from "@/app/prisma";
 import { parseZonedDateTime } from "@internationalized/date";
 import { DrinkAndFoodCostCategory } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../auth/[...nextauth]/authConfig";
 const POST = async (req: NextRequest): Promise<NextResponse> => {
   const formData = await req.formData();
   const category = formData.get("category") as DrinkAndFoodCostCategory;
