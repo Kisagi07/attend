@@ -25,10 +25,6 @@ const POST = async (req: NextRequest): Promise<NextResponse> => {
   return NextResponse.json({ message: "Meal/Drink Noted", foodAndDrinkCost });
 };
 const GET = async (req: NextRequest): Promise<NextResponse> => {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 404 });
-  }
   const searchParams = req.nextUrl.searchParams;
   const limit = searchParams.get("limit");
   const orderIn = searchParams.get("orderIn") as "desc" | "asc";
