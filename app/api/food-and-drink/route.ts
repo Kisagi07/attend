@@ -37,4 +37,19 @@ const GET = async (req: NextRequest): Promise<NextResponse> => {
   return NextResponse.json(drinkFoodCost);
 };
 
-export { POST, GET };
+const OPTIONS = async (req: NextRequest) => {
+  const response = new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST,PUT,GET,OPTIONS,DELETE",
+      "Access-Control-Allow-Headers":
+        "Content-Type, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, X-Uroboros",
+    },
+  });
+
+  return response;
+};
+
+export { POST, GET, OPTIONS };

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
 export default auth(async function middleware(req) {
+  if (req.method === "OPTIONS") {
+    return NextResponse.next();
+  }
+
   const { pathname, origin } = req.nextUrl;
   const apiKey = req.headers.get("X-Uroboros") ?? null;
   const xUroborosKey = process.env.APP_API_KEY ?? "ShKs07";
@@ -10,15 +14,14 @@ export default auth(async function middleware(req) {
   const isLoginRoute = pathname === "/api/login";
   const isNextAuthRoute = pathname.startsWith("/api/auth");
   const hasKeyAndMatch = apiKey ? apiKey === xUroborosKey : false;
+  console.log({ apiKey, xUroborosKey, hasKeyAndMatch });
 
-  // ? if not authenticated and not login route and not nextauth auth route
-  if (!req.auth && !isLoginRoute && !isNextAuthRoute) {
-    //   ? if is api route
+  if (!req.auth) {
     if (isApiRoute) {
       if (!hasKeyAndMatch) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
-    } else {
+    } else if (!isLoginRoute && !isNextAuthRoute) {
       return NextResponse.redirect(new URL("/login", origin));
     }
   }
@@ -35,5 +38,5 @@ export default auth(async function middleware(req) {
 });
 
 export const config = {
-  matcher: ["/home/:path*", "/dashboard/:path*"],
+  matcher: ["/home/:path*", "/dashboard/:path*", "/api/:path*"],
 };
