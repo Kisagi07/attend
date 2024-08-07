@@ -41,7 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ### Endpoint
 
-`GET /api/food-and-drink
+`GET` /api/food-and-drink
 
 ### Description
 
@@ -75,7 +75,7 @@ Fetches all food and drink note, by default ordered by when note are indicating 
 
 ### Endpoint
 
-`GET /api/attendances
+`GET` /api/attendances
 
 ### Description
 
