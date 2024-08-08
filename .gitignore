@@ -44,3 +44,4 @@ next-env.d.ts
 types/DrinkAndFoodNote.ts
 types/Log.ts
 types/types.rar
+app/components/plainFall.js

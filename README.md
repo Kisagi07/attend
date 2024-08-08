@@ -116,3 +116,79 @@ Fetches all attendances, by default ordered by created in desc direction
     ...
 ]
 ```
+
+## Holidays Resource
+
+### Endpoint
+
+`GET` /api/holidays
+
+### Description
+
+Fetches all holidays, by default ordered by created in desc direction
+
+### API Options
+
+No Options
+
+### Response
+
+```json
+[
+    ...
+    {
+        "id": 5,
+        "date": "2024-07-06T17:00:00.000Z",
+        "name": "Tahun Baru Hijriah",
+        "created_at": "2024-07-08T08:51:32.000Z",
+        "updated_at": "2024-07-08T08:51:32.000Z"
+    }
+    ...
+]
+```
+
+## Users Resource
+
+### Endpoint
+
+`GET` /api/users
+
+### Description
+
+Fetches all ysers, by default ordered by created in desc direction
+
+### API Options
+
+- `role` (string: `intern` | `employee`): fetch only users with said role, by default fetch all users except admin
+
+### Response
+
+```json
+[
+    ...
+    {
+        "job_position":
+            {
+                "id": 3,
+                "name": "Intern Developer",
+                "shift_start": "09:00",
+                "shift_end": "16:00",
+                "created_at": "2024-07-01T02:09:21.000Z",
+                "updated_at": "2024-07-01T02:09:21.000Z",
+                "work_day": "1,2,3,4,5",
+                "salary": 0
+            },
+        "name": "Dewa Raditya Rochman",
+        "work_id": "ID008",
+        "role": "intern",
+        "job_position_id": 3,
+        "created_at": "2024-07-01T02:17:42.000Z",
+        "updated_at": "2024-07-10T01:03:32.000Z",
+        "gender": "male",
+        "id": 16,
+        "profile_picture": null,
+        "api_profile_picture": null
+    },
+    ...
+]
+```

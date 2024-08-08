@@ -33,7 +33,8 @@
     "models/user.js",
     "migrations/20240124085644-create-user.ts",
     "migrations/20240125041904-create-user.js",
-    "babel.config.js"
+    "babel.config.js",
+    "app/components/plainFall.js"
   ],
   "exclude": ["node_modules"]
 }

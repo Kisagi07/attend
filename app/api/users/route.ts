@@ -26,13 +26,14 @@ export async function GET(req: NextRequest) {
       where: {
         role: role,
       },
+      orderBy: {
+        created_at: "desc",
+      },
     });
 
     if (monthlyStatus) {
       // get year, month, beggining of the month in string
-      const usersWithStatus = await calculateMonthlyStatus(
-        users as UserResultMany,
-      );
+      const usersWithStatus = await calculateMonthlyStatus(users as UserResultMany);
       return NextResponse.json(usersWithStatus);
     }
     return NextResponse.json(users);
@@ -64,9 +65,7 @@ export async function GET(req: NextRequest) {
 
   if (monthlyStatus) {
     // get year, month, beggining of the month in string
-    const usersWithStatus = await calculateMonthlyStatus(
-      users as UserResultMany,
-    );
+    const usersWithStatus = await calculateMonthlyStatus(users as UserResultMany);
     return NextResponse.json(usersWithStatus);
   }
 
