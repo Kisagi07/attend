@@ -73,7 +73,9 @@ const prisma = new PrismaClient({
       },
     },
   });
+
 // validators
+// Logs
 const LogWithUser = Prisma.validator<Prisma.logsDefaultArgs>()({
   select: {
     date: true,
@@ -110,6 +112,7 @@ const LogWithUserWithJob = Prisma.validator<Prisma.logsDefaultArgs>()({
   },
 });
 
+// Users
 const UserJobExPassword = Prisma.validator<Prisma.usersDefaultArgs>()({
   select: {
     job_position: true,
@@ -130,12 +133,20 @@ const UserWithJob = Prisma.validator<Prisma.usersDefaultArgs>()({
   },
 });
 
+const UserOmitPassword = Prisma.validator<Prisma.usersDefaultArgs>()({
+  omit: {
+    password: true,
+  },
+});
+
+// Day Off Requests
 const DayOffRequestWithUser = Prisma.validator<Prisma.DayOffRequestDefaultArgs>()({
   include: {
     user: true,
   },
 });
 
+// Projects
 const ProjectWithLeadWithJobAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
   include: {
     projectLead: {
@@ -160,50 +171,40 @@ const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()(
   },
 });
 
-// activities
+// Activities
 const ActivityWithUser = Prisma.validator<Prisma.ProjectActivityDefaultArgs>()({
   include: {
     user: true,
   },
 });
 
-// histories
+// Histories
 const HistoryWithUser = Prisma.validator<Prisma.ProjectHistoryDefaultArgs>()({
   include: {
     user: true,
   },
 });
 
-// types from validator
+// Types from validator
+export type LogWithUser = Prisma.logsGetPayload<typeof LogWithUser>;
 export type LogWithUserWithJob = Prisma.logsGetPayload<typeof LogWithUserWithJob>;
 
-export type DayOffRequestWithUser = Prisma.DayOffRequestGetPayload<typeof DayOffRequestWithUser>;
-export type LogWithUser = Prisma.logsGetPayload<typeof LogWithUser>;
 export type UserJobExPassword = Prisma.usersGetPayload<typeof UserJobExPassword>;
 export type UserWithJob = Prisma.usersGetPayload<typeof UserWithJob>;
+export type UserOmitPassword = Prisma.usersGetPayload<typeof UserOmitPassword>;
 
-export type withStatus = UserJobExPassword & {
-  totalAbsent: number;
-  totalWorkFromHome: number;
-  totalWorkFromOffice: number;
-  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent" | "work_with_duty";
-};
+export type DayOffRequestWithUser = Prisma.DayOffRequestGetPayload<typeof DayOffRequestWithUser>;
 
 export type ProjectWithLeadWithJobAndMembers = Prisma.ProjectGetPayload<
   typeof ProjectWithLeadWithJobAndMembers
 >;
-
 export type ProjectWithMembers = Prisma.ProjectGetPayload<typeof ProjectWithMembers>;
 export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<typeof ProjectWithLeadAndMembers>;
 
-// activities
 export type ActivityWithUser = Prisma.ProjectActivityGetPayload<typeof ActivityWithUser>;
-
-// histories
 export type HistoryWithUser = Prisma.ProjectHistoryGetPayload<typeof HistoryWithUser>;
 
-// type results
-
+// Type results
 export type UserApiProfile = Prisma.Result<
   typeof prisma.users,
   {
@@ -224,6 +225,7 @@ export type UserApiProfile = Prisma.Result<
   },
   "findFirst"
 >;
+
 export type UserResultMany = Prisma.Result<
   typeof prisma.users,
   {
@@ -263,6 +265,14 @@ export type ProjectResult = Prisma.Result<
   },
   "findFirst"
 >;
+
+// Custom type with additional properties
+export type withStatus = UserJobExPassword & {
+  totalAbsent: number;
+  totalWorkFromHome: number;
+  totalWorkFromOffice: number;
+  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent" | "work_with_duty";
+};
 
 async () => {
   const user = await prisma.users.findFirst({

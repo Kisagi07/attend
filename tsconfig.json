@@ -22,7 +22,10 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "next-auth/*": ["./node_modules/next-auth/*"]
+      "next-auth/*": ["./node_modules/next-auth/*"],
+      "@helper/*": ["./app/helper/*"],
+      "@components/*": ["./app/components/*"],
+      "@components": ["./app/components/index"]
     }
   },
   "include": [

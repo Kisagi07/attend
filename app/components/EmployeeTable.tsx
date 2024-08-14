@@ -1,7 +1,7 @@
 "use client";
 
 import { createColumnHelper } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState, FC } from "react";
 import Table from "./Table";
 import { FaUserAltSlash, FaUserEdit, FaClock } from "react-icons/fa";
 import Confirmation from "@/app/components/Confirmation";
@@ -10,13 +10,24 @@ import Link from "next/link";
 import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
 import { UserWithJob } from "../prisma";
 import { users } from "@prisma/client";
+import { Tooltip } from "@nextui-org/tooltip";
+import { BsPersonFillExclamation } from "react-icons/bs";
+import { Button } from "@nextui-org/button";
+import { KeyedMutator } from "swr";
+import sendRequest from "@helper/sendRequest";
+
 interface UserModelEx extends UserWithJob {
   action: string;
 }
 const employeeColumn = createColumnHelper<UserModelEx>();
 
-const EmployeeTable = () => {
-  const [users, setUsers] = useState<users[]>([]);
+type EmployeeTable = {
+  users: users[];
+  mutate: KeyedMutator<any>;
+  ex?: boolean;
+};
+
+const EmployeeTable: FC<EmployeeTable> = ({ users, mutate, ex = false }) => {
   const columns = [
     employeeColumn.accessor("name", {
       header: "Name",
@@ -43,85 +54,117 @@ const EmployeeTable = () => {
       header: "Action",
       cell: ({ row }) => (
         <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => {
-              setShowConfirmation(true);
-              setWorkIdDelete(row.original.work_id!);
-            }}
-            className="bg-red-400 hover:bg-red-500 inline-block align-middle text-white rounded p-2"
+          <Tooltip content="Delete User">
+            <Button
+              onClick={() => {
+                setShowConfirmation(true);
+                setWorkIdDelete(row.original.work_id!);
+              }}
+              variant="flat"
+              color="danger"
+              isIconOnly
+            >
+              <FaUserAltSlash className="size-6" />
+            </Button>
+          </Tooltip>
+          <Tooltip content="Edit User">
+            <Button
+              as={Link}
+              href={`/dashboard/employees/${row.original.work_id}/edit`}
+              variant="flat"
+              color="secondary"
+              isIconOnly
+            >
+              <FaUserEdit className="size-6" />
+            </Button>
+          </Tooltip>
+          <Tooltip content="Check Attendances">
+            <Button
+              as={Link}
+              href={`/dashboard/employees/${row.original.work_id}/attendances`}
+              variant="flat"
+              color="success"
+              isIconOnly
+            >
+              <FaClock className="size-6" />
+            </Button>
+          </Tooltip>
+          <Tooltip
+            content={`${ex ? "Unmark " : "Mark Ex-"}${row.original.role.replaceToSpaceAndCapitalize("_")}`}
           >
-            <FaUserAltSlash />
-          </button>
-          <Link
-            href={`/dashboard/employees/${row.original.work_id}/edit`}
-            className="bg-amber-400 inline-block align-middle rounded p-2 text-white hover:bg-amber-500"
-          >
-            <FaUserEdit />
-          </Link>
-          <Link
-            className="bg-violet-400 text-white p-2 align-middle inline-block rounded hover:bg-violet-500"
-            href={`/dashboard/employees/${row.original.work_id}/attendances`}
-          >
-            <FaClock />
-          </Link>
+            <Button
+              onClick={() => {
+                setExConfirmation(true);
+                setWorkIdEx(row.original.work_id!);
+              }}
+              variant="flat"
+              isIconOnly
+            >
+              <BsPersonFillExclamation className="size-6" />
+            </Button>
+          </Tooltip>
         </div>
       ),
       minSize: 100,
     }),
   ];
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [exConfirmation, setExConfirmation] = useState(false);
   const [workIdDelete, setWorkIdDelete] = useState<string>("");
-  const [fetching, setFetching] = useState<boolean>(true);
-  const handleDelete = async () => {
-    const deleteIt = async () => {
-      const res = await fetch(`/api/users/${workIdDelete}`, {
-        method: "DELETE",
-      });
+  const [workIdEx, setWorkIdEx] = useState("");
 
-      if (!res.ok) {
-        throw new Error("Failed on deleting user");
-      }
-
-      const data = await res.json();
-      return data;
-    };
+  const handleDelete = () => {
     toast.promise(
-      deleteIt().then(() => {
-        setWorkIdDelete("");
+      sendRequest(`/api/users/${workIdDelete}`, {
+        method: "DELETE",
       }),
       {
         loading: "Deleting user...",
         success: (data) => {
-          handleFilterAfterDelete();
+          setWorkIdDelete("");
+          mutate();
           return "User deleted!";
         },
         error: "Failed on deleting user!",
       }
     );
   };
-  const handleFilterAfterDelete = () => {
-    const filtered = users.filter((user) => user.work_id !== workIdDelete);
-    setUsers(filtered);
+  // ? send request to turn user to ex-role
+  const handleExRole = () => {
+    toast.promise(
+      sendRequest(`/api/users/${workIdEx}`, {
+        method: "PUT",
+        body: JSON.stringify(ex ? { unEx: true } : { toEx: true }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      {
+        loading: "Loading...",
+        success: async (data) => {
+          mutate();
+          return `${data.name} has been turn into ${data.role.replaceToSpaceAndCapitalize("_")}`;
+        },
+        error: (error: CustomError) => {
+          return "Something went wrong";
+        },
+      }
+    );
   };
-  const fetchUsers = () => {
-    fetch(`/api/users`, { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .finally(() => setFetching(false));
-  };
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-  return fetching ? (
-    <EmployeeTableSkeleton />
-  ) : (
+  return (
     <>
       <Confirmation
         show={showConfirmation}
         onConfirm={handleDelete}
         onClose={setShowConfirmation}
       />
-      <Table data={users} columns={columns} />
+      <Confirmation
+        show={exConfirmation}
+        onClose={setExConfirmation}
+        onConfirm={handleExRole}
+        text={ex ? "Un Ex this Intern / Employee?" : "Turn this user into an Ex Employee / Intern?"}
+      />
+      <Table data={users ?? []} columns={columns} />
     </>
   );
 };

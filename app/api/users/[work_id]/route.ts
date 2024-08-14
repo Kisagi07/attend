@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calculateMonthlyStatus } from "@/app/serverhelper";
-import prisma, { withStatus, UserResultFirst } from "@/app/prisma";
+import prisma, { UserOmitPassword } from "@/app/prisma";
 import bcryptjs from "bcryptjs";
+
+const changeExRole = async (
+  user: UserOmitPassword,
+  to: "ex_intern" | "ex_employee" | "intern" | "employee"
+) => {
+  const updatedUser = await prisma.users.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      role: to,
+    },
+  });
+  return updatedUser;
+};
 
 export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
   const searchParams = req.nextUrl.searchParams;
@@ -68,7 +82,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
-  const { name, job_position_id, gender, role, password } = await req.json();
+  const { name, job_position_id, gender, role, password, toEx, unEx } = await req.json();
 
   let user = await prisma.users.findFirst({
     where: {
@@ -79,6 +93,19 @@ export async function PUT(req: NextRequest, { params }: { params: { work_id: str
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
 
+  // ? turn employee to ex_employee / ex_intern feature
+  if (toEx) {
+    const role = `ex_${user.role}` as "ex_intern" | "ex_employee";
+    const updatedUser = await changeExRole(user, role);
+    return NextResponse.json(updatedUser);
+  }
+  // ? turn ex employee / intern no normal feature
+  if (unEx) {
+    const role = user.role.slice(3) as "intern" | "employee";
+    const updatedUser = await changeExRole(user, role);
+    return NextResponse.json(updatedUser);
+  }
+  // ? basic user update feature
   if (password) {
     // get all users for unique checking
     const users = await prisma.users.findMany({

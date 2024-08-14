@@ -43,7 +43,7 @@ const Table: FC<TableProps> = ({ data, columns }) => {
   });
 
   useEffect(() => {
-    setTotalPage(Math.max(data.length / pagination.pageSize, 1));
+    setTotalPage(Math.max(Math.ceil(data.length / pagination.pageSize), 1));
   }, [data, pagination.pageSize]);
 
   return (

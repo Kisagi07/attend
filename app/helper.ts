@@ -116,7 +116,37 @@ const monthNumberToWord = (month: number): string => {
 
   return monthName[month];
 };
-
+const monthWordToNumber = (month: string): number => {
+  const lowercase = month.toLowerCase();
+  switch (lowercase) {
+    case "january":
+      return 0;
+    case "february":
+      return 1;
+    case "march":
+      return 2;
+    case "april":
+      return 3;
+    case "may":
+      return 4;
+    case "june":
+      return 5;
+    case "july":
+      return 6;
+    case "august":
+      return 7;
+    case "september":
+      return 8;
+    case "october":
+      return 9;
+    case "november":
+      return 10;
+    case "december":
+      return 11;
+    default:
+      return 0;
+  }
+};
 const calculatePercentageValue = (numbers: number[]): number[] => {
   if (numbers.every((number) => number === 0)) {
     return [0, 0, 0, 0];
@@ -191,4 +221,5 @@ export {
   replaceToSpaceAndCapitalize,
   capitalize,
   groupByDate,
+  monthWordToNumber,
 };
