@@ -27,6 +27,8 @@ enum users_role {
   admin
   employee
   intern
+  ex_employee
+  ex_intern
 }
 
 enum users_gender {

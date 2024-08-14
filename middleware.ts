@@ -14,14 +14,13 @@ export default auth(async function middleware(req) {
   const isLoginRoute = pathname === "/api/login";
   const isNextAuthRoute = pathname.startsWith("/api/auth");
   const hasKeyAndMatch = apiKey ? apiKey === xUroborosKey : false;
-  console.log({ apiKey, xUroborosKey, hasKeyAndMatch });
 
   if (!req.auth) {
-    if (isApiRoute) {
+    if (isApiRoute && !isLoginRoute && !isNextAuthRoute) {
       if (!hasKeyAndMatch) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
-    } else if (!isLoginRoute && !isNextAuthRoute) {
+    } else if (!isLoginRoute && !isApiRoute) {
       return NextResponse.redirect(new URL("/login", origin));
     }
   }

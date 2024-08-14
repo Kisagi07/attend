@@ -1,26 +1,40 @@
 "use client";
 import useSWR from "swr";
-import { fetcher, monthNumberToWord } from "@/app/helper";
-import { UserResultFirst, UserWithJob } from "../prisma";
+import { fetcher, monthNumberToWord, monthWordToNumber } from "@/app/helper";
+import { UserWithJob } from "../prisma";
 import { EmployeeCard } from "@/app/components";
 import { CardSkeleton } from "@/app/skeletons";
-import { holidays, logs, users } from "@prisma/client";
+import { holidays, logs } from "@prisma/client";
 import React from "react";
 
-interface GroupedAttendances {
-  [key: string]: logs[];
-}
-interface GroupedHolidays {
-  [key: string]: holidays[];
-}
 interface Grouped {
   [key: string]: {
     holidays: holidays[];
     attendances: logs[];
   };
 }
+
+const getGroupName = (date: Date) => `${monthNumberToWord(date.getMonth())}-${date.getFullYear()}`;
+
+const groupByMonth = <T,>(
+  items: T[],
+  getDate: (item: T) => Date,
+  type: "holidays" | "attendances"
+): Grouped => {
+  return items.reduce<Grouped>((acc, item) => {
+    const date = getDate(item);
+    const groupName = getGroupName(date);
+    if (!acc[groupName]) acc[groupName] = { holidays: [], attendances: [] };
+    (acc[groupName][type] as T[]).push(item);
+    return acc;
+  }, {});
+};
+
 const AttendancesEmployeeCard = ({ params }: { params: { work_id: string } }) => {
-  const { data: user, isLoading } = useSWR<UserWithJob>(`/api/users/${params.work_id}`, fetcher);
+  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(
+    `/api/users/${params.work_id}`,
+    fetcher
+  );
   const { data: attendances, isLoading: attendancesLoading } = useSWR<logs[]>(
     `/api/users/${params.work_id}/attendances`,
     fetcher
@@ -30,83 +44,70 @@ const AttendancesEmployeeCard = ({ params }: { params: { work_id: string } }) =>
     fetcher
   );
 
-  const [today, setToday] = React.useState(new Date());
-  const [card1Date, setCard1Date] = React.useState(
-    new Date(today.getFullYear(), today.getMonth(), 0)
-  );
-  const [card2Date, setCard2Date] = React.useState(
-    new Date(today.getFullYear(), today.getMonth() - 1, 0)
-  );
+  const [today] = React.useState(new Date());
+  const [card1Date] = React.useState(new Date(today.getFullYear(), today.getMonth(), 0));
+  const [card2Date] = React.useState(new Date(today.getFullYear(), today.getMonth() - 1, 0));
 
   const grouped = React.useMemo(() => {
-    const groupedAttendances = attendances?.reduce<GroupedAttendances>((acc, log) => {
-      const date = new Date(log.date!);
-      const groupName = `${monthNumberToWord(date.getMonth())}-${date.getFullYear()}`;
-      acc[groupName] = [...(acc[groupName] || []), log];
-      return acc;
-    }, {});
+    if (!user || !attendances || !holidays) return {};
 
-    const groupedHolidays = holidays?.reduce<GroupedHolidays>((acc, holiday) => {
-      const date = new Date(holiday.date);
-      const groupName = `${monthNumberToWord(date.getMonth())}-${date.getFullYear()}`;
-      acc[groupName] = [...(acc[groupName] || []), holiday];
-      return acc;
-    }, {});
+    const groupedAttendances = groupByMonth(
+      attendances,
+      (log) => new Date(log.date!),
+      "attendances"
+    );
+    const groupedHolidays = groupByMonth(holidays, (holiday) => new Date(holiday.date), "holidays");
 
-    if (groupedAttendances && groupedHolidays) {
-      const uniqueNames = Array.from(
-        new Set([...Object.keys(groupedAttendances), ...Object.keys(groupedHolidays)])
-      );
-      const sortedNames = uniqueNames.sort((a, b) => (a > b ? -1 : 1));
-
-      const finalGroup = sortedNames.reduce<Grouped>((acc, name) => {
-        acc[name] = {
-          holidays: groupedHolidays[name] || [],
-          attendances: groupedAttendances[name] || [],
+    const mergedGroups = Object.keys({ ...groupedAttendances, ...groupedHolidays }).reduce<Grouped>(
+      (acc, groupName) => {
+        acc[groupName] = {
+          holidays: groupedHolidays[groupName]?.holidays || [],
+          attendances: groupedAttendances[groupName]?.attendances || [],
         };
         return acc;
-      }, {});
+      },
+      {}
+    );
 
-      return finalGroup;
+    if (["ex_intern", "ex_employee"].includes(user.role)) {
+      return Object.fromEntries(Object.entries(mergedGroups).slice(0, 3));
     }
 
-    return {};
-  }, [attendances, holidays]);
+    return mergedGroups;
+  }, [attendances, holidays, user]);
 
-  const getGroupName = (date: Date) => {
-    return `${monthNumberToWord(date.getMonth())}-${date.getFullYear()}`;
-  };
+  const generateEmployeeCard = React.useCallback(() => {
+    if (!user) return null;
 
-  return isLoading || attendancesLoading || holidaysLoading ? (
+    const dates = ["ex_intern", "ex_employee"].includes(user.role)
+      ? Object.keys(grouped).map((groupName) => new Date(groupName.split("-").reverse().join("-")))
+      : [today, card1Date, card2Date];
+
+    return (
+      <>
+        {dates.map((date) => (
+          <EmployeeCard
+            displayDate
+            key={date.toISOString()}
+            date={date}
+            user={user}
+            attendances={grouped[getGroupName(date)]?.attendances ?? []}
+            holidays={grouped[getGroupName(date)]?.holidays ?? []}
+          />
+        ))}
+      </>
+    );
+  }, [user, grouped, today, card1Date, card2Date]);
+
+  return userLoading || attendancesLoading || holidaysLoading ? (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <CardSkeleton />
       <CardSkeleton />
       <CardSkeleton />
     </div>
   ) : (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <EmployeeCard
-        displayDate
-        date={today}
-        user={user!}
-        attendances={grouped[getGroupName(today)]?.attendances ?? []}
-        holidays={grouped[getGroupName(today)]?.holidays ?? []}
-      />
-      <EmployeeCard
-        displayDate
-        date={card1Date}
-        user={user!}
-        attendances={grouped[getGroupName(card1Date)]?.attendances ?? []}
-        holidays={grouped[getGroupName(card1Date)]?.holidays ?? []}
-      />
-      <EmployeeCard
-        displayDate
-        date={card2Date}
-        user={user!}
-        attendances={grouped[getGroupName(card2Date)]?.attendances ?? []}
-        holidays={grouped[getGroupName(card2Date)]?.holidays ?? []}
-      />
-    </div>
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{generateEmployeeCard()}</div>
   );
 };
+
 export default AttendancesEmployeeCard;
