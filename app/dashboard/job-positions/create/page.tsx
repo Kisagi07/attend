@@ -4,11 +4,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import { extractNumber } from "@/app/helper";
+import { Input } from "@nextui-org/input";
+import { TimeInput } from "@nextui-org/date-input";
+import { Time, parseTime } from "@internationalized/date";
+import { Button } from "@nextui-org/button";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
   const [salary, setSalary] = useState<string>("Rp.0");
-  const [shiftStart, setShiftStart] = useState<string>("");
-  const [shiftEnd, setShiftEnd] = useState<string>("");
+  const [shiftStart, setShiftStart] = useState<undefined | Time>();
+  const [shiftEnd, setShiftEnd] = useState<undefined | Time>();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [workDay, setWorkDay] = useState<string>("");
@@ -17,8 +21,8 @@ const JobCreatePage = () => {
       method: "POST",
       body: JSON.stringify({
         name,
-        shift_start: shiftStart,
-        shift_end: shiftEnd,
+        shift_start: shiftStart!.toString(),
+        shift_end: shiftEnd!.toString,
         work_day: workDay,
         salary: extractNumber(salary),
       }),
@@ -53,10 +57,10 @@ const JobCreatePage = () => {
     if (name.trim().length === 0) {
       errors.name = "Name is required";
     }
-    if (shiftStart.trim().length === 0) {
+    if (!shiftStart || shiftStart.toString().length === 0) {
       errors.shiftStart = "Shift start is required";
     }
-    if (shiftEnd.trim().length === 0) {
+    if (!shiftEnd || shiftEnd.toString().length === 0) {
       errors.shiftEnd = "Shift end is required";
     }
     setFormErrors(errors);
@@ -68,8 +72,8 @@ const JobCreatePage = () => {
   };
   const resetForm = () => {
     setName("");
-    setShiftStart("");
-    setShiftEnd("");
+    setShiftStart(undefined);
+    setShiftEnd(undefined);
   };
   const handleSalaryChange = (value: string) => {
     const clean: number = parseInt(value.match(/\d+/g)?.join("") || "0");
@@ -81,45 +85,45 @@ const JobCreatePage = () => {
       <h1 className="text-xl uppercase font-semibold">Create Job Position</h1>
       <hr />
       <form onSubmit={handleSubmit} className="space-y-4">
-        <InputText
-          error={formErrors["name"]}
-          value={name}
-          onChange={setName}
+        <Input
           label="Position Name"
+          name="name"
+          value={name}
+          isInvalid={Object.hasOwn(formErrors, "name")}
+          errorMessage={formErrors["name"]}
+          onValueChange={setName}
         />
         <div>
           <h6>Shift :</h6>
-          <small className="text-red-400 block">{formErrors["shiftStart"]}</small>
-          <small className="text-red-400 block">{formErrors["shiftEnd"]}</small>
           <div className="grid grid-cols-3 items-center">
-            <input
+            <TimeInput
               value={shiftStart}
-              onChange={({ currentTarget }) => setShiftStart(currentTarget.value)}
-              type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              onChange={setShiftStart}
+              isInvalid={Object.hasOwn(formErrors, "shiftStart")}
+              errorMessage={formErrors["shiftStart"]}
+              label="Shift Start"
             />
             <span className="text-center">-</span>
-            <input
+            <TimeInput
               value={shiftEnd}
-              onChange={({ currentTarget }) => setShiftEnd(currentTarget.value)}
-              type="time"
-              className="outline-none border-2 border-gray-200 p-2 focus:border-sky-500"
+              onChange={setShiftEnd}
+              isInvalid={Object.hasOwn(formErrors, "shiftEnd")}
+              errorMessage={formErrors["shiftEnd"]}
+              label="Shift End"
             />
           </div>
         </div>
         <WorkDayInput onChange={setWorkDay} />
-        <InputText
+        <Input
           label="Salary (Per Hour)"
-          value={`${salary}`}
-          onChange={handleSalaryChange}
-          error={formErrors["salary"]}
+          value={salary}
+          onValueChange={handleSalaryChange}
+          isInvalid={Object.hasOwn(formErrors, "salary")}
+          errorMessage={formErrors["salary"]}
         />
-        <button
-          type="submit"
-          className="bg-emerald-400 hover:bg-emerald-500 w-full text-white rounded p-4"
-        >
+        <Button type="submit" isLoading={submitting} color="success" fullWidth>
           Save
-        </button>
+        </Button>
       </form>
     </section>
   );
