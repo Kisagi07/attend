@@ -312,6 +312,11 @@ const ClockInOut = () => {
     }
   };
 
+  const isWorkDay = (): boolean => {
+    const todayDay = new Date().getDay();
+    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
+  };
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const type = todayAttendance?.type;
@@ -361,7 +366,7 @@ const ClockInOut = () => {
     <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">Rest Well!</button>
   ) : (
     <>
-      {isLate && !clockedIn && (
+      {isLate && !clockedIn && isWorkDay() && (
         <>
           <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
             You are late! hurry up!
