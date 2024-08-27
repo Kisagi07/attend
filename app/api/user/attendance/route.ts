@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
     clock_out_time,
     clock_out_latitude,
     clock_out_longitude,
+    isOverTime,
   } = await req.json();
 
   const session = await auth();
@@ -127,16 +128,27 @@ export async function POST(req: NextRequest) {
         clock_in_longitude,
         work: todaysWork,
         user_id: user.id,
+        isOverTime,
       },
     });
 
-    await prisma.timelines.create({
-      data: {
-        title: `${user.name} Attendance: ${log.type.replaceAll("_", " ")}`,
-        description: `${user.name} has clocked in at ${clock_in_time}`,
-        type: "new",
-      },
-    });
+    if (isOverTime) {
+      await prisma.timelines.create({
+        data: {
+          title: `${user.name} are doing overtime today`,
+          description: `${user.name} has clocked in for overtime at ${clock_in_time}`,
+          type: "new",
+        },
+      });
+    } else {
+      await prisma.timelines.create({
+        data: {
+          title: `${user.name} Attendance: ${log.type.replaceAll("_", " ")}`,
+          description: `${user.name} has clocked in at ${clock_in_time}`,
+          type: "new",
+        },
+      });
+    }
   }
 
   return NextResponse.json(log);
