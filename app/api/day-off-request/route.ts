@@ -3,7 +3,7 @@ import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
 import prisma from "@/app/prisma";
 import { getUTCMidnightDate } from "@/app/serverhelper";
-import { users } from "@prisma/client";
+import { $Enums, users } from "@prisma/client";
 const POST = async (req: NextRequest) => {
   // authorize user
   const session = await auth();
@@ -63,6 +63,17 @@ const GET = async (req: NextRequest) => {
   if (!session) {
     return NextResponse.json("Unauthorized", { status: 401 });
   }
+
+  const searchParams = req.nextUrl.searchParams;
+  const userId = searchParams.has("user-id") ? Number(searchParams.get("user-id")) : undefined;
+  const status = (searchParams.get("status") as $Enums.DayOffStatus | null) ?? undefined;
+  const date = searchParams.get("date") ?? undefined;
+  let startDate: undefined | Date = undefined;
+  let endDate: undefined | Date = undefined;
+  if (date) {
+    [startDate, endDate] = date.split("-").map((date) => new Date(date.split("/").join("-")));
+  }
+
   // get all day off requests
   const dayOffRequests = await prisma.dayOffRequest.findMany({
     orderBy: {
@@ -70,6 +81,24 @@ const GET = async (req: NextRequest) => {
     },
     include: {
       user: true,
+    },
+    where: {
+      userId,
+      status,
+      OR: date
+        ? [
+            {
+              leaveStartDate: {
+                gte: startDate,
+              },
+            },
+            {
+              leaveEndDate: {
+                lte: endDate,
+              },
+            },
+          ]
+        : undefined,
     },
   });
   return NextResponse.json(dayOffRequests);

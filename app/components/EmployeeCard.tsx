@@ -3,14 +3,15 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
-import { company, holidays, job_positions, logs, users } from "@prisma/client";
+import { company, holidays, logs, DayOffRequest } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
 import { Spinner } from "@nextui-org/spinner";
 import { UserWithJob } from "../prisma";
 import { Chip } from "@nextui-org/chip";
-import { parseTime } from "@internationalized/date";
+import { parseTime, parseDate, startOfMonth } from "@internationalized/date";
 
+// Dates will always be the last day of the month or current day of current month
 interface Props {
   user: UserWithJob;
   attendances: logs[];
@@ -27,6 +28,10 @@ const EmployeeCard: React.FC<Props> = ({
   date,
 }: Props) => {
   const { data: company, isLoading } = useSWR<company>(`/api/company`, fetcher);
+  const { data: leaveRequest, isLoading: leaveLoading } = useSWR<DayOffRequest[]>(
+    `/api/day-off-request?status=approved&date=${date.getFullYear()}/${date.getMonth() + 1}/01-${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}&user-id=${user.id}`,
+    fetcher
+  );
 
   const calculated = React.useMemo(() => {
     // Initialize status
@@ -118,9 +123,51 @@ const EmployeeCard: React.FC<Props> = ({
     });
     // substract total absent with total work on weekdays
     totalAbsent -= weekdaysAttendances.length;
+
+    // start month date
+    if (leaveRequest) {
+      // ? get the start of month of passed date
+      const startMonthDate = startOfMonth(
+        parseDate(
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+        )
+      );
+
+      // ? turn passed date into @internationalized/date CalendarDate
+      const passedMonthDate = parseDate(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+      );
+
+      leaveRequest.forEach((leave) => {
+        // initiate max loop count
+        const MAX_LOOP_COUNT = 1000;
+        let loop = 0;
+
+        // ? use @internationalized/date CalendarDate as base date object
+        let startDate = parseDate(new Date(leave.leaveStartDate).toISOString().split("T")[0]);
+        const endDate = parseDate(new Date(leave.leaveEndDate).toISOString().split("T")[0]);
+
+        // ? as long as start loop date still less than passed date and less than leave end date keep running while loop
+        while (startDate.compare(passedMonthDate) <= 0 && startDate.compare(endDate) <= 0) {
+          // ! Don't delete in case of infinite loop
+          loop++;
+          if (loop === MAX_LOOP_COUNT) {
+            console.log("Infinite Loop Found");
+            break;
+          }
+
+          // ? check if current start loop date does not exists the end leave date and this month passed/last date
+          if (startDate.compare(startMonthDate) >= 0 && startDate.compare(passedMonthDate) <= 0) {
+            totalAbsent--;
+          }
+
+          // ? reasign start loop date adding 1 days each loop
+          startDate = startDate.add({ days: 1 });
+        }
+      });
+    }
     // use Math.max incase total absent are less than 0, if so asign it 0
     totalAbsent = Math.max(totalAbsent, 0);
-
     return {
       todayStatus,
       totalWorkFromOffice: workFromOffice.length,
@@ -128,7 +175,7 @@ const EmployeeCard: React.FC<Props> = ({
       totalLate: late,
       totalAbsent,
     };
-  }, [attendances, holidays, company, user, date]);
+  }, [attendances, holidays, company, user, date, leaveRequest]);
 
   return isLoading ? (
     <div className="w-full justify-center">
