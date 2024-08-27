@@ -205,9 +205,11 @@ const ClockInOut = () => {
       sendData["clock_in_time"] = getTimeOnly();
       sendData["clock_in_latitude"] = latitude;
       sendData["clock_in_longitude"] = longitude;
-      sendData["todaysWork"] = lateReason
-        ? [...todaysWork, `Reason for being late: ${lateReason}`]
-        : todaysWork;
+      sendData["todaysWork"] = isOverTime
+        ? todaysWork
+        : lateReason
+          ? [...todaysWork, `Reason for being late: ${lateReason}`]
+          : todaysWork;
     }
     try {
       const res = await fetch(`/api/user/attendance`, {
