@@ -75,16 +75,15 @@ const EmployeeCard: React.FC<Props> = ({
     );
     const workFromHome = attendances.filter((log) => log.type === "work_from_home");
 
-    // calculate totalLate
+    //! calculate totalLate
     let late = 0;
     // parse job shift start time
     let jobStartTime = parseTime(user.job_position?.shift_start ?? "08:00");
     // add company tolerance time
     jobStartTime = jobStartTime.add({ minutes: company?.tolerance_time ?? 0 });
-    jobStartTime.add({ hours: 5 });
     // filter late work
     late = attendances.filter((work) => {
-      if (work.type === "sick") {
+      if (work.type === "sick" || work.isOverTime) {
         return false;
       }
       // parse the time
@@ -124,6 +123,7 @@ const EmployeeCard: React.FC<Props> = ({
     // substract total absent with total work on weekdays
     totalAbsent -= weekdaysAttendances.length;
 
+    //? calculating leave / day off request
     // start month date
     if (leaveRequest) {
       // ? get the start of month of passed date
