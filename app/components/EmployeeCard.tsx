@@ -231,7 +231,7 @@ const EmployeeCard: FC<Props> = ({
         )}
       </div>
 
-      <div className="flex gap-4 justify-between">
+      <div className="flex gap-4 justify-between items-end">
         <div className="space-y-2 p-2">
           {calculated.todayStatus !== "complete" && (
             <Chip color={getColor(calculated.todayStatus)} className="capitalize" variant="flat">
@@ -277,7 +277,7 @@ const EmployeeCard: FC<Props> = ({
             src={"/img/male.png"}
             width={200}
             height={200}
-            className="h-auto w-16 md:w-24"
+            className="w-20 md:w-32 h-auto"
             alt=""
             draggable={false}
           />
@@ -286,7 +286,7 @@ const EmployeeCard: FC<Props> = ({
             src={"/img/female.png"}
             width={200}
             height={200}
-            className="h-auto w-16 md:w-24"
+            className="w-20 md:w-32 h-auto"
             alt=""
             draggable={false}
           />
