@@ -2,11 +2,12 @@
 
 import { createColumnHelper } from "@tanstack/react-table";
 import { Table } from "@/app/components";
-import { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
+import { LogWithUserWithJob } from "@/app/prisma";
 import clsx from "clsx";
 import { parseTime } from "@internationalized/date";
-import useSWR from "swr";
-import { fetcher } from "../helper";
+import { FcOvertime } from "react-icons/fc";
+import { Chip } from "@nextui-org/chip";
+import { Tooltip } from "@nextui-org/tooltip";
 
 const columnHelper = createColumnHelper<LogWithUserWithJob>();
 const MonthAttendances = ({
@@ -31,20 +32,33 @@ const MonthAttendances = ({
     columnHelper.accessor("type", {
       header: "Status",
       cell: (info) => (
-        <p
-          className={clsx("capitalize", {
-            "text-red-500": isLate(info.row.original),
-          })}
-        >
-          {info.getValue().replaceAll("_", " ")}
-        </p>
+        <div className="flex gap-2">
+          <p
+            className={clsx("capitalize", {
+              "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
+            })}
+          >
+            {info.getValue().replaceAll("_", " ")}
+          </p>
+          {info.row.original.isOverTime && (
+            <Tooltip content="Overtime">
+              <Chip color="secondary" radius="full" variant="faded">
+                <FcOvertime size={20} />
+              </Chip>
+            </Tooltip>
+          )}
+        </div>
       ),
       size: 175,
     }),
     columnHelper.accessor("date", {
       header: "Date",
       cell: (info) => (
-        <span className={clsx({ "text-red-500": isLate(info.row.original) })}>
+        <span
+          className={clsx({
+            "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
+          })}
+        >
           {(info.getValue() as unknown as string).split("T")[0]}
         </span>
       ),
@@ -53,7 +67,11 @@ const MonthAttendances = ({
     columnHelper.accessor("clock_in_time", {
       header: "Clock In Time",
       cell: (info) => (
-        <span className={clsx({ "text-red-500": isLate(info.row.original) })}>
+        <span
+          className={clsx({
+            "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
+          })}
+        >
           {info.row.original.type === "sick"
             ? "-"
             : (info.getValue() as unknown as string).split("T")[1].slice(0, 7)}
@@ -64,7 +82,11 @@ const MonthAttendances = ({
     columnHelper.accessor("clock_out_time", {
       header: "Clock Out Time",
       cell: (info) => (
-        <span className={clsx({ "text-red-500": isLate(info.row.original) })}>
+        <span
+          className={clsx({
+            "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
+          })}
+        >
           {info.getValue() ? (info.getValue() as unknown as string).split("T")[1].slice(0, 7) : "-"}
         </span>
       ),
@@ -75,7 +97,7 @@ const MonthAttendances = ({
       cell: (info) => (
         <ul
           className={clsx("list-disc text-sm", {
-            "text-red-500": isLate(info.row.original),
+            "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
           })}
         >
           {(info.getValue() as string[])?.map((work) => <li key={work}>{work}</li>)}
@@ -90,7 +112,11 @@ const MonthAttendances = ({
       columnHelper.accessor("user.name", {
         header: "Name",
         cell: (info) => (
-          <span className={clsx({ "text-red-500": isLate(info.row.original) })}>
+          <span
+            className={clsx({
+              "text-red-500": isLate(info.row.original) && !info.row.original.isOverTime,
+            })}
+          >
             {info.getValue()}
           </span>
         ),
