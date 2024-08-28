@@ -22,26 +22,33 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
   const [defaultWorkDay, setDefaultWorkDay] = useState<string[]>([]);
   const [fetching, setFetching] = useState<boolean>(true);
   const updateJobPosition = async (): Promise<any> => {
-    const res = await fetch(`/api/job-positions/${params.id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        name,
-        shift_start: shiftStart!.toString(),
-        shift_end: shiftEnd!.toString(),
-        work_day: workDay,
-        salary: extractNumber(salary),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) {
-      toast.error("Something went wrong when updating job position");
-    }
+    try {
+      const res = await fetch(`/api/job-positions/${params.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          name,
+          shift_start: shiftStart!.toString(),
+          shift_end: shiftEnd!.toString(),
+          work_day: workDay,
+          salary: extractNumber(salary),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        toast.error("Something went wrong when updating job position");
+        throw Error(`${res.status}: ${res.statusText}`);
+      }
 
-    const data = await res.json();
-    resetForm();
-    return data;
+      const data = await res.json();
+      resetForm();
+      return data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
