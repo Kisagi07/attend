@@ -72,6 +72,13 @@ const ClockInOut = () => {
     },
   ]);
 
+  const overtimeOptions = [
+    {
+      label: "Work Overtime",
+      className: "bg-emerald-400 hover:bg-emerald-500 text-white disabled:bg-emerald-300",
+    },
+  ];
+
   const buttonChanges = (value: string | null) => {
     if (value == "Clock With Duty") {
       setShowDuty(true);
@@ -111,7 +118,8 @@ const ClockInOut = () => {
       if (
         isLate &&
         !lateReason &&
-        (type === "work-from-home" || type === "work-from-office" || type === "work_with_duty")
+        (type === "work-from-home" || type === "work-from-office" || type === "work_with_duty") &&
+        isWorkDay()
       ) {
         toast.error("You need to fill reason for being late");
         return;
@@ -125,6 +133,7 @@ const ClockInOut = () => {
           latitude,
           longitude,
           todaysWork,
+          isOverTime: !isWorkDay(),
         });
       }
     } catch (error) {
@@ -169,42 +178,38 @@ const ClockInOut = () => {
     latitude,
     longitude,
     todaysWork,
+    isOverTime = false,
   }: {
     type: string;
     latitude: number;
     longitude: number;
     todaysWork: string[];
+    isOverTime?: boolean;
   }) => {
-    let sendData = {};
+    let sendData: { [key: string]: any } = {
+      type,
+      date: getDateOnly(),
+      isOverTime,
+    };
     if (type === "clock-out") {
-      sendData = {
-        type,
-        clock_out_time: getTimeOnly(),
-        date: getDateOnly(),
-        clock_out_latitude: latitude,
-        clock_out_longitude: longitude,
-        todaysWork,
-      };
+      sendData["clock_out_time"] = getTimeOnly();
+      sendData["clock_out_latitude"] = latitude;
+      sendData["clock_out_longitude"] = longitude;
+      sendData["todaysWork"] = todaysWork;
     } else if (type === "work_with_duty") {
-      sendData = {
-        type,
-        clock_in_time: getTimeOnly(),
-        date: getDateOnly(),
-        clock_in_latitude: latitude,
-        clock_in_longitude: longitude,
-        todaysWork: [`Duty: ${duty}`],
-      };
+      sendData["clock_in_time"] = getTimeOnly();
+      sendData["clock_in_latitude"] = latitude;
+      sendData["clock_in_longitude"] = longitude;
+      sendData["todaysWork"] = ["Duty: " + duty];
     } else {
-      sendData = {
-        type,
-        clock_in_time: getTimeOnly(),
-        date: getDateOnly(),
-        clock_in_latitude: latitude,
-        clock_in_longitude: longitude,
-        todaysWork: lateReason
+      sendData["clock_in_time"] = getTimeOnly();
+      sendData["clock_in_latitude"] = latitude;
+      sendData["clock_in_longitude"] = longitude;
+      sendData["todaysWork"] = isOverTime
+        ? todaysWork
+        : lateReason
           ? [...todaysWork, `Reason for being late: ${lateReason}`]
-          : todaysWork,
-      };
+          : todaysWork;
     }
     try {
       const res = await fetch(`/api/user/attendance`, {
@@ -312,20 +317,32 @@ const ClockInOut = () => {
     }
   };
 
+  const isWorkDay = (): boolean => {
+    const todayDay = new Date().getDay();
+    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
+  };
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const type = todayAttendance?.type;
       if (type === "sick") {
         setIsSick(true);
       } else {
+        setIsSick(false);
         setClockedIn(true);
         if (type === "work_from_home") {
           setFromHome(true);
+        } else {
+          setFromHome(false);
         }
         if (todayAttendance.clock_out_time) {
           setDone(true);
+        } else {
+          setDone(false);
         }
       }
+    } else {
+      setClockedIn(false);
     }
   }, [todayAttendance, isLoading]);
 
@@ -361,7 +378,7 @@ const ClockInOut = () => {
     <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">Rest Well!</button>
   ) : (
     <>
-      {isLate && !clockedIn && (
+      {isLate && !clockedIn && isWorkDay() && (
         <>
           <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
             You are late! hurry up!
@@ -393,7 +410,7 @@ const ClockInOut = () => {
         loading={isLoading || sending}
         disabled={done || isLoading || sending}
         className="bg-slate-900 text-white hover:bg-black"
-        options={done ? options3 : clockedIn ? options2 : options1}
+        options={done ? options3 : clockedIn ? options2 : !isWorkDay() ? overtimeOptions : options1}
       />
     </>
   );

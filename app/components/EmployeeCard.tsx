@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import { FC, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
@@ -9,7 +9,7 @@ import { fetcher, monthNumberToWord } from "../helper";
 import { Spinner } from "@nextui-org/spinner";
 import { UserWithJob } from "../prisma";
 import { Chip } from "@nextui-org/chip";
-import { parseTime, parseDate, startOfMonth } from "@internationalized/date";
+import { parseTime, parseDate, startOfMonth, Time } from "@internationalized/date";
 
 // Dates will always be the last day of the month or current day of current month
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
   date: Date;
 }
 
-const EmployeeCard: React.FC<Props> = ({
+const EmployeeCard: FC<Props> = ({
   user,
   attendances,
   holidays,
@@ -33,7 +33,11 @@ const EmployeeCard: React.FC<Props> = ({
     fetcher
   );
 
-  const calculated = React.useMemo(() => {
+  const extractTime = (time: Date | string): Time => {
+    return parseTime(time.toString().split("T")[1].split(".")[0]);
+  };
+
+  const calculated = useMemo(() => {
     // Initialize status
     let todayStatus = "absent";
     const today = new Date();
@@ -75,16 +79,15 @@ const EmployeeCard: React.FC<Props> = ({
     );
     const workFromHome = attendances.filter((log) => log.type === "work_from_home");
 
-    // calculate totalLate
+    //! calculate totalLate
     let late = 0;
     // parse job shift start time
     let jobStartTime = parseTime(user.job_position?.shift_start ?? "08:00");
     // add company tolerance time
     jobStartTime = jobStartTime.add({ minutes: company?.tolerance_time ?? 0 });
-    jobStartTime.add({ hours: 5 });
     // filter late work
     late = attendances.filter((work) => {
-      if (work.type === "sick") {
+      if (work.type === "sick" || work.isOverTime) {
         return false;
       }
       // parse the time
@@ -124,6 +127,7 @@ const EmployeeCard: React.FC<Props> = ({
     // substract total absent with total work on weekdays
     totalAbsent -= weekdaysAttendances.length;
 
+    //? calculating leave / day off request
     // start month date
     if (leaveRequest) {
       // ? get the start of month of passed date
@@ -177,6 +181,43 @@ const EmployeeCard: React.FC<Props> = ({
     };
   }, [attendances, holidays, company, user, date, leaveRequest]);
 
+  const overtimeHours = useMemo<number>(() => {
+    const overtime = attendances.filter((work) => work.isOverTime);
+    let hours = 0;
+    let minutes = 0;
+    overtime.forEach((work) => {
+      const clockIn = extractTime(work.clock_in_time!);
+      const clockOut = work.clock_out_time
+        ? extractTime(work.clock_out_time)
+        : clockIn.add({ hours: 1 });
+      const overtimeDuration = clockOut.subtract({
+        hours: clockIn.hour,
+        minutes: clockIn.minute,
+        seconds: clockIn.second,
+      });
+      hours += overtimeDuration.hour;
+      minutes += overtimeDuration.minute;
+    });
+    return hours + minutes / 60;
+  }, [attendances]);
+
+  const getColor = (todayStatus: string) => {
+    switch (todayStatus) {
+      case "work_from_office":
+        return "secondary";
+      case "absent" || "work_with_duty":
+        return "danger";
+      case "work_from_home" || "holiday":
+        return "success";
+      case "sick":
+        return "primary";
+      case "weekend":
+        return "secondary";
+      default:
+        return "primary";
+    }
+  };
+
   return isLoading ? (
     <div className="w-full justify-center">
       <Spinner label="Loading..." />
@@ -190,32 +231,29 @@ const EmployeeCard: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="flex gap-4 justify-between">
+      <div className="flex gap-4 justify-between items-end">
         <div className="space-y-2 p-2">
           {calculated.todayStatus !== "complete" && (
-            <h4
-              className={clsx(" rounded-md px-1 text-sm font-semibold capitalize", {
-                "bg-violet-100 text-violet-500": calculated.todayStatus === "work_from_office",
-                "bg-red-100 text-red-500": calculated.todayStatus === "absent",
-                "bg-green-100 text-green-500": calculated.todayStatus === "work_from_home",
-                "bg-blue-100 text-blue-500": calculated.todayStatus === "sick",
-                "bg-rose-100 text-rose-500": calculated.todayStatus === "work_with_duty",
-                "bg-lime-100 text-lime-500": calculated.todayStatus === "holiday",
-                "bg-fuchsia-100 text-fuchsia-500": calculated.todayStatus === "weekend",
-              })}
-            >
+            <Chip color={getColor(calculated.todayStatus)} className="capitalize" variant="flat">
               {calculated.todayStatus.replaceAll("_", " ") || "Hadir"}
-            </h4>
+            </Chip>
           )}
-          <div className="text-sm">
-            <h6 className="text-red-500">{calculated.totalAbsent || 0} hari tidak hadir</h6>
-            <h6 className="text-fuchsia-500">{calculated.totalLate || 0} hari terlambat</h6>
-            <h6 className="text-amber-500">
-              {calculated.totalWorkFromHome || 0} hari kerja dari rumah
-            </h6>
-            <h6 className="text-violet-500">
-              {calculated.totalWorkFromOffice || 0} hari kerja dari kantor
-            </h6>
+          <div className="text-sm grid gap-1">
+            <Chip size="sm" variant="dot" color="danger">
+              {calculated.totalAbsent} hari tidak hadir
+            </Chip>
+            <Chip size="sm" variant="dot" color="secondary">
+              {calculated.totalLate} hari terlambat
+            </Chip>
+            <Chip size="sm" variant="dot" color="warning">
+              {calculated.totalWorkFromHome} hari kerja dari rumah
+            </Chip>
+            <Chip size="sm" variant="dot" color="primary">
+              {calculated.totalWorkFromOffice} hari kerja dari kantor
+            </Chip>
+            <Chip size="sm" variant="dot" color="success">
+              {overtimeHours} jam overtime
+            </Chip>
           </div>
           <Link
             href={`/dashboard/employees/${user.work_id}/attendances`}
@@ -239,7 +277,7 @@ const EmployeeCard: React.FC<Props> = ({
             src={"/img/male.png"}
             width={200}
             height={200}
-            className="h-auto w-16 md:w-24"
+            className="w-20 md:w-32 h-auto"
             alt=""
             draggable={false}
           />
@@ -248,7 +286,7 @@ const EmployeeCard: React.FC<Props> = ({
             src={"/img/female.png"}
             width={200}
             height={200}
-            className="h-auto w-16 md:w-24"
+            className="w-20 md:w-32 h-auto"
             alt=""
             draggable={false}
           />
