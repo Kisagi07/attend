@@ -252,7 +252,7 @@ const EmployeeCard: FC<Props> = ({
               {calculated.totalWorkFromOffice} hari kerja dari kantor
             </Chip>
             <Chip size="sm" variant="dot" color="success">
-              {overtimeHours} hours overtime
+              {overtimeHours} jam overtime
             </Chip>
           </div>
           <Link
