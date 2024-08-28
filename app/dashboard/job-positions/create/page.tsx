@@ -17,27 +17,33 @@ const JobCreatePage = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [workDay, setWorkDay] = useState<string>("");
   const storeJobPosition = async (): Promise<any> => {
-    const res = await fetch("/api/job-positions", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        shift_start: shiftStart!.toString(),
-        shift_end: shiftEnd!.toString,
-        work_day: workDay,
-        salary: extractNumber(salary),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      throw error;
-    }
+    try {
+      const res = await fetch("/api/job-positions", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          shift_start: shiftStart!.toString(),
+          shift_end: shiftEnd!.toString(),
+          work_day: workDay,
+          salary: extractNumber(salary),
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw error;
+      }
 
-    const data = await res.json();
-    resetForm();
-    return data;
+      const data = await res.json();
+      resetForm();
+      return data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
