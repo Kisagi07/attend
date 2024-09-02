@@ -2,7 +2,8 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-import { Prisma } from "@prisma/client";
+import { Prisma, logs as Log } from "@prisma/client";
+import { parseTime } from "@internationalized/date";
 
 export async function POST(req: NextRequest) {
   const {
@@ -18,8 +19,8 @@ export async function POST(req: NextRequest) {
     isOverTime,
   } = await req.json();
 
+  // #region //? session authentication
   const session = await auth();
-
   if (!session) {
     return NextResponse.json(
       {
@@ -30,16 +31,15 @@ export async function POST(req: NextRequest) {
       }
     );
   }
-
   const user = await prisma.users.findFirst({
     where: {
       work_id: session.user.work_id,
     },
     include: {
       logs: true,
+      job_position: true,
     },
   });
-
   if (!user) {
     return NextResponse.json(
       {
@@ -50,9 +50,11 @@ export async function POST(req: NextRequest) {
       }
     );
   }
+  // #endregion
 
-  let log;
+  let log: Log;
 
+  // #region //? basic store data functionality
   if (type === "sick") {
     const [hours, minutes, seconds] = clock_in_time.split(":");
     const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
@@ -150,6 +152,39 @@ export async function POST(req: NextRequest) {
       });
     }
   }
+
+  //#endregion
+
+  // #region //? after hour overtime functionality
+  // check if today is not overtime day
+  if (!isOverTime) {
+    // check if its clock out
+    if (type === "clock-out") {
+      // check if user have job position
+      if (user.job_position) {
+        // parse job end shift & clock out time
+        const jobShiftEnd = parseTime(user.job_position.shift_end);
+        const clockOutTime = parseTime(clock_out_time);
+        // check if clock out time are 15 minutes after job shift end
+        const comparedResult = clockOutTime.compare(jobShiftEnd);
+        // convert result number miliseconds into minutes
+        const resultInMinutes = comparedResult / 1000 / 60;
+        // check if result in minutes are more than 15 minutes for after hout overtime qualification
+        if (resultInMinutes > 15) {
+          // update log afterHourOvertime to `true`
+          log = await prisma.logs.update({
+            where: {
+              id: log.id,
+            },
+            data: {
+              afterHourOvertime: true,
+            },
+          });
+        }
+      }
+    }
+  }
+  // #endregion
 
   return NextResponse.json(log);
 }

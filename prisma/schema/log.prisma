@@ -14,6 +14,7 @@ model logs {
   clock_out_longitude Decimal?  @db.Decimal(11, 8)
   user                users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "logs_ibfk_1")
   isOverTime          Boolean   @default(false)
+  afterHourOvertime   Boolean   @default(false)
 
   @@index([user_id], map: "user_id")
 }

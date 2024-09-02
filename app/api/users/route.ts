@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calculateMonthlyStatus } from "@/app/serverhelper";
 import prisma, { UserResultMany } from "@/app/prisma";
 import { $Enums } from "@prisma/client";
 export const revalidate = 0;
@@ -35,12 +34,6 @@ export async function GET(req: NextRequest) {
       },
     },
   });
-
-  if (monthlyStatus) {
-    // get year, month, beggining of the month in string
-    const usersWithStatus = await calculateMonthlyStatus(users as UserResultMany);
-    return NextResponse.json(usersWithStatus);
-  }
 
   return NextResponse.json(users);
 }

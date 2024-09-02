@@ -2,10 +2,10 @@
 import { FC, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import clsx from "clsx";
 import { company, holidays, logs, DayOffRequest } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
+import totalOvertime from "@helper/totalOvertime";
 import { Spinner } from "@nextui-org/spinner";
 import { UserWithJob } from "../prisma";
 import { Chip } from "@nextui-org/chip";
@@ -133,13 +133,13 @@ const EmployeeCard: FC<Props> = ({
       // ? get the start of month of passed date
       const startMonthDate = startOfMonth(
         parseDate(
-          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
         )
       );
 
       // ? turn passed date into @internationalized/date CalendarDate
       const passedMonthDate = parseDate(
-        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
       );
 
       leaveRequest.forEach((leave) => {
@@ -182,24 +182,10 @@ const EmployeeCard: FC<Props> = ({
   }, [attendances, holidays, company, user, date, leaveRequest]);
 
   const overtimeHours = useMemo<number>(() => {
-    const overtime = attendances.filter((work) => work.isOverTime);
-    let hours = 0;
-    let minutes = 0;
-    overtime.forEach((work) => {
-      const clockIn = extractTime(work.clock_in_time!);
-      const clockOut = work.clock_out_time
-        ? extractTime(work.clock_out_time)
-        : clockIn.add({ hours: 1 });
-      const overtimeDuration = clockOut.subtract({
-        hours: clockIn.hour,
-        minutes: clockIn.minute,
-        seconds: clockIn.second,
-      });
-      hours += overtimeDuration.hour;
-      minutes += overtimeDuration.minute;
-    });
-    return hours + minutes / 60;
-  }, [attendances]);
+    const overtime = attendances.filter((work) => work.isOverTime || work.afterHourOvertime);
+    const totalHourOvertime = totalOvertime(overtime, user.job_position, { unit: "hour" });
+    return totalHourOvertime;
+  }, [attendances, user.job_position]);
 
   const getColor = (todayStatus: string) => {
     switch (todayStatus) {
