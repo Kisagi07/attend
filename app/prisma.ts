@@ -8,45 +8,6 @@ const prisma = new PrismaClient({
   },
 })
   .$extends({
-    name: "status",
-    result: {
-      users: {
-        totalAbsent: {
-          compute(): number {
-            return 0;
-          },
-        },
-        totalWorkFromHome: {
-          compute(): number {
-            return 0;
-          },
-        },
-        totalWorkFromOffice: {
-          compute(): number {
-            return 0;
-          },
-        },
-        todayStatus: {
-          compute(): string {
-            return "absent";
-          },
-        },
-        totalLate: {
-          compute(): number {
-            return 0;
-          },
-        },
-      },
-    },
-    model: {
-      users: {
-        excludePassword(user: users) {
-          return Object.fromEntries(Object.entries(user).filter(([key]) => key !== "password"));
-        },
-      },
-    },
-  })
-  .$extends({
     name: "api-profile-picture",
     result: {
       users: {
