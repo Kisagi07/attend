@@ -185,7 +185,7 @@ const EmployeeCard: FC<Props> = ({
     const overtime = attendances.filter((work) => work.isOverTime || work.afterHourOvertime);
     const totalHourOvertime = totalOvertime(overtime, user.job_position, { unit: "hour" });
     return totalHourOvertime;
-  }, [attendances]);
+  }, [attendances, user.job_position]);
 
   const getColor = (todayStatus: string) => {
     switch (todayStatus) {

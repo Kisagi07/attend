@@ -40,7 +40,7 @@ const MonthAttendances = ({
           >
             {info.getValue().replaceAll("_", " ")}
           </p>
-          {info.row.original.isOverTime && (
+          {(info.row.original.isOverTime || info.row.original.afterHourOvertime) && (
             <Tooltip content="Overtime">
               <Chip color="secondary" radius="full" variant="faded">
                 <FcOvertime size={20} />
