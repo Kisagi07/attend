@@ -6,50 +6,28 @@ const totalOvertime = (
   job: JobPosition | null,
   { unit }: { unit: "hour" | "minutes" } = { unit: "minutes" }
 ) => {
-  // initialize total minutes
   let totalMinutes = 0;
-  // loop through logs
+
+  const parseTimeFromLog = (time: string) => parseTime(time.split("T")[1].split(".")[0]);
+
+  const calculateMinutes = (startTime: string, endTime: string) => {
+    const start = parseTimeFromLog(startTime);
+    const end = parseTimeFromLog(endTime);
+    return end.compare(start) / 1000 / 60;
+  };
+
   logs.forEach((log) => {
-    // check if log are overtime day also clock out time are not null
     if (log.isOverTime && log.clock_out_time) {
-      // parse clock in and out time
-      const clockInTime = parseTime(
-        (log.clock_in_time as unknown as string).split("T")[1].split(".")[0]
+      totalMinutes += calculateMinutes(
+        log.clock_in_time as unknown as string,
+        log.clock_out_time as unknown as string
       );
-      const clockOutTime = parseTime(
-        (log.clock_out_time as unknown as string).split("T")[1].split(".")[0]
-      );
-      // calculate compare result
-      const compareResult = clockOutTime.compare(clockInTime);
-      // turn into minute
-      const resultInMinute = compareResult / 1000 / 60;
-      // add to total minutes
-      totalMinutes += resultInMinute;
-      return;
-    }
-    // check if log are after hour overtime
-    if (log.afterHourOvertime && job) {
-      // parse clock out and end shift
-      const shiftEnd = parseTime(job.shift_end);
-      const clockOutTime = parseTime(
-        (log.clock_out_time as unknown as string).split("T")[1].split(".")[0]
-      );
-      // calculate compare result
-      const compareResult = clockOutTime.compare(shiftEnd);
-      // turn into minute
-      const resultInMinute = compareResult / 1000 / 60;
-      // add to total minutes
-      totalMinutes += resultInMinute;
-      return;
+    } else if (log.afterHourOvertime && job) {
+      totalMinutes += calculateMinutes(job.shift_end, log.clock_out_time as unknown as string);
     }
   });
 
-  // determine return in hour or minute
-  if (unit === "hour") {
-    return totalMinutes / 60;
-  } else {
-    return totalMinutes;
-  }
+  return unit === "hour" ? totalMinutes / 60 : totalMinutes;
 };
 
 export default totalOvertime;
