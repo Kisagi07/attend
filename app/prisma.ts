@@ -38,7 +38,7 @@ const prisma = new PrismaClient({
   .$extends({
     name: "After hour overtime",
     client: {
-      totalOvertime: (
+      $totalOvertime: (
         logs: Log[],
         { unit }: { unit: "hour" | "minutes" } = { unit: "minutes" }
       ) => {
