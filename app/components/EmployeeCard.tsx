@@ -5,8 +5,9 @@ import Image from "next/image";
 import { company, holidays, logs, DayOffRequest } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
+import totalOvertime from "@helper/totalOvertime";
 import { Spinner } from "@nextui-org/spinner";
-import prisma, { UserWithJob } from "../prisma";
+import { UserWithJob } from "../prisma";
 import { Chip } from "@nextui-org/chip";
 import { parseTime, parseDate, startOfMonth, Time } from "@internationalized/date";
 
@@ -132,13 +133,13 @@ const EmployeeCard: FC<Props> = ({
       // ? get the start of month of passed date
       const startMonthDate = startOfMonth(
         parseDate(
-          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
         )
       );
 
       // ? turn passed date into @internationalized/date CalendarDate
       const passedMonthDate = parseDate(
-        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate()}`
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
       );
 
       leaveRequest.forEach((leave) => {
@@ -182,7 +183,7 @@ const EmployeeCard: FC<Props> = ({
 
   const overtimeHours = useMemo<number>(() => {
     const overtime = attendances.filter((work) => work.isOverTime || work.afterHourOvertime);
-    const totalHourOvertime = prisma.$totalOvertime(overtime, { unit: "hour" });
+    const totalHourOvertime = totalOvertime(overtime, user.job_position, { unit: "hour" });
     return totalHourOvertime;
   }, [attendances]);
 
