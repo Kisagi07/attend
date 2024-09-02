@@ -13,12 +13,9 @@ import { LogWithUserWithJob } from "@/app/prisma";
 const Page = () => {
   const { data: logs, isLoading: logsLoading } = useSWR<any>(
     `/api/attendances?grouped-name-date&latest`,
-    fetcher,
+    fetcher
   );
-  const { data: users, isLoading: usersLoading } = useSWR<users[]>(
-    `/api/users`,
-    fetcher,
-  );
+  const { data: users, isLoading: usersLoading } = useSWR<users[]>(`/api/users`, fetcher);
 
   const { data: company } = useSWR<company>(`/api/company`, fetcher);
 
@@ -37,10 +34,10 @@ const Page = () => {
 
   const sortByDateAndTime = (a: logs, b: logs) => {
     const dateA = new Date(
-      `${a.date?.toString().split("T")[0]}T${a.clock_in_time?.toString().split("T")[1]}`,
+      `${a.date?.toString().split("T")[0]}T${a.clock_in_time?.toString().split("T")[1]}`
     ).getTime();
     const dateB = new Date(
-      `${b.date?.toString().split("T")[0]}T${b.clock_in_time?.toString().split("T")[1]}`,
+      `${b.date?.toString().split("T")[0]}T${b.clock_in_time?.toString().split("T")[1]}`
     ).getTime();
     return dateB - dateA;
   };
@@ -56,9 +53,7 @@ const Page = () => {
 
   useEffect(() => {
     if (users) {
-      setUserOptions(
-        users.map((user) => ({ label: user.name!, value: user.name! })),
-      );
+      setUserOptions(users.map((user) => ({ label: user.name!, value: user.name! })));
     }
   }, [users]);
 
@@ -72,11 +67,7 @@ const Page = () => {
         }
       } else if (selectedUser) {
         if (Object.hasOwn(logs, selectedUser.value)) {
-          setTableData(
-            Object.values(
-              logs[selectedUser.value],
-            ).flat() as LogWithUserWithJob[],
-          );
+          setTableData(Object.values(logs[selectedUser.value]).flat() as LogWithUserWithJob[]);
         } else {
           setTableData([]);
         }
@@ -86,7 +77,7 @@ const Page = () => {
             Object.values(logs)
               .flatMap((inner: any) => Object.values(inner))
               .flat() as logs[]
-          ).sort(sortByDateAndTime) as LogWithUserWithJob[],
+          ).sort(sortByDateAndTime) as LogWithUserWithJob[]
         );
       }
     }
@@ -99,7 +90,7 @@ const Page = () => {
           Object.keys(logs[selectedUser.value]).map((date) => ({
             label: date,
             value: date,
-          })),
+          }))
         );
       } else {
         setDateOptions([]);
