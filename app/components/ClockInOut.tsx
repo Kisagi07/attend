@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import { ButtonDropdown, ListInput } from "@/app/components";
+import { ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company } from "@prisma/client";
@@ -323,7 +323,7 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleGeolocationError = (error: PositionErrorCallback | any) => {
+  const handleGeolocationError = useCallback((error: PositionErrorCallback | any) => {
     if (error.code === error.PERMISSION_DENIED) {
       toast.error("Location permission denied by user.");
     } else if (error.code === error.POSITION_UNAVAILABLE) {
@@ -333,7 +333,7 @@ const ClockInOut = () => {
     } else {
       toast.error("An unknown error occurred.");
     }
-  };
+  }, []);
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {}, handleGeolocationError);
   }, [handleGeolocationError]);
