@@ -1,139 +1,159 @@
 "use client";
 import React from "react";
-import { ButtonDropdown, ListInput } from "@/app/components";
+import { ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Input } from "@nextui-org/input";
 import { UserWithJob } from "../prisma";
+import { Button, ButtonGroup } from "@nextui-org/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
+import { BiChevronDown } from "react-icons/bi";
+import { Skeleton } from "@nextui-org/skeleton";
 
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
+
+type ButtonOption = Record<
+  string,
+  { label: string; color: "secondary" | "primary" | "danger" | "success" | "default" } | undefined
+>;
 
 const ClockInOut = () => {
   //fetched data
   const {
     data: todayAttendance,
-    error,
     isLoading,
     mutate: mutateAttendance,
   } = useSWR<logs>("/api/user/attendance", fetcher);
-  const {
-    data: company,
-    error: companyError,
-    isLoading: companyLoading,
-  } = useSWR<company>(`/api/company`, fetcher);
-  const { data: user } = useSWR<UserWithJob>(`/api/user`, fetcher, {
+  const { data: company, isLoading: companyLoading } = useSWR<company>(`/api/company`, fetcher);
+  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(`/api/user`, fetcher, {
     refreshInterval: 1000,
   });
 
   // hook variable
+
+  const [selectedButton, setSelectedButton] = useState<Set<string> | "all">(
+    new Set(["work_from_office"])
+  );
+  const selectedButtonValue = Array.from(selectedButton)[0];
+  const showDuty = selectedButtonValue === "work_with_duty";
+  const [status, setStatus] = useState({
+    clockIn: false,
+    done: false,
+    isSick: false,
+    fromHome: false,
+    isLate: false,
+  });
   const [sending, setSending] = useState<boolean>(false);
-  const [clockedIn, setClockedIn] = useState<boolean>(false);
-  const [done, setDone] = useState<boolean>(false);
-  const [isSick, setIsSick] = useState<boolean>(false);
-  const [fromHome, setFromHome] = useState<boolean>(false);
   const [todaysWork, setTodaysWork] = useState<string[]>([]);
   const [duty, setDuty] = useState<string>("");
-  const [showDuty, setShowDuty] = useState<boolean>(false);
-  const [isLate, setIsLate] = useState<boolean>(false);
   const [lateReason, setLateReason] = useState<string>("");
   const [time, setTime] = useState(0);
-  const [options1, setOptions1] = useState([
-    {
-      label: "Clock From Home",
-      className: "bg-green-400 hover:bg-green-500 text-white disabled:bg-green-300",
-    },
-    {
-      label: "Clock From Office",
-      className: "bg-violet-400 hover:bg-violet-500 text-white disabled:bg-violet-300",
-    },
-    {
-      label: "Sick Day",
-      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
-    },
-    {
-      label: "Clock With Duty",
-      className: "bg-blue-400 hover:bg-blue-500 text-white disabled:bg-blue-300",
-    },
-  ]);
-  const [options2, setOptions2] = useState([
-    {
-      label: "Clock-Out",
-      className: "bg-red-400 hover:bg-red-500 text-white disabled:bg-red-300",
-    },
-  ]);
-  const [options3, setOptions3] = useState([
-    {
-      label: "Good Job",
-      className: "bg-gray-400 hover:bg-gray-500 text-white disabled:bg-gray-300",
-    },
-  ]);
+  const isWorkDay = useMemo(() => {
+    const todayDay = new Date().getDay();
+    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
+  }, [user]);
 
-  const overtimeOptions = [
-    {
-      label: "Work Overtime",
-      className: "bg-emerald-400 hover:bg-emerald-500 text-white disabled:bg-emerald-300",
-    },
-  ];
-
-  const buttonChanges = (value: string | null) => {
-    if (value == "Clock With Duty") {
-      setShowDuty(true);
+  const buttonOptions = useMemo<ButtonOption>(() => {
+    if (status.clockIn) {
+      setSelectedButton(new Set(["clock-out"]));
+      return {
+        "clock-out": {
+          label: "Clock Out",
+          color: "danger",
+        },
+      };
+    } else if (!isWorkDay) {
+      setSelectedButton(new Set(["work_overtime"]));
+      return {
+        work_overtime: {
+          label: "Work Overtime",
+          color: "primary",
+        },
+      };
     } else {
-      setShowDuty(false);
+      setSelectedButton(new Set(["work_from_office"]));
+      return {
+        work_from_home: {
+          label: "Work From Home",
+          color: "success",
+        },
+        work_from_office: {
+          label: "Work From Office",
+          color: "secondary",
+        },
+        work_with_duty: {
+          label: "Work With Duty",
+          color: "primary",
+        },
+        sick: {
+          label: "Sick Leave",
+          color: "danger",
+        },
+      };
     }
-  };
+  }, [status.clockIn, isWorkDay]);
 
-  const handleClockBtn = async (value: string) => {
+  const handleButtonClick = async () => {
     try {
       setSending(true);
-      const type = getType(value);
+      // get user and terget compare location
       const { latitude, longitude } = await getUserLocation();
       const { targetLatitude, targetLongitude } = getTargetLocation(
-        type === "work-from-home" || fromHome
+        selectedButtonValue === "work_from_home" || status.fromHome
       );
+      // calculate distance between location
       const distance = Math.floor(
         calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
           1000
       );
+      // #region //? rejection check
       // if distance is more than 50m and not sick or work with duty then warned user then return
-      if (distance > 50 && type !== "sick" && type !== "work_with_duty") {
-        toast.error("You are not in the right location to clockin");
+      if (
+        distance > 50 &&
+        selectedButtonValue !== "sick" &&
+        selectedButtonValue !== "work_with_duty"
+      ) {
+        toast.error(` You are ${distance - 50} meter too far from location!`);
         return;
       }
       // if clock out but no work filled then warned user then return
-      if (type === "clock-out" && todaysWork.length === 0) {
+      if (selectedButtonValue === "clock-out" && todaysWork.length === 0) {
         toast.error("You need to fill today's work in order to clockout");
         return;
       }
       // if work with duty but duty is not filled then warned user then return
-      if (type === "work_with_duty" && !duty) {
+      if (selectedButtonValue === "work_with_duty" && !duty) {
         toast.error("You need to fill duty in order to clockin");
         return;
       }
       // if user is late but reason for late is not filled then warned user then return
       if (
-        isLate &&
+        status.isLate &&
         !lateReason &&
-        (type === "work-from-home" || type === "work-from-office" || type === "work_with_duty") &&
-        isWorkDay()
+        (selectedButtonValue === "work_from_home" ||
+          selectedButtonValue === "work_from_office" ||
+          selectedButtonValue === "work_with_duty") &&
+        isWorkDay
       ) {
         toast.error("You need to fill reason for being late");
         return;
       }
+      // #endregion //? rejection check
 
-      if (type === "sick") {
-        await sendSickDay({ type, latitude, longitude });
+      // ? next operation
+      if (selectedButtonValue === "sick") {
+        await sendSickDay({ type: selectedButtonValue, latitude, longitude });
       } else {
         await sendWork({
-          type,
+          type: selectedButtonValue,
           latitude,
           longitude,
           todaysWork,
-          isOverTime: !isWorkDay(),
+          isOverTime: !isWorkDay,
         });
       }
     } catch (error) {
@@ -161,6 +181,7 @@ const ClockInOut = () => {
           date: getDateOnly(),
           clock_in_latitude: latitude,
           clock_in_longitude: longitude,
+          todaysWork,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -190,26 +211,22 @@ const ClockInOut = () => {
       type,
       date: getDateOnly(),
       isOverTime,
+      todaysWork: todaysWork,
     };
     if (type === "clock-out") {
       sendData["clock_out_time"] = getTimeOnly();
       sendData["clock_out_latitude"] = latitude;
       sendData["clock_out_longitude"] = longitude;
-      sendData["todaysWork"] = todaysWork;
-    } else if (type === "work_with_duty") {
-      sendData["clock_in_time"] = getTimeOnly();
-      sendData["clock_in_latitude"] = latitude;
-      sendData["clock_in_longitude"] = longitude;
-      sendData["todaysWork"] = ["Duty: " + duty];
     } else {
       sendData["clock_in_time"] = getTimeOnly();
       sendData["clock_in_latitude"] = latitude;
       sendData["clock_in_longitude"] = longitude;
-      sendData["todaysWork"] = isOverTime
-        ? todaysWork
-        : lateReason
-          ? [...todaysWork, `Reason for being late: ${lateReason}`]
-          : todaysWork;
+    }
+    if (type === "work_with_duty") {
+      sendData["todaysWork"] = ["Duty: " + duty, ...sendData["todaysWork"]];
+    }
+    if (status.isLate && type !== "clock-out") {
+      sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
     }
     try {
       const res = await fetch(`/api/user/attendance`, {
@@ -221,31 +238,9 @@ const ClockInOut = () => {
       });
       const data = await res.json();
       mutateAttendance();
-      setShowDuty(false);
+      setStatus((prev) => ({ ...prev, clockin: true }));
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const getType = (value: string) => {
-    switch (value) {
-      case "Sick Day":
-        return "sick";
-        break;
-      case "Clock From Home":
-        return "work-from-home";
-        break;
-      case "Clock From Office":
-        return "work-from-office";
-        break;
-      case "Clock-Out":
-        return "clock-out";
-        break;
-      case "Clock With Duty":
-        return "work_with_duty";
-        break;
-      default:
-        return "work-from-office";
     }
   };
 
@@ -299,50 +294,24 @@ const ClockInOut = () => {
     setTodaysWork((prev) => prev.filter((pre) => pre !== value));
   };
 
-  const requestLocationPermission = React.useCallback(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      console.log("Permission granted");
-    }, handleGeolocationError);
-  }, []);
-
-  const handleGeolocationError = (error: PositionErrorCallback | any) => {
-    if (error.code === error.PERMISSION_DENIED) {
-      toast.error("Location permission denied by user.");
-    } else if (error.code === error.POSITION_UNAVAILABLE) {
-      toast.error("Location information is unavailable.");
-    } else if (error.code === error.TIMEOUT) {
-      toast.error("The request to get user location timed out.");
-    } else {
-      toast.error("An unknown error occurred.");
-    }
-  };
-
-  const isWorkDay = (): boolean => {
-    const todayDay = new Date().getDay();
-    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
-  };
-
   useEffect(() => {
     if (!isLoading && todayAttendance) {
-      const type = todayAttendance?.type;
-      if (type === "sick") {
-        setIsSick(true);
-      } else {
-        setIsSick(false);
-        setClockedIn(true);
-        if (type === "work_from_home") {
-          setFromHome(true);
-        } else {
-          setFromHome(false);
-        }
-        if (todayAttendance.clock_out_time) {
-          setDone(true);
-        } else {
-          setDone(false);
-        }
-      }
+      const { type, clock_out_time } = todayAttendance;
+      setStatus((prev) => ({
+        ...prev,
+        isSick: type === "sick",
+        clockIn: type !== "sick",
+        fromHome: type === "work_from_home",
+        done: !!clock_out_time,
+      }));
     } else {
-      setClockedIn(false);
+      setStatus({
+        clockIn: false,
+        done: false,
+        isSick: false,
+        fromHome: false,
+        isLate: false,
+      });
     }
   }, [todayAttendance, isLoading]);
 
@@ -354,9 +323,20 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleGeolocationError = useCallback((error: PositionErrorCallback | any) => {
+    if (error.code === error.PERMISSION_DENIED) {
+      toast.error("Location permission denied by user.");
+    } else if (error.code === error.POSITION_UNAVAILABLE) {
+      toast.error("Location information is unavailable.");
+    } else if (error.code === error.TIMEOUT) {
+      toast.error("The request to get user location timed out.");
+    } else {
+      toast.error("An unknown error occurred.");
+    }
+  }, []);
   useEffect(() => {
-    requestLocationPermission();
-  }, [requestLocationPermission]);
+    navigator.geolocation.getCurrentPosition((position) => {}, handleGeolocationError);
+  }, [handleGeolocationError]);
 
   useEffect(() => {
     if (user) {
@@ -369,16 +349,24 @@ const ClockInOut = () => {
       }
       const shiftStartTime = workStart.getTime();
       if (time > shiftStartTime) {
-        setIsLate(true);
+        setStatus((prev) => ({ ...prev, isLate: true }));
       }
     }
   }, [time, user, company]);
 
-  return isSick ? (
-    <button className="w-full cursor-default  rounded bg-sky-400 p-4 text-white">Rest Well!</button>
+  return isLoading && userLoading && companyLoading ? (
+    <Skeleton className="h-10 w-full rounded" />
+  ) : status.isSick ? (
+    <Button color="primary" variant="flat" fullWidth>
+      Rest Well!
+    </Button>
+  ) : status.done ? (
+    <Button color="default" variant="flat" fullWidth>
+      Good Work Today!
+    </Button>
   ) : (
     <>
-      {isLate && !clockedIn && isWorkDay() && (
+      {status.isLate && !status.clockIn && isWorkDay && selectedButtonValue !== "sick" && (
         <>
           <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
             You are late! hurry up!
@@ -393,7 +381,7 @@ const ClockInOut = () => {
           />
         </>
       )}
-      {clockedIn && !done && (
+      {status.clockIn && !status.done && (
         <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
       {showDuty && (
@@ -404,14 +392,32 @@ const ClockInOut = () => {
           onChange={(e) => setDuty(e.currentTarget.value)}
         />
       )}
-      <ButtonDropdown
-        buttonChanged={buttonChanges}
-        onClick={(value) => handleClockBtn(value)}
-        loading={isLoading || sending}
-        disabled={done || isLoading || sending}
-        className="bg-slate-900 text-white hover:bg-black"
-        options={done ? options3 : clockedIn ? options2 : !isWorkDay() ? overtimeOptions : options1}
-      />
+      <ButtonGroup variant="flat" fullWidth>
+        <Button
+          isLoading={sending}
+          onClick={handleButtonClick}
+          color={buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ?? "default"}
+        >
+          {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ?? "Loading"}
+        </Button>
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger>
+            <Button isIconOnly>
+              <BiChevronDown className="size-6" />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={selectedButton}
+            onSelectionChange={(selected) => setSelectedButton(selected as Set<string>)}
+          >
+            {Object.values(buttonOptions).map((option, index) => (
+              <DropdownItem key={Object.keys(buttonOptions)[index]}>{option!.label}</DropdownItem>
+            ))}
+          </DropdownMenu>
+        </Dropdown>
+      </ButtonGroup>
     </>
   );
 };

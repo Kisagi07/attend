@@ -4,11 +4,11 @@ import UserInfo from "@/app/components/UserInfo";
 import HomeOptions from "@/app/components/HomeOptions";
 import { Suspense } from "react";
 import Logout from "@/app/components/Logout";
-import UserInfoSkeleton from "@/app/_loader/UserInfoSekleton";
 import ClockInOut from "@/app/components/ClockInOut";
 import { FaRegCalendarTimes } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Link from "next/link";
+import { Skeleton } from "@nextui-org/skeleton";
 
 import getUser from "@/app/libs/getUser";
 import { Button, ButtonGroup } from "@nextui-org/button";
@@ -49,7 +49,7 @@ const Home = () => {
           </div>
           <Logout />
         </div>
-        <Suspense fallback={<UserInfoSkeleton />}>
+        <Suspense fallback={<Skeleton className="rounded w-full h-28" />}>
           <UserInfo promise={promise} />
         </Suspense>
         <ClockInOut />
