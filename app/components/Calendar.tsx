@@ -30,10 +30,18 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
   const selectedValue = isControlled ? value : internalValue;
 
   const handleDateChange = (newValue: CalendarDate | null) => {
+    const theSame = () => {
+      return (
+        newValue?.day === selectedValue?.day &&
+        newValue?.month === selectedValue?.month &&
+        newValue?.year === selectedValue?.year
+      );
+    };
+
     if (isControlled) {
-      onChange?.(newValue);
+      onChange?.(theSame() ? null : newValue);
     } else {
-      setInternalValue(newValue);
+      setInternalValue(theSame() ? null : newValue);
     }
   };
 
@@ -114,7 +122,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
           isIconOnly
           radius="full"
           size="sm"
-          className="text-default-400"
+          className="text-slate-400"
           onClick={() => handleChangeMonth("prev")}
         >
           <BiChevronLeft className="size-6" />
@@ -126,8 +134,8 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
               ref={(el) => {
                 monthRefSpan.current[m.id] = el!;
               }}
-              className={`text-default-500 font-medium transition-all duration-200 overflow-x-hidden ${
-                visibleMonth === m.id + 1 ? "text-default-500" : ""
+              className={`text-slate-500 font-medium transition-all duration-200 overflow-x-hidden ${
+                visibleMonth === m.id + 1 ? "text-slate-500" : ""
               }`}
             >
               {monthNumberToWord(baseDate.add({ months: m.id }).month - 1)}{" "}
@@ -140,7 +148,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
           isIconOnly
           radius="full"
           size="sm"
-          className="text-default-400"
+          className="text-slate-400"
           onClick={() => handleChangeMonth("next")}
         >
           <BiChevronRight className="size-6" />
@@ -151,7 +159,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
           const loopDate = baseDate.add({ months: m.id });
           return (
             <div key={m.id} className="text-center w-60">
-              <div className="grid grid-cols-7 gap-1 px-4 text-default-400 font-medium">
+              <div className="grid grid-cols-7 gap-1 px-4 text-slate-400 font-medium">
                 <span>S</span>
                 <span>M</span>
                 <span>T</span>
@@ -160,7 +168,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
                 <span>F</span>
                 <span>S</span>
               </div>
-              <div className="bg-default-50 overflow-x-hidden h-full">
+              <div className="bg-slate-50 overflow-x-hidden h-full">
                 <div
                   className="grid grid-cols-7 gap-1 px-4 py-2 *:aspect-square transition-all duration-200"
                   ref={(el) => {
@@ -174,7 +182,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
                     .map((sd) => (
                       <span
                         key={sd.id + "-start-empty"}
-                        className="flex items-center justify-center text-default-300"
+                        className="flex items-center justify-center text-slate-300"
                       >
                         {endOfMonth(loopDate.subtract({ months: 1 })).day - sd.id}
                       </span>
@@ -233,7 +241,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
                   ).map((ed) => (
                     <span
                       key={ed.id + "-end-empty"}
-                      className="flex items-center justify-center text-default-300"
+                      className="flex items-center justify-center text-slate-300"
                     >
                       {ed.id + 1}
                     </span>
