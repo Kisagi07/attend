@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState, useRef } from "react";
+import { FC, useState, useRef, useEffect } from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import { Button } from "@nextui-org/button";
 import {
@@ -19,7 +19,7 @@ type Calendar = {
   visibleMonth?: 1 | 2 | 3;
 };
 
-const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
+const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange }) => {
   const [baseDate, setBaseDate] = useState(today(getLocalTimeZone()));
   const [internalValue, setInternalValue] = useState<CalendarDate | null>(null);
   const monthRefSpan = useRef<HTMLSpanElement[]>([]);
@@ -55,6 +55,11 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
   };
 
   const loopNumber = Array.from({ length: visibleMonth }, (_, i) => ({ id: i }));
+
+  useEffect(() => {
+    monthRefSpan.current = [];
+    calendarsRef.current = [];
+  }, [visibleMonth]);
 
   const animate = (step: "diss" | "switch" | "appear") => {
     switch (step) {
@@ -93,13 +98,17 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
   return (
     <div
       slot="wrapper"
-      className={clsx("rounded-md shadow-around", {
-        "max-w-[17.5rem]": visibleMonth === 1,
-        "max-w-[27.5rem]": visibleMonth === 2,
-        "max-w-[37.5rem]": visibleMonth === 3,
-      })}
+      className={clsx("rounded-md shadow-around max-w-full overflow-x-auto w-max")}
     >
-      <div slot="navigation" className="flex justify-between w-full py-1 px-4 items-center gap-2">
+      {/* <div className="max-w-full overflow-x-auto"> */}
+      <div
+        slot="navigation"
+        className={clsx("flex *:shrink-0 py-1 px-4 items-center gap-8", {
+          "w-[15rem]": visibleMonth === 1,
+          "w-[30rem]": visibleMonth === 2,
+          "w-[45rem]": visibleMonth === 3,
+        })}
+      >
         <Button
           variant="light"
           isIconOnly
@@ -110,20 +119,22 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
         >
           <BiChevronLeft className="size-6" />
         </Button>
-        {loopNumber.map((m) => (
-          <span
-            key={m.id}
-            ref={(el) => {
-              monthRefSpan.current[m.id] = el!;
-            }}
-            className={`text-default-500 font-medium transition-all duration-200 overflow-x-hidden ${
-              visibleMonth === m.id + 1 ? "text-default-500" : ""
-            }`}
-          >
-            {monthNumberToWord(baseDate.add({ months: m.id }).month - 1)}{" "}
-            {baseDate.add({ months: m.id }).year}
-          </span>
-        ))}
+        <div className="overflow-x-clip flex grow *:shrink-0 justify-between">
+          {loopNumber.map((m) => (
+            <span
+              key={m.id}
+              ref={(el) => {
+                monthRefSpan.current[m.id] = el!;
+              }}
+              className={`text-default-500 font-medium transition-all duration-200 overflow-x-hidden ${
+                visibleMonth === m.id + 1 ? "text-default-500" : ""
+              }`}
+            >
+              {monthNumberToWord(baseDate.add({ months: m.id }).month - 1)}{" "}
+              {baseDate.add({ months: m.id }).year}
+            </span>
+          ))}
+        </div>
         <Button
           variant="light"
           isIconOnly
@@ -135,11 +146,11 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
           <BiChevronRight className="size-6" />
         </Button>
       </div>
-      <div slot="calendar" className="overflow-x-hidden">
+      <div slot="calendar" className="flex *:shrink-0 w-max overflow-y-hidden">
         {loopNumber.map((m) => {
           const loopDate = baseDate.add({ months: m.id });
           return (
-            <div key={m.id} className="text-center ">
+            <div key={m.id} className="text-center w-60">
               <div className="grid grid-cols-7 gap-1 px-4 text-default-400 font-medium">
                 <span>S</span>
                 <span>M</span>
@@ -149,7 +160,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
                 <span>F</span>
                 <span>S</span>
               </div>
-              <div className="bg-default-50">
+              <div className="bg-default-50 overflow-x-hidden h-full">
                 <div
                   className="grid grid-cols-7 gap-1 px-4 py-2 *:aspect-square transition-all duration-200"
                   ref={(el) => {
@@ -161,7 +172,10 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
                     (_, id) => ({ id })
                   )
                     .map((sd) => (
-                      <span className="flex items-center justify-center text-default-300">
+                      <span
+                        key={sd.id + "-start-empty"}
+                        className="flex items-center justify-center text-default-300"
+                      >
                         {endOfMonth(loopDate.subtract({ months: 1 })).day - sd.id}
                       </span>
                     ))
@@ -201,6 +215,7 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 1, value, onChange }) => {
             </div>
           );
         })}
+        {/* </div> */}
       </div>
     </div>
   );
