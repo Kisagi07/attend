@@ -1,10 +1,12 @@
 import React from "react";
-import { CompanyHoliday } from "@/app/components";
+import HolidaysCalendar from "@components/HolidaysCalendar";
 
 const Page: React.FC = () => {
   return (
     <>
-      <CompanyHoliday />
+      <section>
+        <HolidaysCalendar />
+      </section>
     </>
   );
 };

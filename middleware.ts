@@ -21,7 +21,8 @@ export default auth(async function middleware(req) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
     } else if (!isLoginRoute && !isApiRoute) {
-      return NextResponse.redirect(new URL("/login", origin));
+      const pathToGo = req.nextUrl.pathname;
+      return NextResponse.redirect(new URL(`/login?callbackUrl=${pathToGo}`, origin));
     }
   }
 
