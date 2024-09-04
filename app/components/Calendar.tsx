@@ -17,9 +17,10 @@ type Calendar = {
   value?: CalendarDate | null;
   onChange?: (value: CalendarDate | null) => void;
   visibleMonth?: 1 | 2 | 3;
+  setDates?: { color: "danger" | "default" | "success" | "primary"; dates: CalendarDate[] };
 };
 
-const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange }) => {
+const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates }) => {
   const [baseDate, setBaseDate] = useState(today(getLocalTimeZone()));
   const [internalValue, setInternalValue] = useState<CalendarDate | null>(null);
   const monthRefSpan = useRef<HTMLSpanElement[]>([]);
@@ -100,7 +101,6 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange }) => {
       slot="wrapper"
       className={clsx("rounded-md shadow-around max-w-full overflow-x-auto w-max")}
     >
-      {/* <div className="max-w-full overflow-x-auto"> */}
       <div
         slot="navigation"
         className={clsx("flex *:shrink-0 py-1 px-4 items-center gap-8", {
@@ -193,6 +193,34 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange }) => {
                             selectedValue?.day === d.i + 1 &&
                             selectedValue?.month === loopDate.month &&
                             selectedValue?.year === loopDate.year,
+                          "text-blue-500": setDates?.dates.some(
+                            (date) =>
+                              date.day === d.i + 1 &&
+                              date.month === loopDate.month &&
+                              date.year === loopDate.year &&
+                              setDates.color === "primary"
+                          ),
+                          "text-red-500": setDates?.dates.some(
+                            (date) =>
+                              date.day === d.i + 1 &&
+                              date.month === loopDate.month &&
+                              date.year === loopDate.year &&
+                              setDates.color === "danger"
+                          ),
+                          "text-emerald-500": setDates?.dates.some(
+                            (date) =>
+                              date.day === d.i + 1 &&
+                              date.month === loopDate.month &&
+                              date.year === loopDate.year &&
+                              setDates.color === "success"
+                          ),
+                          "text-slate-500": setDates?.dates.some(
+                            (date) =>
+                              date.day === d.i + 1 &&
+                              date.month === loopDate.month &&
+                              date.year === loopDate.year &&
+                              setDates.color === "default"
+                          ),
                         }
                       )}
                     >
@@ -215,7 +243,6 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange }) => {
             </div>
           );
         })}
-        {/* </div> */}
       </div>
     </div>
   );
