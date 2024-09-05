@@ -252,7 +252,7 @@ const HolidaysCalendar: FC = () => {
           </ModalContent>
         </Modal>
       </section>
-      <section className="flex gap-2">
+      <section className="flex gap-2 flex-wrap">
         <Modal isOpen={isOpenPut} onOpenChange={onOpenChangePut}>
           <ModalContent>
             <ModalHeader>Edit Holiday {editHoliday?.name}</ModalHeader>
