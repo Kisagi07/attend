@@ -107,11 +107,11 @@ const Calendar: FC<Calendar> = ({ visibleMonth = 2, value, onChange, setDates })
   return (
     <div
       slot="wrapper"
-      className={clsx("rounded-md shadow-around max-w-full overflow-x-auto w-max")}
+      className={clsx("rounded-md shrink-0 shadow-around max-w-full overflow-x-auto w-max")}
     >
       <div
         slot="navigation"
-        className={clsx("flex *:shrink-0 py-1 px-4 items-center gap-8", {
+        className={clsx("flex *:shrink-0 py-1 px-4 items-center gap-2", {
           "w-[15rem]": visibleMonth === 1,
           "w-[30rem]": visibleMonth === 2,
           "w-[45rem]": visibleMonth === 3,

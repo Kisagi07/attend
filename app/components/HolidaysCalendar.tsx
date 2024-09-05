@@ -1,20 +1,43 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, useState, useEffect, useCallback } from "react";
 import Calendar from "@components/Calendar";
 import { parseDate, CalendarDate } from "@internationalized/date";
+import useSWR from "swr";
+import { fetcher } from "@/app/helper";
+import { holidays } from "@prisma/client";
 
 const HolidaysCalendar: FC = () => {
+  const { data: holidays, isLoading } = useSWR<holidays[]>("/api/holidays", fetcher);
   const [highlightDate, setHightlightDate] = useState<{
     color: "primary";
     dates: CalendarDate[];
   }>({
     color: "primary",
-    dates: [parseDate("2024-09-02")],
+    dates: [],
   });
+
+  const [screenSize, setScreenSize] = useState("sm");
+  const handleScreenChange = useCallback(() => {
+    if (window.innerWidth >= 1280) {
+      setScreenSize("lg");
+    } else if (window.innerWidth >= 768) {
+      setScreenSize("md");
+    } else {
+      setScreenSize("sm");
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleScreenChange);
+    return () => window.removeEventListener("resize", handleScreenChange);
+  }, [handleScreenChange]);
+
   return (
-    <section>
-      <Calendar setDates={highlightDate} />
-      <div className="mt-4 drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] p-4"></div>
+    <section className="flex justify-center">
+      <Calendar
+        setDates={highlightDate}
+        visibleMonth={screenSize === "sm" ? 1 : screenSize === "md" ? 2 : 3}
+      />
     </section>
   );
 };
