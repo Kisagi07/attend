@@ -8,22 +8,31 @@ const totalOvertime = (
 ) => {
   let totalMinutes = 0;
 
-  const parseTimeFromLog = (time: string) => parseTime(time.split("T")[1].split(".")[0]);
+  const parseTimeFromLog = (time: string) =>
+    time.includes("T") ? parseTime(time.split("T")[1].split(".")[0]) : parseTime(time);
 
-  const calculateMinutes = (startTime: string, endTime: string) => {
+  const calculateMinutes = (startTime: string, endTime: string | null) => {
     const start = parseTimeFromLog(startTime);
-    const end = parseTimeFromLog(endTime);
+    const end = endTime ? parseTimeFromLog(endTime) : start;
     return end.compare(start) / 1000 / 60;
   };
 
   logs.forEach((log) => {
-    if (log.isOverTime && log.clock_out_time) {
-      totalMinutes += calculateMinutes(
-        log.clock_in_time as unknown as string,
-        log.clock_out_time as unknown as string
-      );
-    } else if (log.afterHourOvertime && job) {
-      totalMinutes += calculateMinutes(job.shift_end, log.clock_out_time as unknown as string);
+    try {
+      if (log.isOverTime && log.clock_out_time) {
+        totalMinutes += calculateMinutes(
+          log.clock_in_time as unknown as string,
+          log.clock_out_time as unknown as string
+        );
+      } else if (log.afterHourOvertime && job) {
+        totalMinutes += calculateMinutes(
+          job.shift_end,
+          log.clock_out_time as unknown as string | null
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      console.log({ log, job });
     }
   });
 
