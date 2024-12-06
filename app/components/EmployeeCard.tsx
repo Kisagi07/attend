@@ -181,9 +181,9 @@ const EmployeeCard: FC<Props> = ({
     };
   }, [attendances, holidays, company, user, date, leaveRequest]);
 
-  const overtimeHours = useMemo<number>(() => {
+  const overtimeAmount = useMemo<{ hour: number; minute: number }>(() => {
     const overtime = attendances.filter((work) => work.isOverTime || work.afterHourOvertime);
-    const totalHourOvertime = totalOvertime(overtime, user.job_position, { unit: "hour" });
+    const totalHourOvertime = totalOvertime(overtime, user.job_position);
     return totalHourOvertime;
   }, [attendances, user.job_position]);
 
@@ -191,9 +191,11 @@ const EmployeeCard: FC<Props> = ({
     switch (todayStatus) {
       case "work_from_office":
         return "secondary";
-      case "absent" || "work_with_duty":
+      case "work_with_duty":
+      case "absent":
         return "danger";
-      case "work_from_home" || "holiday":
+      case "holiday":
+      case "work_from_home":
         return "success";
       case "sick":
         return "primary";
@@ -238,7 +240,8 @@ const EmployeeCard: FC<Props> = ({
               {calculated.totalWorkFromOffice} hari kerja dari kantor
             </Chip>
             <Chip size="sm" variant="dot" color="success">
-              {overtimeHours} jam overtime
+              {/* {overtimeAmount.amount} {overtimeAmount.type === "minutes" ? "menit" : "jam"} overtime */}
+              {overtimeAmount.hour} jam {overtimeAmount.minute} menit overtime
             </Chip>
           </div>
           <Link
