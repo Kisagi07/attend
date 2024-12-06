@@ -1,11 +1,7 @@
 import { logs as Log, job_positions as JobPosition } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
 
-const totalOvertime = (
-  logs: Log[],
-  job: JobPosition | null,
-  { unit }: { unit: "hour" | "minutes" } = { unit: "minutes" }
-) => {
+const totalOvertime = (logs: Log[], job: JobPosition | null) => {
   let totalMinutes = 0;
 
   const parseTimeFromLog = (time: string) =>
@@ -36,7 +32,8 @@ const totalOvertime = (
     }
   });
 
-  return unit === "hour" ? totalMinutes / 60 : totalMinutes;
+  const minuteReminder = Math.trunc(totalMinutes % 60);
+  return { hour: Math.trunc(totalMinutes / 60), minute: minuteReminder };
 };
 
 export default totalOvertime;
