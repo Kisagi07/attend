@@ -64,11 +64,13 @@ const VisitChart = () => {
     }
   }, [chartData]);
   return (
-    <section className="h-80 md:col-span-2 space-y-2">
+    <div className="h-80 md:col-span-2 flex flex-col gap-2">
       <h1 className="text-xl uppercase font-semibold">Visit by Month</h1>
       <hr />
-      {chartDataLoading ? <VerticalChartSkeleton /> : <Bar options={options} data={data} />}
-    </section>
+      <div className="relative flex-1">
+        {chartDataLoading ? <VerticalChartSkeleton /> : <Bar options={options} data={data} />}
+      </div>
+    </div>
   );
 };
 export default VisitChart;
