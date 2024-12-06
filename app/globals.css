@@ -34,7 +34,7 @@ body {
 
 @layer base {
   main > section {
-    @apply space-y-4 px-4;
+    @apply px-4;
   }
 }
 

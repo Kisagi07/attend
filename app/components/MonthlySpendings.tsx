@@ -81,7 +81,24 @@ const MonthlySpendings = () => {
       <Spinner color="primary" />
     </div>
   ) : (
-    <Line data={lineData} options={options} />
+    <div className="relative w-full">
+      <Line
+        data={lineData}
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top" as const,
+            },
+            title: {
+              display: true,
+              text: "Monthly Spending",
+            },
+          },
+        }}
+      />
+    </div>
   );
 };
 export default MonthlySpendings;
