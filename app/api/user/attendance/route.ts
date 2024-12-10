@@ -191,6 +191,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const session = await auth();
+  const searchParams = req.nextUrl.searchParams;
+  const date = searchParams.get("date") as string;
 
   if (!session)
     return NextResponse.json(
@@ -217,10 +219,11 @@ export async function GET(req: NextRequest) {
         status: 404,
       }
     );
-  const jakartaDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
+  const todayDate = new Date(date);
+  console.log(todayDate);
   const logs = await prisma.logs.findMany({
     where: {
-      date: jakartaDate,
+      date: todayDate,
       user_id: user.id,
     },
   });

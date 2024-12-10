@@ -13,6 +13,7 @@ import { Button, ButtonGroup } from "@nextui-org/button";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
 import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@nextui-org/skeleton";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 
@@ -27,7 +28,10 @@ const ClockInOut = () => {
     data: todayAttendance,
     isLoading,
     mutate: mutateAttendance,
-  } = useSWR<logs>("/api/user/attendance", fetcher);
+  } = useSWR<logs>(
+    `/api/user/attendance?date=${today(getLocalTimeZone()).toDate(getLocalTimeZone())}`,
+    fetcher
+  );
   const { data: company, isLoading: companyLoading } = useSWR<company>(`/api/company`, fetcher);
   const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(`/api/user`, fetcher, {
     refreshInterval: 1000,
@@ -113,7 +117,7 @@ const ClockInOut = () => {
       // #region //? rejection check
       // if distance is more than 50m and not sick or work with duty then warned user then return
       if (
-        distance > 50 &&
+        distance > 100 &&
         selectedButtonValue !== "sick" &&
         selectedButtonValue !== "work_with_duty"
       ) {
