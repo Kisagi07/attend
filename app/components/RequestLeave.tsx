@@ -2,8 +2,9 @@
 import { Input } from "@nextui-org/input";
 import { DatePicker, DateRangePicker } from "@nextui-org/date-picker";
 import { Button } from "@nextui-org/button";
-import { today, getLocalTimeZone } from "@internationalized/date";
+import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import React from "react";
+import { RangeValue } from "@nextui-org/calendar";
 const RequestLeave = () => {
   const [alert, setAlert] = React.useState({
     error: "",
@@ -13,7 +14,7 @@ const RequestLeave = () => {
 
   const [reason, setReason] = React.useState<string>("");
   const [comment, setComment] = React.useState<string>("");
-  const [dateRange, setDateRange] = React.useState({
+  const [dateRange, setDateRange] = React.useState<RangeValue<CalendarDate> | null>({
     start: today(getLocalTimeZone()),
     end: today(getLocalTimeZone()),
   });
@@ -24,7 +25,7 @@ const RequestLeave = () => {
     e.preventDefault();
 
     // validate all value is not empty
-    if (!reason || !comment || !dateRange.start || !dateRange.end) {
+    if (!reason || !comment || !dateRange) {
       setAlert({ error: "All fields are required", success: "" });
       return;
     }

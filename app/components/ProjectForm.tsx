@@ -124,7 +124,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ users, defaultValue }) => {
   const handleLeaderChange = (value: Selection) => {
     value = value as Set<Key>;
     if (value.size > 0) {
-      removeLeaderFromMembers(value.values().next().value);
+      for (const leader of value) {
+        removeLeaderFromMembers(leader.toString());
+      }
     }
     setLead(value);
   };
