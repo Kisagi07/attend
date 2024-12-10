@@ -1,6 +1,4 @@
 "use client";
-import { FaHome } from "react-icons/fa";
-import { InputText } from "./";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import clsx from "clsx";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -8,6 +6,8 @@ import useSWR, { Fetcher } from "swr";
 import { debounce } from "../helper";
 import { users } from "@prisma/client";
 import { Spinner } from "@nextui-org/spinner";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
 
 const fetcher: Fetcher<users, string> = (...args) => fetch(...args).then((res) => res.json());
 
@@ -122,18 +122,18 @@ const HomeCoordinate = () => {
         className={clsx(`h-full space-y-4 overflow-hidden rounded border-gray-300 transition-all`)}
       >
         <div className="flex items-start justify-between">
-          <button className="p-4 text-black" onClick={getPosition}>
+          <Button onClick={getPosition} isIconOnly>
             <FaLocationCrosshairs />
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-2 gap-x-2">
-          <InputText
-            onChange={(value) => latitudeChanged(value)}
+          <Input
+            onValueChange={(value) => latitudeChanged(value)}
             label="Latitude"
             value={`${latitude}`}
           />
-          <InputText
-            onChange={(value) => longitudeChanged(value)}
+          <Input
+            onValueChange={(value) => longitudeChanged(value)}
             label="Longitude"
             value={`${longitude}`}
           />

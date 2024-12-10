@@ -3,7 +3,6 @@ import React from "react";
 import useSWR from "swr";
 import { fetcher } from "../helper";
 import { Spinner } from "@nextui-org/spinner";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { ProjectWithLeadAndMembers, ProjectWithMembers } from "../prisma";
 import HomeProjectLeading from "./HomeProjectLeading";
