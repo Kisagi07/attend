@@ -40,7 +40,7 @@ const FoodAndDrinkCostForm = (
   }
 
   const [cost, setCost] = useState(defaultValue?.cost ?? "Rp. 0");
-  const [today, setToday] = useState<ZonedDateTime>();
+  const [today, setToday] = useState<ZonedDateTime | null>(null);
 
   const { handleSubmit, validated, errors, isSubmitting } = useForm(
     {

@@ -7,12 +7,12 @@ import { IoIosRemoveCircle } from "react-icons/io";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { DatePicker } from "@nextui-org/date-picker";
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 
 const CompanyHoliday: React.FC = () => {
   const { data, isLoading, mutate } = useSWR<holidays[]>("/api/holidays", fetcher);
 
-  const [date, setDate] = React.useState(today(getLocalTimeZone()));
+  const [date, setDate] = React.useState<CalendarDate | null>(today(getLocalTimeZone()));
   const [holidayName, setHolidayName] = React.useState<string>("");
   const [sending, setSending] = React.useState<boolean>(false);
   const [deleting, setDeleting] = React.useState<boolean>(false);

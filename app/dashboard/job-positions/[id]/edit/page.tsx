@@ -13,8 +13,8 @@ import { Button } from "@nextui-org/button";
 const JobEditPage = ({ params }: { params: { id: number } }) => {
   const router = useRouter();
   const [name, setName] = useState<string>("");
-  const [shiftStart, setShiftStart] = useState<Time | undefined>();
-  const [shiftEnd, setShiftEnd] = useState<Time | undefined>();
+  const [shiftStart, setShiftStart] = useState<Time | null>(null);
+  const [shiftEnd, setShiftEnd] = useState<Time | null>(null);
   const [salary, setSalary] = useState<string>("Rp.0");
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -92,8 +92,8 @@ const JobEditPage = ({ params }: { params: { id: number } }) => {
   };
   const resetForm = () => {
     setName("");
-    setShiftStart(undefined);
-    setShiftEnd(undefined);
+    setShiftStart(null);
+    setShiftEnd(null);
   };
   const handleSalaryChange = (value: string) => {
     const clean: number = parseInt(value.match(/\d+/g)?.join("") || "0");

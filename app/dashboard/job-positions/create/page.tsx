@@ -11,8 +11,8 @@ import { Button } from "@nextui-org/button";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
   const [salary, setSalary] = useState<string>("Rp.0");
-  const [shiftStart, setShiftStart] = useState<undefined | Time>();
-  const [shiftEnd, setShiftEnd] = useState<undefined | Time>();
+  const [shiftStart, setShiftStart] = useState<null | Time>(null);
+  const [shiftEnd, setShiftEnd] = useState<null | Time>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [workDay, setWorkDay] = useState<string>("");
@@ -78,8 +78,8 @@ const JobCreatePage = () => {
   };
   const resetForm = () => {
     setName("");
-    setShiftStart(undefined);
-    setShiftEnd(undefined);
+    setShiftStart(null);
+    setShiftEnd(null);
   };
   const handleSalaryChange = (value: string) => {
     const clean: number = parseInt(value.match(/\d+/g)?.join("") || "0");
