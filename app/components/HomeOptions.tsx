@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
+import { Tabs, Tab } from "@nextui-org/tabs";
 import HomeCoordinate from "./HomeCoordinate";
 import { FaHome } from "react-icons/fa";
 import { VscGithubProject } from "react-icons/vsc";
@@ -8,22 +8,30 @@ import HomeProjects from "./HomeProjects";
 
 const HomeOptions = () => {
   return (
-    <Accordion>
-      <AccordionItem
-        aria-label="Home Coordinate"
-        title="Home Coordinate"
-        startContent={<FaHome className="w-6 h-6 text-blue-600" />}
+    <Tabs aria-label="options" color="primary" variant="underlined">
+      <Tab
+        key="home-coordinate"
+        title={
+          <div className="flex items-center gap-2">
+            <FaHome className="size-4" />
+            <span>Home Coordinate</span>
+          </div>
+        }
       >
         <HomeCoordinate />
-      </AccordionItem>
-      <AccordionItem
-        aria-label="Projects"
-        title="Projects"
-        startContent={<VscGithubProject className="w-6 h-6 text-violet-600" />}
+      </Tab>
+      <Tab
+        key="projects"
+        title={
+          <div className="flex items-center gap-2">
+            <VscGithubProject className="size-4" />
+            <span>Projects</span>
+          </div>
+        }
       >
         <HomeProjects />
-      </AccordionItem>
-    </Accordion>
+      </Tab>
+    </Tabs>
   );
 };
 

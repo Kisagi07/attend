@@ -3,7 +3,7 @@ import React from "react";
 import useSWR from "swr";
 import { fetcher } from "../helper";
 import { Spinner } from "@nextui-org/spinner";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
+import { Tabs, Tab } from "@nextui-org/tabs";
 import { ProjectWithLeadAndMembers, ProjectWithMembers } from "../prisma";
 import HomeProjectLeading from "./HomeProjectLeading";
 import { Chip } from "@nextui-org/chip";
@@ -29,15 +29,15 @@ const HomeProjects = () => {
     </div>
   ) : (
     <section>
-      <Accordion>
-        <AccordionItem title="Projects You Lead">
+      <Tabs aria-label="projects" color="secondary" variant="light">
+        <Tab key="lead-project" title="Project You Lead">
           <div className="space-y-4">
             {data?.projectLeading.map((project) => (
               <HomeProjectLeading project={project} key={project.id} />
             ))}
           </div>
-        </AccordionItem>
-        <AccordionItem title="Members of Projects">
+        </Tab>
+        <Tab key="memberofproject" title="Member Project">
           {data?.projectMembersOf.map((project) => (
             <article key={project.id} className="shadow-md p-2 border border-slate-100 space-y-2">
               <div className="flex justify-between">
@@ -95,8 +95,8 @@ const HomeProjects = () => {
               </Tooltip>
             </article>
           ))}
-        </AccordionItem>
-      </Accordion>
+        </Tab>
+      </Tabs>
     </section>
   );
 };
