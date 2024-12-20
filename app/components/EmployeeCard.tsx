@@ -2,7 +2,7 @@
 import { FC, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { company, holidays, logs, DayOffRequest } from "@prisma/client";
+import { company, holidays, logs, DayOffRequest, logs_type } from "@prisma/client";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
 import totalOvertime from "@helper/totalOvertime";
@@ -20,6 +20,14 @@ interface Props {
   date: Date;
 }
 
+interface Calculated {
+  todayStatus: logs_type | "weekend" | "holiday" | "complete" | "absent";
+  totalWorkFromOffice: number;
+  totalWorkFromHome: number;
+  totalLate: number;
+  totalAbsent: number;
+}
+
 const EmployeeCard: FC<Props> = ({
   user,
   attendances,
@@ -33,13 +41,9 @@ const EmployeeCard: FC<Props> = ({
     fetcher
   );
 
-  const extractTime = (time: Date | string): Time => {
-    return parseTime(time.toString().split("T")[1].split(".")[0]);
-  };
-
-  const calculated = useMemo(() => {
+  const calculated: Calculated = useMemo<Calculated>(() => {
     // Initialize status
-    let todayStatus = "absent";
+    let todayStatus: Calculated["todayStatus"] = "absent";
     const today = new Date();
     const passedDate = new Date(date);
     const passedDateString = passedDate.toLocaleDateString();
@@ -75,7 +79,7 @@ const EmployeeCard: FC<Props> = ({
 
     // calculate totalWofkFromOffice (include work_with_duty)
     const workFromOffice = attendances.filter(
-      (log) => log.type === "work_with_duty" || log.type === "work_from_office"
+      (log) => log.type === "special_attendance" || log.type === "work_from_office"
     );
     const workFromHome = attendances.filter((log) => log.type === "work_from_home");
 
@@ -187,11 +191,11 @@ const EmployeeCard: FC<Props> = ({
     return totalHourOvertime;
   }, [attendances, user.job_position]);
 
-  const getColor = (todayStatus: string) => {
+  const getColor = (todayStatus: Calculated["todayStatus"]) => {
     switch (todayStatus) {
+      case "special_attendance":
       case "work_from_office":
         return "secondary";
-      case "work_with_duty":
       case "absent":
         return "danger";
       case "holiday":
