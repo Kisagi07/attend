@@ -138,9 +138,7 @@ const ClockInOut = () => {
       if (
         status.isLate &&
         !lateReason &&
-        (selectedButtonValue === "work_from_home" ||
-          selectedButtonValue === "work_from_office" ||
-          selectedButtonValue === "special_attendance") &&
+        (selectedButtonValue === "work_from_home" || selectedButtonValue === "work_from_office") &&
         isWorkDay
       ) {
         toast.error("You need to fill reason for being late");
@@ -369,21 +367,25 @@ const ClockInOut = () => {
     </Button>
   ) : (
     <>
-      {status.isLate && !status.clockIn && isWorkDay && selectedButtonValue !== "sick" && (
-        <>
-          <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
-            You are late! hurry up!
-          </div>
-          <Input
-            label="State your reason for coming in late"
-            color="danger"
-            variant="underlined"
-            name="late-reason"
-            value={lateReason}
-            onValueChange={setLateReason}
-          />
-        </>
-      )}
+      {status.isLate &&
+        !status.clockIn &&
+        isWorkDay &&
+        selectedButtonValue !== "sick" &&
+        selectedButtonValue !== "special_attendance" && (
+          <>
+            <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
+              You are late! hurry up!
+            </div>
+            <Input
+              label="State your reason for coming in late"
+              color="danger"
+              variant="underlined"
+              name="late-reason"
+              value={lateReason}
+              onValueChange={setLateReason}
+            />
+          </>
+        )}
       {status.clockIn && !status.done && (
         <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
