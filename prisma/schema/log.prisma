@@ -23,6 +23,5 @@ enum logs_type {
   work_from_home     @map("work-from-home")
   sick
   work_from_office   @map("work-from-office")
-  work_with_duty
   special_attendance @map("special-attendance")
 }
