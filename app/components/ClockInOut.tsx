@@ -5,7 +5,7 @@ import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
-import { logs, company } from "@prisma/client";
+import { logs, company, logs_type } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { Input } from "@nextui-org/input";
 import { UserWithJob } from "../prisma";
@@ -43,7 +43,7 @@ const ClockInOut = () => {
     new Set(["work_from_office"])
   );
   const selectedButtonValue = Array.from(selectedButton)[0];
-  const showDuty = selectedButtonValue === "work_with_duty";
+  const showSpecialReason = (selectedButtonValue as logs_type) === "special_attendance";
   const [status, setStatus] = useState({
     clockIn: false,
     done: false,
@@ -53,7 +53,7 @@ const ClockInOut = () => {
   });
   const [sending, setSending] = useState<boolean>(false);
   const [todaysWork, setTodaysWork] = useState<string[]>([]);
-  const [duty, setDuty] = useState<string>("");
+  const [specialReason, setSpecialReason] = useState<string>("");
   const [lateReason, setLateReason] = useState<string>("");
   const [time, setTime] = useState(0);
   const isWorkDay = useMemo(() => {
@@ -89,8 +89,8 @@ const ClockInOut = () => {
           label: "Work From Office",
           color: "secondary",
         },
-        work_with_duty: {
-          label: "Work With Duty",
+        special_attendance: {
+          label: "Special Attendance",
           color: "primary",
         },
         sick: {
@@ -119,7 +119,7 @@ const ClockInOut = () => {
       if (
         distance > 100 &&
         selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "work_with_duty"
+        selectedButtonValue !== "special_atteandance"
       ) {
         toast.error(` You are ${distance - 50} meter too far from location!`);
         return;
@@ -130,8 +130,8 @@ const ClockInOut = () => {
         return;
       }
       // if work with duty but duty is not filled then warned user then return
-      if (selectedButtonValue === "work_with_duty" && !duty) {
-        toast.error("You need to fill duty in order to clockin");
+      if (selectedButtonValue === "special_attendance" && !specialReason) {
+        toast.error("You need to fill reason in order to clockin");
         return;
       }
       // if user is late but reason for late is not filled then warned user then return
@@ -140,7 +140,7 @@ const ClockInOut = () => {
         !lateReason &&
         (selectedButtonValue === "work_from_home" ||
           selectedButtonValue === "work_from_office" ||
-          selectedButtonValue === "work_with_duty") &&
+          selectedButtonValue === "special_attendance") &&
         isWorkDay
       ) {
         toast.error("You need to fill reason for being late");
@@ -226,8 +226,8 @@ const ClockInOut = () => {
       sendData["clock_in_latitude"] = latitude;
       sendData["clock_in_longitude"] = longitude;
     }
-    if (type === "work_with_duty") {
-      sendData["todaysWork"] = ["Duty: " + duty, ...sendData["todaysWork"]];
+    if (type === "special_attendance") {
+      sendData["todaysWork"] = ["Reason: " + specialReason, ...sendData["todaysWork"]];
     }
     if (status.isLate && type !== "clock-out") {
       sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
@@ -240,7 +240,6 @@ const ClockInOut = () => {
           "Content-Type": "application/json",
         },
       });
-      const data = await res.json();
       mutateAttendance();
       setStatus((prev) => ({ ...prev, clockin: true }));
     } catch (error) {
@@ -388,12 +387,12 @@ const ClockInOut = () => {
       {status.clockIn && !status.done && (
         <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
       )}
-      {showDuty && (
+      {showSpecialReason && (
         <Input
           variant="underlined"
-          label="Duty"
-          value={duty}
-          onChange={(e) => setDuty(e.currentTarget.value)}
+          label="Reason"
+          value={specialReason}
+          onChange={(e) => setSpecialReason(e.currentTarget.value)}
         />
       )}
       <ButtonGroup variant="flat" fullWidth>
