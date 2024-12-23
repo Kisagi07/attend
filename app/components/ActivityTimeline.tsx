@@ -88,7 +88,12 @@ const ActivityTimeline = () => {
                     timeline.title.includes("Clock Out") ? (
                       <>
                         {timeline.description.split("at")[0]} at{" "}
-                        <span className="text-lime-400">{timeline.description.split("at")[1]}</span>
+                        <span className="text-emerald-500">
+                          {timeline.description.split("at")[1].split(",")[0]}
+                        </span>
+                        {timeline.description.includes("special reason") && (
+                          <span>{timeline.description.split(",").slice(1).join(", ")}</span>
+                        )}
                       </>
                     ) : timeline.title.includes("Working on") ? (
                       <>

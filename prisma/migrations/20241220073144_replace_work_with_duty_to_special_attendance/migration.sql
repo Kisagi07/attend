@@ -1,0 +1,1 @@
+UPDATE logs SET type = 'special-attendance' WHERE type = 'work_with_duty';

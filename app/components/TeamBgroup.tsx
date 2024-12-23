@@ -43,13 +43,6 @@ const TeamBgroup = () => {
             <CardSkeleton />
           </>
         ) : (
-          // <EmployeeCard
-          //   attendances={attendances?.filter((log) => log.user_id === 5) ?? []}
-          //   key={5}
-          //   user={users?.find((user) => user.id === 5)!}
-          //   holidays={holidays!}
-          //   date={date}
-          // />
           users
             ?.filter((user) => user.role === "employee")
             .map((user) => (
