@@ -25,7 +25,7 @@ export default async function RootLayout({
   const maintenance = process.env.MAINTENANCE_MODE;
 
   if (maintenance === "on") {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const key = cookieStore.get("maintenance_key") || { value: "" };
     if (key.value !== process.env.MAINTENANCE_KEY) {
       return (

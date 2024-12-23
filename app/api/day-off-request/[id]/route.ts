@@ -3,7 +3,8 @@ import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
 import prisma from "@/app/prisma";
 
-const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
+const GET = async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
   // authorize user
   const session = await auth();
   if (!session) {

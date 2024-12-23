@@ -17,7 +17,8 @@ const changeExRole = async (
   return updatedUser;
 };
 
-export async function GET(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+  const params = await props.params;
   const searchParams = req.nextUrl.searchParams;
   const monthlyStatus = searchParams.has("monthly-status");
 
@@ -49,7 +50,8 @@ export async function GET(req: NextRequest, { params }: { params: { work_id: str
   return NextResponse.json(user);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+  const params = await props.params;
   const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
@@ -81,7 +83,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { work_id: 
   return NextResponse.json({ message: "Deleted", data: { deleted } });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+  const params = await props.params;
   const { name, job_position_id, gender, role, password, toEx, unEx } = await req.json();
 
   let user = await prisma.users.findFirst({

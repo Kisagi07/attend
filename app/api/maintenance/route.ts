@@ -5,7 +5,7 @@ const POST = async (req: NextRequest) => {
   const { key } = await req.json();
 
   if (key === process.env.MAINTENANCE_KEY) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.set("maintenance_key", key, {
       maxAge: 60 * 60 * 24,
     });
@@ -26,7 +26,7 @@ const POST = async (req: NextRequest) => {
 };
 
 const GET = async (req: NextRequest) => {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const key = cookieStore.get("maintenance_key");
   if (key) {
     return NextResponse.json(

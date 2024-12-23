@@ -20,10 +20,8 @@ const checkIfAllIdsExists = async (numbers: number[]): Promise<boolean> => {
   return allRecords.length === numbers.length;
 };
 
-const GET = async (
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> => {
+const GET = async (req: NextRequest, props: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+  const params = await props.params;
   // authorized
 
   if (!(await authorized())) {

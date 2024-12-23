@@ -4,10 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import "@/initExtension";
 import { storeFile } from "@/app/file";
 
-const POST = async (
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> => {
+const POST = async (req: NextRequest, props: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+  const params = await props.params;
   // authorizew
   const session = await auth();
   if (!session) {

@@ -1,6 +1,6 @@
 "use client";
 import InputText from "@/app/components/InputText";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import JobFormSkeleton from "@/app/skeletons/JobFormSkeleton";
@@ -10,7 +10,8 @@ import { Input } from "@nextui-org/input";
 import { TimeInput } from "@nextui-org/date-input";
 import { parseTime, Time } from "@internationalized/date";
 import { Button } from "@nextui-org/button";
-const JobEditPage = ({ params }: { params: { id: number } }) => {
+const JobEditPage = (props: { params: Promise<{ id: number }> }) => {
+  const params = use(props.params);
   const router = useRouter();
   const [name, setName] = useState<string>("");
   const [shiftStart, setShiftStart] = useState<Time | null>(null);

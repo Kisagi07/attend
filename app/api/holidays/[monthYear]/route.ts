@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/app/prisma";
 
-const GET = async (req: NextRequest, { params }: { params: { monthYear: string } }) => {
+const GET = async (req: NextRequest, props: { params: Promise<{ monthYear: string }> }) => {
+  const params = await props.params;
   const [month, year] = params.monthYear.split("-").map(Number);
   if (!year) {
     return NextResponse.json("Year are needed", { status: 422 });

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
 import { Spinner } from "@nextui-org/spinner";
@@ -12,17 +12,18 @@ import ProjectDetailMembers from "@/app/components/ProjectDetailMembers";
 import ProjectDetailLead from "@/app/components/ProjectDetailLead";
 import ProjectHistories from "@/app/components/ProjectHistories";
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const Page = (props: Props) => {
+  const params = use(props.params);
   const {
     data: project,
     isLoading,
     error,
-  } = useSWR<ProjectResult>(`/api/projects/${props.params.id}`, fetcher, {
+  } = useSWR<ProjectResult>(`/api/projects/${params.id}`, fetcher, {
     refreshInterval: 1000,
   });
   if ((error && error.status === 404) || (!isLoading && !project)) {

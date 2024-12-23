@@ -3,8 +3,9 @@ import { NextResponse, NextRequest } from "next/server";
 
 const GET = async (
   req: NextRequest,
-  { params }: { params: { monthYear: string; work_id: string } }
+  props: { params: Promise<{ monthYear: string; work_id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   const user = await prisma.users.findFirst({
     where: {
       work_id: params.work_id,
