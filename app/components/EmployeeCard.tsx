@@ -77,7 +77,7 @@ const EmployeeCard: FC<Props> = ({
       todayStatus = "holiday";
     }
 
-    // calculate totalWofkFromOffice (include work_with_duty)
+    // calculate totalWofkFromOffice (include special_attendance)
     const workFromOffice = attendances.filter(
       (log) => log.type === "special_attendance" || log.type === "work_from_office"
     );
@@ -91,7 +91,7 @@ const EmployeeCard: FC<Props> = ({
     jobStartTime = jobStartTime.add({ minutes: company?.tolerance_time ?? 0 });
     // filter late work
     late = attendances.filter((work) => {
-      if (work.type === "sick" || work.isOverTime) {
+      if (work.type === "sick" || work.isOverTime || work.type === "special_attendance") {
         return false;
       }
       // parse the time

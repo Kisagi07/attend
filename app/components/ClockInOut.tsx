@@ -145,7 +145,6 @@ const ClockInOut = () => {
         return;
       }
       // #endregion //? rejection check
-
       // ? next operation
       if (selectedButtonValue === "sick") {
         await sendSickDay({ type: selectedButtonValue, latitude, longitude });
@@ -227,7 +226,7 @@ const ClockInOut = () => {
     if (type === "special_attendance") {
       sendData["todaysWork"] = ["Reason: " + specialReason, ...sendData["todaysWork"]];
     }
-    if (status.isLate && type !== "clock-out") {
+    if (status.isLate && type !== "clock-out" && type !== "special_attendance") {
       sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
     }
     try {

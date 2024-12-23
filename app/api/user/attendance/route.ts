@@ -2,8 +2,21 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-import { Prisma, logs as Log } from "@prisma/client";
+import { Prisma, logs as Log, logs_type } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
+
+interface PostJson {
+  type: logs_type | "clock-out";
+  clock_in_time: string;
+  date: string;
+  clock_in_latitude: string;
+  clock_in_longitude: string;
+  todaysWork: string[];
+  clock_out_time: string;
+  clock_out_latitude: string;
+  clock_out_longitude: string;
+  isOverTime: boolean;
+}
 
 export async function POST(req: NextRequest) {
   const {
@@ -17,7 +30,7 @@ export async function POST(req: NextRequest) {
     clock_out_latitude,
     clock_out_longitude,
     isOverTime,
-  } = await req.json();
+  }: PostJson = await req.json();
 
   // #region //? session authentication
   const session = await auth();
@@ -123,7 +136,7 @@ export async function POST(req: NextRequest) {
     const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
     log = await prisma.logs.create({
       data: {
-        type: type.replaceAll("-", "_"),
+        type: type.replaceAll("-", "_") as logs_type,
         clock_in_time: clock_in_time_object,
         date: new Date(date),
         clock_in_latitude,
@@ -143,10 +156,14 @@ export async function POST(req: NextRequest) {
         },
       });
     } else {
+      let description = `${user.name} has clocked in at ${clock_in_time}`;
+      if (type === "special_attendance") {
+        description += `, with special ${todaysWork[0].replace("Reason", "reason")}`;
+      }
       await prisma.timelines.create({
         data: {
           title: `${user.name} Attendance: ${log.type.replaceAll("_", " ")}`,
-          description: `${user.name} has clocked in at ${clock_in_time}`,
+          description,
           type: "new",
         },
       });
@@ -220,7 +237,6 @@ export async function GET(req: NextRequest) {
       }
     );
   const todayDate = new Date(date);
-  console.log(todayDate);
   const logs = await prisma.logs.findMany({
     where: {
       date: todayDate,
