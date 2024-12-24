@@ -47,11 +47,6 @@ const nextConfig = {
       },
     ];
   },
-  modularizeImports: {
-    "react-icons/(?<lib>[^/]+)": {
-      transform: "react-icons/{{lib}}/{{member}}",
-    },
-  },
 };
 
 export default nextConfig;
