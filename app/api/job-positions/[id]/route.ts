@@ -2,7 +2,8 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: number } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: number }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session) return NextResponse.json("Unauthorized", { status: 401 });
 
@@ -38,7 +39,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: number }
   return NextResponse.json(jobPosition);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const jobPosition = await prisma.job_positions.findFirst({
     where: { id: Number(params.id) },
   });
@@ -59,7 +61,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   return NextResponse.json({ message: "Job position deleted" });
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: number } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: number }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session) {
     return NextResponse.json("Unauthorized", { status: 401 });

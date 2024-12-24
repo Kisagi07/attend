@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
 import { Spinner } from "@nextui-org/spinner";
@@ -15,17 +15,18 @@ import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const Page = (props: Props) => {
+  const params = use(props.params);
   const {
     data: project,
     isLoading,
     error,
-  } = useSWR<ProjectResult>(`/api/projects/${props.params.id}`, fetcher, {
+  } = useSWR<ProjectResult>(`/api/projects/${params.id}`, fetcher, {
     refreshInterval: 1000,
   });
   if ((error && error.status === 404) || (!isLoading && !project)) {

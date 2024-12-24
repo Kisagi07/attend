@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use } from "react";
 import ProjectForm from "@/app/components/ProjectForm";
 import { fetcher } from "@/app/helper";
 import { ProjectWithLeadWithJobAndMembers } from "@/app/prisma";
@@ -8,12 +8,13 @@ import { users } from "@prisma/client";
 import useSWR from "swr";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-const Page: React.FC<PageProps> = ({ params }) => {
+const Page: React.FC<PageProps> = (props) => {
+  const params = use(props.params);
   const {
     data: project,
     isLoading,

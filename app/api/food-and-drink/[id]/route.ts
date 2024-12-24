@@ -6,8 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 const GET = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
       id: Number(params.id),
@@ -22,8 +23,10 @@ const GET = async (
 
 const PUT = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
+
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
       id: Number(params.id),
@@ -57,8 +60,10 @@ const PUT = async (
 
 const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
+
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
       id: Number(params.id),
