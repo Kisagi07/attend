@@ -8,12 +8,12 @@ import { users } from "@prisma/client";
 import useSWR from "swr";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-const Page: React.FC<PageProps> = props => {
+const Page: React.FC<PageProps> = (props) => {
   const params = use(props.params);
   const {
     data: project,
