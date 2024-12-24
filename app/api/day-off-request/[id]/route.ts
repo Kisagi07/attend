@@ -26,7 +26,9 @@ const GET = async (req: NextRequest, props: { params: Promise<{ id: string }> })
   return NextResponse.json(dayOffRequests);
 };
 
-const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
+const PUT = async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
+
   // authorize user
   const session = await auth();
   if (!session) {
@@ -69,7 +71,8 @@ const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => 
   return NextResponse.json({ message: "Updated", data: updatedDayOffRequest });
 };
 
-const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
+const DELETE = async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
   // authorize user
   const session = await auth();
   if (!session) {

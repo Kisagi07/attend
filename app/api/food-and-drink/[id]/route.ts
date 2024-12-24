@@ -4,7 +4,10 @@ import { parseZonedDateTime } from "@internationalized/date";
 import { DrinkAndFoodCostCategory } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-const GET = async (req: NextRequest, props: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+const GET = async (
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+): Promise<NextResponse> => {
   const params = await props.params;
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
@@ -20,8 +23,10 @@ const GET = async (req: NextRequest, props: { params: Promise<{ id: string }> })
 
 const PUT = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
+
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
       id: Number(params.id),
@@ -55,8 +60,10 @@ const PUT = async (
 
 const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
+
   const foodDrinkCost = await prisma.drinkAndFoodCost.findFirst({
     where: {
       id: Number(params.id),
