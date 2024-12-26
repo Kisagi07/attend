@@ -30,7 +30,7 @@ const GET = async (req: NextRequest) => {
   const company = await prisma.company.findFirst();
   const tolerance = company?.tolerance_time ?? 0;
   // score to determine the best employee
-  let score: Record<string, number> = {};
+  let score: Record<string, Record<string, number>> = {};
   let devi = null;
   // iterate over users
   users.forEach((user) => {
@@ -48,6 +48,8 @@ const GET = async (req: NextRequest) => {
       const shiftStart = parseTime(user.job_position.shift_start);
       // add company tolerance time to shiftStart
       const shiftStartTolerance = shiftStart.add({ minutes: tolerance });
+      // total late
+      let totalLate = 0;
       // iterate logs
       logs.forEach((log) => {
         // get log clock_in_time as string with format `HH:mm:ss` from date string
@@ -60,16 +62,34 @@ const GET = async (req: NextRequest) => {
         // if isLate is true then decrease initialScore
         if (isLate) {
           initialScore -= 1;
+          totalLate++;
         }
       });
-      // set user score
-      score[user.name!] = initialScore;
+      // only work from home logs
+      const workFromHome = logs.filter((log) => log.type === "work_from_home");
+      // set user score and its needed properties
+      if (score[user.name!]) {
+        score[user.name!]["score"] = initialScore;
+        score[user.name!]["totalLate"] = totalLate;
+        score[user.name!]["workFromHome"] = workFromHome.length;
+        score[user.name!]["attendances"] = logs.length;
+      } else {
+        score[user.name!] = {
+          score: initialScore,
+          totalLate: totalLate,
+          workFromHome: workFromHome.length,
+            attendances: logs.length,
+        };
+      }
     }
   });
-  // get the highest score user
-  const bestEmployee = Object.keys(score).reduce((a, b) =>
-    score[a] > score[b] ? a : b
-  );
+  // get the user with the highest score along with its properties
+  const bestEmployee = Object.entries(score).reduce((acc, curr) => {
+    if (acc[1].score < curr[1].score) {
+      return curr;
+    }
+    return acc;
+  });
 
   // return
   return NextResponse.json(bestEmployee);
