@@ -22,7 +22,9 @@ export default auth(async function middleware(req) {
       }
     } else if (!isLoginRoute && !isApiRoute) {
       const pathToGo = req.nextUrl.pathname;
-      return NextResponse.redirect(new URL(`/login?callbackUrl=${pathToGo}`, origin));
+      return NextResponse.redirect(
+        new URL(`/login?callbackUrl=${pathToGo}`, origin)
+      );
     }
   }
 
