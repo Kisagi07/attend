@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/prisma";
 import { fromDate, parseDate, parseTime } from "@internationalized/date";
+import calculateLateInLogs from "@/app/helper/calculateLate";
 
 const GET = async (req: NextRequest) => {
   // get today's date
@@ -44,27 +45,12 @@ const GET = async (req: NextRequest) => {
       );
       // initial scrone
       let initialScore = logs.length;
-      // get user job position shift_start time
-      const shiftStart = parseTime(user.job_position.shift_start);
-      // add company tolerance time to shiftStart
-      const shiftStartTolerance = shiftStart.add({ minutes: tolerance });
-      // total late
-      let totalLate = 0;
-      // iterate logs
-      logs.forEach((log) => {
-        // get log clock_in_time as string with format `HH:mm:ss` from date string
-        const utcClockInTime = log.clock_in_time;
-        const clockInTime = parseTime(
-          `${utcClockInTime?.getUTCHours().toString().padStart(2, "0")}:${utcClockInTime?.getUTCMinutes().toString().padStart(2, "0")}:${utcClockInTime?.getUTCSeconds().toString().padStart(2, "0")}`
-        );
-        // check if clockInTime is late
-        const isLate = clockInTime.compare(shiftStartTolerance) > 0;
-        // if isLate is true then decrease initialScore
-        if (isLate) {
-          initialScore -= 1;
-          totalLate++;
-        }
-      });
+      // get total late
+      const totalLate = calculateLateInLogs(
+        logs,
+        tolerance,
+        user.job_position.shift_start
+      );
       // only work from home logs
       const workFromHome = logs.filter((log) => log.type === "work_from_home");
       // set user score and its needed properties
@@ -78,7 +64,7 @@ const GET = async (req: NextRequest) => {
           score: initialScore,
           totalLate: totalLate,
           workFromHome: workFromHome.length,
-            attendances: logs.length,
+          attendances: logs.length,
         };
       }
     }
