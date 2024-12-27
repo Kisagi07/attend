@@ -14,9 +14,10 @@ export default auth(async function middleware(req) {
   const isLoginRoute = pathname === "/api/login";
   const isNextAuthRoute = pathname.startsWith("/api/auth");
   const hasKeyAndMatch = apiKey ? apiKey === xUroborosKey : false;
+  const isImageApi = pathname.startsWith("/api/images");
 
   if (!req.auth) {
-    if (isApiRoute && !isLoginRoute && !isNextAuthRoute) {
+    if (isApiRoute && !isLoginRoute && !isNextAuthRoute && !isImageApi) {
       if (!hasKeyAndMatch) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }

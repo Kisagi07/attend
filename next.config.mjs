@@ -1,3 +1,5 @@
+import NextBundleAnalyzer from "@next/bundle-analyzer";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -52,6 +54,11 @@ const nextConfig = {
       transform: "react-icons/{{lib}}/{{member}}",
     },
   },
+  output: "standalone",
 };
 
-export default nextConfig;
+const withAnalyzer = NextBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
+export default withAnalyzer(nextConfig);
