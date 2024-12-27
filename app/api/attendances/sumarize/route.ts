@@ -80,4 +80,7 @@ const GET = async () => {
 
   return NextResponse.json(result);
 };
+
+export const dynamic = "force-dynamic";
+
 export { GET };

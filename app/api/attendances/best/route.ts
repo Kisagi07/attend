@@ -46,11 +46,7 @@ const GET = async (req: NextRequest) => {
       // initial scrone
       let initialScore = logs.length;
       // get total late
-      const totalLate = calculateLateInLogs(
-        logs,
-        tolerance,
-        user.job_position.shift_start
-      );
+      const totalLate = calculateLateInLogs(logs, tolerance, user.job_position.shift_start);
       // only work from home logs
       const workFromHome = logs.filter((log) => log.type === "work_from_home");
       // set user score and its needed properties
@@ -80,5 +76,7 @@ const GET = async (req: NextRequest) => {
   // return
   return NextResponse.json(bestEmployee);
 };
+
+export const dynamic = "force-dynamic";
 
 export { GET };
