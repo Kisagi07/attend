@@ -1,11 +1,6 @@
-import calculateLateInLogs from "@/app/helper/calculateLate";
 import prisma from "@/app/prisma";
-import {
-  getLocalTimeZone,
-  isWeekend,
-  parseTime,
-  today,
-} from "@internationalized/date";
+import { getLocalTimeZone, isWeekend, parseTime, Time, today } from "@internationalized/date";
+import { NextResponse } from "next/server";
 
 const GET = async () => {
   // get company tolerance
@@ -18,14 +13,14 @@ const GET = async () => {
   // if result are less than 5 the continue loop
   while (result.length < 5) {
     // check if now are weekend
-    while (isWeekend(now, getLocalTimeZone())) {
+    while (isWeekend(now, "id-ID")) {
       // subtract 1 day
       now = now.subtract({ days: 1 });
     }
     // fetch the attendance
     const attendances = await prisma.logs.findMany({
       where: {
-        date: now.toDate(getLocalTimeZone()),
+        date: now.toDate("etc/utc"),
       },
       include: {
         user: {
@@ -35,6 +30,9 @@ const GET = async () => {
         },
       },
     });
+
+    // declare variable to store the later clock in time
+    let latestClockInTime: null | Time = null;
 
     // calculate the total late
     let totalLate = 0;
@@ -58,6 +56,11 @@ const GET = async () => {
         if (isLate) {
           totalLate++;
         }
+
+        // check if latestClockInTime is null or clockInTime is later than latestClockInTime
+        if (latestClockInTime === null || clockInTime.compare(latestClockInTime) > 0) {
+          latestClockInTime = clockInTime;
+        }
       }
     });
 
@@ -66,9 +69,15 @@ const GET = async () => {
       total: attendances.length,
       attendances: attendances,
       totalLate: totalLate,
+      date: now.toString(),
+      latestClockInTime: latestClockInTime ? (latestClockInTime as Time).toString() : null,
     };
     // push the sumarize to result
     result.push(sumarize);
+    // reduce 1 day
+    now = now.subtract({ days: 1 });
   }
+
+  return NextResponse.json(result);
 };
-export default GET;
+export { GET };

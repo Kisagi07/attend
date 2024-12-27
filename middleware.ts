@@ -8,7 +8,7 @@ export default auth(async function middleware(req) {
 
   const { pathname, origin } = req.nextUrl;
   const apiKey = req.headers.get("X-Uroboros") ?? null;
-  const xUroborosKey = process.env.APP_API_KEY ?? "ShKs07";
+  const xUroborosKey = process.env.APP_API_KEY;
 
   const isApiRoute = pathname.startsWith("/api");
   const isLoginRoute = pathname === "/api/login";
@@ -22,9 +22,7 @@ export default auth(async function middleware(req) {
       }
     } else if (!isLoginRoute && !isApiRoute) {
       const pathToGo = req.nextUrl.pathname;
-      return NextResponse.redirect(
-        new URL(`/login?callbackUrl=${pathToGo}`, origin)
-      );
+      return NextResponse.redirect(new URL(`/login?callbackUrl=${pathToGo}`, origin));
     }
   }
 
