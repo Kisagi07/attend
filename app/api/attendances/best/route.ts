@@ -5,17 +5,19 @@ import calculateLateInLogs from "@/app/helper/calculateLate";
 
 const GET = async (req: NextRequest) => {
   // get today's date
-  const now = fromDate(new Date(), "asia/jakarta");
+  const now = fromDate(new Date(), "etc/utc");
   const nextYear = now.add({ years: 1 });
-  const prevYear = now.add({ years: -1 });
+  const prevYear = now.add({ years: -1 });  
+  const beginningOfYear = now.set({month: 1, day:1, hour: 0, minute:0, second: 0,millisecond: 0}).toDate()
+  const endOfYear = now.set({month: 12, day:31, hour: 23, minute:59, second: 59,millisecond: 999}).toDate()
   // fetch users with `logs` and `job_position` between last year and next year
   const users = await prisma.users.findMany({
     include: {
       logs: {
         where: {
           date: {
-            lte: nextYear.toDate(),
-            gte: prevYear.toDate(),
+            lt: endOfYear,
+            gt: beginningOfYear,
           },
         },
       },
@@ -24,15 +26,20 @@ const GET = async (req: NextRequest) => {
     where: {
       role: {
         not: "admin",
-      },
+      },      
     },
   });
+  
+  // check if all log of all users are empty
+  if (users.every((user) => user.logs.length === 0)) {
+    return NextResponse.json({message: "No Data to Check"});
+  }
+
   // get company tolerance time
   const company = await prisma.company.findFirst();
   const tolerance = company?.tolerance_time ?? 0;
   // score to determine the best employee
   let score: Record<string, Record<string, number>> = {};
-  let devi = null;
   // iterate over users
   users.forEach((user) => {
     if (user.job_position) {
@@ -51,7 +58,7 @@ const GET = async (req: NextRequest) => {
       const workFromHome = logs.filter((log) => log.type === "work_from_home");
       // set user score and its needed properties
       if (score[user.name!]) {
-        score[user.name!]["score"] = initialScore;
+        score[user.name!]["score"] = initialScore - totalLate;
         score[user.name!]["totalLate"] = totalLate;
         score[user.name!]["workFromHome"] = workFromHome.length;
         score[user.name!]["attendances"] = logs.length;
@@ -72,6 +79,8 @@ const GET = async (req: NextRequest) => {
     }
     return acc;
   });
+
+  
 
   // return
   return NextResponse.json(bestEmployee);
