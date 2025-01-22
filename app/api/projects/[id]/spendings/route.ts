@@ -4,7 +4,8 @@ import prisma from "@/app/prisma";
 import { $Enums } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
-const POST = async (req: NextRequest, { params }: { params: { id: string } }) => {
+const POST = async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
   // authorizew
   const session = await auth();
   if (!session) {

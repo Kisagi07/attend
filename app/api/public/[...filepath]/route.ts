@@ -2,10 +2,8 @@ import { fileTypeFromBuffer } from "file-type";
 import { existsSync, readFileSync } from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-const GET = async (
-  req: NextRequest,
-  { params }: { params: { filepath: string[] } }
-): Promise<NextResponse> => {
+const GET = async (req: NextRequest, props: { params: Promise<{ filepath: string[] }> }): Promise<NextResponse> => {
+  const params = await props.params;
   const { filepath: filename } = params;
   const directory = path.join(process.cwd(), "public/", filename.join("/"));
   const exists = existsSync(directory);

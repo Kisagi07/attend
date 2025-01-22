@@ -8,7 +8,7 @@ import MonthlySpendings from "@/app/components/MonthlySpendings";
 const FoodAndDrinkCostPage = () => {
   return (
     <>
-      <section className="p-4">
+      <section className="p-4 space-y-4">
         <h2 className="text-xl font-semibold">Food And Drink Cost</h2>
         <Divider />
         <Button
@@ -21,7 +21,7 @@ const FoodAndDrinkCostPage = () => {
           New Note
         </Button>
       </section>
-      <section className="p-4">
+      <section className="px-4">
         <DrinkFoodCostTable />
       </section>
       <section>

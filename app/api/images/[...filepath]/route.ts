@@ -3,10 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { fileTypeFromBuffer } from "file-type";
 
-const GET = async (
-  req: NextRequest,
-  { params }: { params: { filepath: string[] } },
-) => {
+const GET = async (req: NextRequest, props: { params: Promise<{ filepath: string[] }> }) => {
+  const params = await props.params;
   const { filepath: filename } = params;
   const directory = path.join(process.cwd(), "public/", filename.join("/"));
   const exists = existsSync(directory);

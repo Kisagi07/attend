@@ -3,7 +3,8 @@ import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, { params }: { params: { work_id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+  const params = await props.params;
   const session = await auth();
 
   if (!session) {

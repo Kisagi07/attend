@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import ProjectDetailSpendingChart from "./ProjectDetailSpendingChart";
+// import ProjectDetailSpendingChart from "./ProjectDetailSpendingChart";
 import ProjectDetailSpendingProgress from "./ProjectDetailSpendingProgress";
 import { ProjectResult } from "../prisma";
 import { formatRupiah } from "../helper";
@@ -62,7 +62,7 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
     <article>
       <h3 className="text-xl font-bold px-4">Monthly Recap</h3>
       <div className="grid gap-4 md:grid-cols-2">
-        <ProjectDetailSpendingChart spendings={project?.spendings ?? []} />
+        {/* <ProjectDetailSpendingChart spendings={project?.spendings ?? []} /> */}
         <ProjectDetailSpendingProgress project={project} />
       </div>
       <article className="mt-4 space-y-4  px-4 ">

@@ -6,26 +6,16 @@ import { Spinner } from "@heroui/spinner";
 import { Line } from "react-chartjs-2";
 import { useMemo } from "react";
 import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  LinearScale,
-  Title,
-  CategoryScale,
+  LineChart,
+  Line as RechartsLine,
+  CartesianAxis,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-ChartJS.register(
-  LineElement,
-  PointElement,
-  LinearScale,
-  Title,
-  CategoryScale,
-  Tooltip,
-  Legend,
-  Filler
-);
+  ResponsiveContainer,
+} from "recharts";
+import getCurrencyAbbreviation from "../helper/getCurrencyAbbreviation";
+
 const MonthlySpendings = () => {
   const { data: foodDrinkNotes, isLoading } = useSWR<DrinkAndFoodCost[]>(
     "/api/food-and-drink",
@@ -33,72 +23,30 @@ const MonthlySpendings = () => {
   );
 
   const lineData = useMemo(() => {
-    if (foodDrinkNotes) {
-      const grouped = groupByDate("date", foodDrinkNotes);
-      const data = {
-        labels: Object.keys(grouped),
-        datasets: [
-          {
-            label: "Total Spending",
-            data: Object.keys(grouped).map((month) => {
-              return grouped[month].reduce((acc, note: DrinkAndFoodCost) => acc + note.cost, 0);
-            }),
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-            fill: true,
-          },
-        ],
+    if (!foodDrinkNotes) return [];
+    const groupedByMonth = groupByDate("date", foodDrinkNotes);
+    return Object.keys(groupedByMonth).map((month) => {
+      return {
+        name: month,
+        pv: groupedByMonth[month].reduce((acc, curr) => acc + curr.cost, 0),
       };
-      return data;
-    } else {
-      const data = {
-        labels: [],
-        datasets: [
-          {
-            label: "Spendings",
-            data: [],
-            backgroundColor: "rgba(255, 99, 132, 0.2)",
-          },
-        ],
-      };
-      return data;
-    }
+    });
   }, [foodDrinkNotes]);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      title: {
-        display: true,
-        text: "Monthly Spending",
-      },
-    },
-  };
   return isLoading ? (
     <div className="flex justify-center">
       <Spinner color="primary" />
     </div>
   ) : (
-    <div className="relative w-full">
-      <Line
-        data={lineData}
-        options={{
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: "top" as const,
-            },
-            title: {
-              display: true,
-              text: "Monthly Spending",
-            },
-          },
-        }}
-      />
-    </div>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={lineData}>
+        <RechartsLine type="monotone" dataKey="pv" stroke="#82ca9d" />
+        <CartesianAxis stroke="#16a34a" />
+        <XAxis dataKey="name" />
+        <YAxis tickFormatter={(value) => getCurrencyAbbreviation(value)} />
+        <Tooltip />
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 export default MonthlySpendings;

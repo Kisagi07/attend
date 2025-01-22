@@ -1,4 +1,5 @@
-"use client";
+"use client";;
+import { use } from "react";
 
 import { fetcher, formatRupiah } from "@/app/helper";
 import { Spinner } from "@heroui/spinner";
@@ -7,7 +8,8 @@ import useSWR from "swr";
 import FoodAndDrinkCostForm from "@/app/components/FoodAndDrinkCostForm";
 import { parseAbsolute, parseZonedDateTime } from "@internationalized/date";
 
-const EditDrinkFoodCostPage = ({ params }: { params: { id: string } }) => {
+const EditDrinkFoodCostPage = (props: { params: Promise<{ id: string }> }) => {
+  const params = use(props.params);
   const { data, isLoading } = useSWR<DrinkAndFoodCost>(
     `/api/food-and-drink/${params.id}`,
     fetcher,

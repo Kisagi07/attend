@@ -4,10 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma, { LogWithUserWithJob } from "@/app/prisma";
 import { logs } from "@prisma/client";
 
-const GET = async (
-  req: NextRequest,
-  { params }: { params: { work_id: string } }
-): Promise<NextResponse> => {
+const GET = async (req: NextRequest, props: { params: Promise<{ work_id: string }> }): Promise<NextResponse> => {
+  const params = await props.params;
   const session = auth();
   if (!session) return NextResponse.json("Unauthorized", { status: 401 });
 

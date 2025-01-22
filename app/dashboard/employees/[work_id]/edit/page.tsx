@@ -5,7 +5,7 @@ import { job_positions, users } from "@prisma/client";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, use } from "react";
 import { toast } from "sonner";
 interface Option {
   label: string;
@@ -15,7 +15,8 @@ const genderOptions = [
   { label: "Male", value: "male" },
   { label: "Female", value: "female" },
 ];
-const UpdateEmployee = ({ params }: { params: { work_id: string } }) => {
+const UpdateEmployee = (props: { params: Promise<{ work_id: string }> }) => {
+  const params = use(props.params);
   const router = useRouter();
   const [showPIN, setShowPIN] = useState<boolean>(false);
   const [PIN, setPIN] = useState<string>("");

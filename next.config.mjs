@@ -49,16 +49,13 @@ const nextConfig = {
       },
     ];
   },
-  modularizeImports: {
-    "react-icons/(?<lib>[^/]+)": {
-      transform: "react-icons/{{lib}}/{{member}}",
-    },
-  },
   output: "standalone",
 };
+
 
 const withAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
 export default withAnalyzer(nextConfig);
+

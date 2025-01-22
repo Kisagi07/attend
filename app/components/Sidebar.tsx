@@ -19,7 +19,7 @@ interface LinkItemProps {
   href: string;
   name: string;
   subMatch?: boolean;
-  icon?: ReactElement;
+  icon?: ReactElement<any>;
 }
 interface CProps {
   sidebarOpen: boolean;

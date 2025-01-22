@@ -22,8 +22,9 @@ const checkIfAllIdsExists = async (numbers: number[]): Promise<boolean> => {
 
 const GET = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   // authorized
 
   if (!(await authorized())) {
@@ -56,9 +57,9 @@ const GET = async (
       },
       spendings: {
         orderBy: {
-          createdAt: "desc"
-        }
-      }
+          createdAt: "desc",
+        },
+      },
     },
   })) as ProjectResult;
 
@@ -71,8 +72,9 @@ const GET = async (
 
 const PUT = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   // authorized
   const session = await auth();
   if (!session) {
@@ -322,8 +324,9 @@ const PUT = async (
 
 const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   // authorized
   if (!(await authorized())) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 402 });

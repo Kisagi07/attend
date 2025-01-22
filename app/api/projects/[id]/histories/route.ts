@@ -6,8 +6,9 @@ import { storeFile } from "@/app/file";
 
 const POST = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   // authorizew
   const session = await auth();
   if (!session) {
@@ -85,8 +86,9 @@ const POST = async (
 };
 const GET = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> => {
+  const params = await props.params;
   // authorized
   const session = await auth();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
