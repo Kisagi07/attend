@@ -8,10 +8,10 @@ import ClockInOut from "@/app/components/ClockInOut";
 import { FaRegCalendarTimes } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Link from "next/link";
-import { Skeleton } from "@nextui-org/skeleton";
+import { Skeleton } from "@heroui/skeleton";
 
 import getUser from "@/app/libs/getUser";
-import { Button, ButtonGroup } from "@nextui-org/button";
+import { Button, ButtonGroup } from "@heroui/button";
 
 const Home = () => {
   const promise = getUser();

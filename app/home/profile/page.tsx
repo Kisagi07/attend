@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import useSWR from "swr";
 import Link from "next/link";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 const Page: React.FC = () => {
   const { data: user, isLoading, mutate } = useSWR<UserApiProfile>("/api/user", fetcher);
 

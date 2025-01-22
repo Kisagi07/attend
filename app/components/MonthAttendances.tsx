@@ -6,8 +6,8 @@ import { LogWithUserWithJob } from "@/app/prisma";
 import clsx from "clsx";
 import { parseTime } from "@internationalized/date";
 import { FcOvertime } from "react-icons/fc";
-import { Chip } from "@nextui-org/chip";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Chip } from "@heroui/chip";
+import { Tooltip } from "@heroui/tooltip";
 
 const columnHelper = createColumnHelper<LogWithUserWithJob>();
 const MonthAttendances = ({

@@ -5,7 +5,7 @@ import { parseDate, CalendarDate } from "@internationalized/date";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
 import { holidays } from "@prisma/client";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import clsx from "clsx";
 import {
   Modal,
@@ -14,10 +14,10 @@ import {
   ModalHeader,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import { toast } from "sonner";
-import { Input } from "@nextui-org/input";
-import { Chip } from "@nextui-org/chip";
+import { Input } from "@heroui/input";
+import { Chip } from "@heroui/chip";
 import { MdHolidayVillage } from "react-icons/md";
 import { MdDeleteSweep } from "react-icons/md";
 

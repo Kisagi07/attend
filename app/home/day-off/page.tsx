@@ -2,7 +2,7 @@
 import RequestLeave from "@/app/components/RequestLeave";
 import UserDayOffTable from "@/app/components/UserDayOffTable";
 import React from "react";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import clsx from "clsx";
 const Page = () => {

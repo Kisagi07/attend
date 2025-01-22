@@ -1,8 +1,8 @@
 import { users } from "@prisma/client";
 import React from "react";
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
-import { Avatar } from "@nextui-org/avatar";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Avatar } from "@heroui/avatar";
+import { Tooltip } from "@heroui/tooltip";
 
 type Props = {
   members: users[];
