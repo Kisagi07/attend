@@ -50,9 +50,9 @@
     "chart.js": "^4.4.3",
     "clsx": "^2.1.0",
     "date-holidays": "^3.23.12",
-    "file-type": "^19.0.0",
-    "framer-motion": "^11.15.0",
-    "glob": "^10.4.2",
+    "file-type": "^20.0.0",
+    "framer-motion": "^12.0.1",
+    "glob": "^11.0.1",
     "next": "15.1.5",
     "next-auth": "^5.0.0-beta.19",
     "react": "19.0.0",
@@ -63,7 +63,7 @@
     "sharp": "^0.33.4",
     "sonner": "^1.5.0",
     "swr": "^2.2.5",
-    "uuid": "^9.0.1"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
