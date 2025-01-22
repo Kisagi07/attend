@@ -71,17 +71,19 @@ Fetches all food and drink note, by default ordered by when note are indicating 
 ]
 ```
 
-## Attendances Note
+## Attendances
 
-### Endpoint
+### All Attendances
+
+#### Endpoint
 
 `GET` /api/attendances
 
-### Description
+#### Description
 
 Fetches all attendances, by default ordered by created in desc direction
 
-### API Options
+#### API Options
 
 - `limit` (number, optional) : The number of data are taken
 - `grouped-name-date` (boolean, optional): UNIQUE this will change the return data to be automatically grouped by User->name => {Month Year} => Attendance
@@ -89,7 +91,7 @@ Fetches all attendances, by default ordered by created in desc direction
 - `month` (number, optional | required): will query only attendance of said month (1 - 12)
 - `year` (number, optional | required): will query only attendances of said year (if one of month or year are inserted, the other becomes required)
 
-### Response
+#### Response
 
 ```json
 [
@@ -115,6 +117,59 @@ Fetches all attendances, by default ordered by created in desc direction
     },
     ...
 ]
+```
+
+### Best Attendances In Year
+
+#### Endpoint
+
+`GET` `/api/attendances/best`
+
+#### Description
+
+This api will return the best employee with the highest score based on attendances and late attendances
+
+#### Response
+
+```json
+[
+    ...
+        {
+            "Employee name": {
+                "score": 12,
+                "totalLate": 2,
+                "workFromHome": 7,
+                "attendances": 14
+            }
+        }
+    ...
+]
+```
+
+### 5 Day Summarize
+
+#### Endpoint
+
+`GET` `/api/attendances/sumarize`
+
+#### Description
+
+Return the latest 5 days attendances (Weekday only)
+
+#### Response
+
+```json
+    [
+        ...
+        {
+            "total": 5,
+            "attendances": `Log[]`,
+            "totalLate": 2,
+            "date": "2024-12-23",
+            "latestClockInTime": "09:23:12" | null
+        }
+        ...
+    ]
 ```
 
 ## Holidays Resource
@@ -155,7 +210,7 @@ No Options
 
 ### Description
 
-Fetches all ysers, by default ordered by created in desc direction
+Fetches all users, by default ordered by created in desc direction
 
 ### API Options
 
@@ -192,3 +247,21 @@ Fetches all ysers, by default ordered by created in desc direction
     ...
 ]
 ```
+
+## Image Resource
+
+### Endpoint
+
+`GET` /api/images/[...filepath]
+
+### Description
+
+Fetches the uploaded image from storage with path of filepath. this api can be directly placed on image src
+
+### API Options
+
+- `...filepath` (string): fetch the image according to the filepath (...filepath means it can be : /profile/image-name.jpg or /projects/private/image-name.jpg). every `/` in ..filepath will be considered a directory
+
+### Response
+
+`Content-type`: `image/*`

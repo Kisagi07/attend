@@ -1,7 +1,7 @@
 import { FaUserPlus } from "react-icons/fa";
 import Link from "next/link";
 import JobPositionTable from "@/app/components/JobPositionTable";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 const JobPositionPage = () => {
   return (
     <section className="space-y-4">

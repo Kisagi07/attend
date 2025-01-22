@@ -2,7 +2,7 @@
 import { DayOffRequestWithUser } from "../prisma";
 import React from "react";
 import clsx from "clsx";
-import { Pagination } from "@nextui-org/pagination";
+import { Pagination } from "@heroui/pagination";
 import DayOffRequestCard from "./DayOffRequestCard";
 
 interface DayOffRequestListProps {

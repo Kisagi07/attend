@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, logs_type } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { Input } from "@nextui-org/input";
+import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
-import { Button, ButtonGroup } from "@nextui-org/button";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
+import { Button, ButtonGroup } from "@heroui/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { BiChevronDown } from "react-icons/bi";
-import { Skeleton } from "@nextui-org/skeleton";
+import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());

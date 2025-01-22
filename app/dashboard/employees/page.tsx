@@ -2,10 +2,10 @@
 import { FaUserPlus } from "react-icons/fa";
 import Link from "next/link";
 import EmployeeTable from "@/app/components/EmployeeTable";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { BsPersonFillExclamation } from "react-icons/bs";
 import useSWR from "swr";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { fetcher } from "@/app/helper";
 
 const EmployeePage = () => {

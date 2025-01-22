@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Tabs, Tab } from "@nextui-org/tabs";
+import { Tabs, Tab } from "@heroui/tabs";
 import HomeCoordinate from "./HomeCoordinate";
 import { FaHome } from "react-icons/fa";
 import { VscGithubProject } from "react-icons/vsc";

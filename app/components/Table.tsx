@@ -7,8 +7,8 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { FC, useEffect, useState } from "react";
-import { Pagination } from "@nextui-org/pagination";
-import { Input } from "@nextui-org/input";
+import { Pagination } from "@heroui/pagination";
+import { Input } from "@heroui/input";
 import { FaSearch } from "react-icons/fa";
 
 interface TableProps {

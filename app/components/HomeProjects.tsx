@@ -2,18 +2,18 @@
 import React from "react";
 import useSWR from "swr";
 import { fetcher } from "../helper";
-import { Spinner } from "@nextui-org/spinner";
-import { Tabs, Tab } from "@nextui-org/tabs";
+import { Spinner } from "@heroui/spinner";
+import { Tabs, Tab } from "@heroui/tabs";
 import { ProjectWithLeadAndMembers, ProjectWithMembers } from "../prisma";
 import HomeProjectLeading from "./HomeProjectLeading";
-import { Chip } from "@nextui-org/chip";
-import { Divider } from "@nextui-org/divider";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
 import clsx from "clsx";
-import { Tooltip } from "@nextui-org/tooltip";
-import { Avatar } from "@nextui-org/avatar";
-import { User } from "@nextui-org/user";
+import { Tooltip } from "@heroui/tooltip";
+import { Avatar } from "@heroui/avatar";
+import { User } from "@heroui/user";
 import Link from "next/link";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { IoIosOpen } from "react-icons/io";
 
 interface Projects {

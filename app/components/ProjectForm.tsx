@@ -1,10 +1,10 @@
 "use client";
-import { Input } from "@nextui-org/input";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 import { users } from "@prisma/client";
 import React from "react";
 import { Key, Selection } from "@react-types/shared";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

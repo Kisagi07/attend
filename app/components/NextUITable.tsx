@@ -1,9 +1,9 @@
 "use client";
 import React, { FC, Key, ReactNode } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/table";
-import { Pagination } from "@nextui-org/pagination";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import { AsyncListData, useAsyncList } from "@react-stately/data";
-import { Input } from "@nextui-org/input";
+import { Input } from "@heroui/input";
 
 interface NextUITableProps {
   data: any[];

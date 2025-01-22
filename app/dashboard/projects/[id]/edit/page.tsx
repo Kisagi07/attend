@@ -3,7 +3,7 @@ import React, { use } from "react";
 import ProjectForm from "@/app/components/ProjectForm";
 import { fetcher } from "@/app/helper";
 import { ProjectWithLeadWithJobAndMembers } from "@/app/prisma";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { users } from "@prisma/client";
 import useSWR from "swr";
 

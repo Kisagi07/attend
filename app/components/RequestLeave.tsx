@@ -1,10 +1,10 @@
 "use client";
-import { Input } from "@nextui-org/input";
-import { DatePicker, DateRangePicker } from "@nextui-org/date-picker";
-import { Button } from "@nextui-org/button";
+import { Input } from "@heroui/input";
+import { DatePicker, DateRangePicker } from "@heroui/date-picker";
+import { Button } from "@heroui/button";
 import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
 import React from "react";
-import { RangeValue } from "@nextui-org/calendar";
+import { RangeValue } from "@heroui/calendar";
 const RequestLeave = () => {
   const [alert, setAlert] = React.useState({
     error: "",

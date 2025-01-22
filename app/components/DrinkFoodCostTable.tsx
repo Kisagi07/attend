@@ -2,14 +2,14 @@
 import Table from "@/app/components/Table";
 import { DrinkAndFoodCost } from "@prisma/client";
 import { createColumnHelper } from "@tanstack/react-table";
-import { Chip } from "@nextui-org/chip";
+import { Chip } from "@heroui/chip";
 import { FaBowlFood, FaTrash, FaPencil } from "react-icons/fa6";
 import { RiDrinksFill } from "react-icons/ri";
 import { fetcher, formatRupiah } from "../helper";
-import { Tooltip } from "@nextui-org/tooltip";
-import { Button } from "@nextui-org/button";
+import { Tooltip } from "@heroui/tooltip";
+import { Button } from "@heroui/button";
 import useSWR from "swr";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import Link from "next/link";
 import Confirmation from "@/app/components/Confirmation";
 import { useState } from "react";

@@ -2,7 +2,7 @@
 import React, { use } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { ProjectResult } from "@/app/prisma";
 import { notFound } from "next/navigation";
 import ProjectDetailStatus from "@/app/components/ProjectDetailStatus";
@@ -11,7 +11,7 @@ import ProjectActivity from "@/app/components/ProjectActivity";
 import ProjectDetailMembers from "@/app/components/ProjectDetailMembers";
 import ProjectDetailLead from "@/app/components/ProjectDetailLead";
 import ProjectHistories from "@/app/components/ProjectHistories";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 type Props = {

@@ -6,10 +6,10 @@ import WorkDayInput from "@/app/components/WorkDayInput";
 import JobFormSkeleton from "@/app/skeletons/JobFormSkeleton";
 import { useRouter } from "next/navigation";
 import { dayNumberToWord, extractNumber, formatRupiah } from "@/app/helper";
-import { Input } from "@nextui-org/input";
-import { TimeInput } from "@nextui-org/date-input";
+import { Input } from "@heroui/input";
+import { TimeInput } from "@heroui/date-input";
 import { parseTime, Time } from "@internationalized/date";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 const JobEditPage = (props: { params: Promise<{ id: number }> }) => {
   const params = use(props.params);
   const router = useRouter();

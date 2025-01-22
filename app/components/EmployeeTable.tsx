@@ -10,9 +10,9 @@ import Link from "next/link";
 import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
 import { UserWithJob } from "../prisma";
 import { users } from "@prisma/client";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Tooltip } from "@heroui/tooltip";
 import { BsPersonFillExclamation } from "react-icons/bs";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { KeyedMutator } from "swr";
 import sendRequest from "@helper/sendRequest";
 

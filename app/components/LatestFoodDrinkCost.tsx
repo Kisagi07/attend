@@ -1,16 +1,9 @@
-"use server";
-
-import prisma from "../prisma";
 import { formatRupiah } from "../helper";
 import clsx from "clsx";
+import getLatestDrinkAndFood from "../libs/getLatestDrinkAndFood";
 
 const LatestFoodDrinkCost = async () => {
-  const foodDrinkCost = await prisma.drinkAndFoodCost.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 6,
-  });
+  const foodDrinkCost = await getLatestDrinkAndFood();
   return (
     <div className="rounded-md lg:shrink-0">
       <ul className="flex flex-col gap-2 sm:grid sm:grid-cols-2 lg:flex xl:grid">

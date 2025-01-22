@@ -4,10 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import { extractNumber } from "@/app/helper";
-import { Input } from "@nextui-org/input";
-import { TimeInput } from "@nextui-org/date-input";
+import { Input } from "@heroui/input";
+import { TimeInput } from "@heroui/date-input";
 import { Time, parseTime } from "@internationalized/date";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
   const [salary, setSalary] = useState<string>("Rp.0");

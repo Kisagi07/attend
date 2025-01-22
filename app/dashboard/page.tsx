@@ -10,10 +10,10 @@ const Dashboard = () => {
         <ActivityTimeline />
         <VisitChart />
       </section>
-      <section className="lg:flex lg:gap-4 max-w-full mt-6">
+      {/* <section className="lg:flex lg:gap-4 max-w-full mt-6">
         <MonthlySpendings />
         <LatestFoodDrinkCost />
-      </section>
+      </section> */}
     </>
   );
 };
