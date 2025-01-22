@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import useSWR, { Fetcher } from "swr";
 import { debounce } from "../helper";
 import { users } from "@prisma/client";
-import { Spinner } from "@nextui-org/spinner";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Spinner } from "@heroui/spinner";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 
 const fetcher: Fetcher<users, string> = (...args) => fetch(...args).then((res) => res.json());
 

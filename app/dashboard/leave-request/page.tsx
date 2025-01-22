@@ -2,13 +2,13 @@
 import { fetcher } from "@/app/helper";
 import useSWR from "swr";
 import React from "react";
-import { Tabs, Tab } from "@nextui-org/tabs";
+import { Tabs, Tab } from "@heroui/tabs";
 import DayOffRequestList from "@/app/components/DayOffRequestList";
-import { Modal, ModalBody, useDisclosure, ModalContent } from "@nextui-org/modal";
+import { Modal, ModalBody, useDisclosure, ModalContent } from "@heroui/modal";
 import { DayOffRequestWithUser } from "@/app/prisma";
 import DayOffRequestCard from "@/app/components/DayOffRequestCard";
-import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 import { FaCircleXmark } from "react-icons/fa6";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { FaFlag } from "react-icons/fa";

@@ -4,9 +4,9 @@ import useSWR from "swr";
 import { fetcher } from "@/app/helper";
 import { holidays } from "@prisma/client";
 import { IoIosRemoveCircle } from "react-icons/io";
-import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
-import { DatePicker } from "@nextui-org/date-picker";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { DatePicker } from "@heroui/date-picker";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 
 const CompanyHoliday: React.FC = () => {

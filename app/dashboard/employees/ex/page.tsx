@@ -2,7 +2,7 @@
 import { FC } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { EmployeeTable } from "@components";
 
 const Page: FC = () => {

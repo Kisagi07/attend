@@ -1,13 +1,13 @@
 import React from "react";
 import { HistoryWithUser, UserResult } from "../prisma";
-import { Avatar } from "@nextui-org/avatar";
+import { Avatar } from "@heroui/avatar";
 import { IoIosTime } from "react-icons/io";
-import { Divider } from "@nextui-org/divider";
+import { Divider } from "@heroui/divider";
 import { FaFileAlt } from "react-icons/fa";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
-import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 import { MdScheduleSend } from "react-icons/md";
 import { FaLink } from "react-icons/fa";
 import { toast } from "sonner";

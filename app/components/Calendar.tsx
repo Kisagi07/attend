@@ -1,7 +1,7 @@
 "use client";
 import { FC, useState, useRef, useEffect } from "react";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   today,
   getLocalTimeZone,

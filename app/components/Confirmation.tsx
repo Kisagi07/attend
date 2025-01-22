@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { FC } from "react";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 interface CProps {
   show?: boolean;
   text?: string;

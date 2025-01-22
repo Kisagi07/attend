@@ -3,7 +3,7 @@ import ProjectsTable from "@/app/components/ProjectsTable";
 import { fetcher } from "@/app/helper";
 import { ProjectWithLeadWithJobAndMembers } from "@/app/prisma";
 import { TableSkeleton } from "@/app/skeletons";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import React from "react";
 import useSWR from "swr";

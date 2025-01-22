@@ -2,7 +2,7 @@
 import React from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { ProjectResult } from "@/app/prisma";
 import { notFound } from "next/navigation";
 import ProjectDetailStatus from "@/app/components/ProjectDetailStatus";

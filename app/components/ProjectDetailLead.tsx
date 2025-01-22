@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
-import { Avatar } from "@nextui-org/avatar";
+import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Avatar } from "@heroui/avatar";
 import { UserResult } from "../prisma";
 
 type Props = {

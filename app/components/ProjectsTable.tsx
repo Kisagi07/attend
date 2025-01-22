@@ -2,11 +2,11 @@ import React, { Key } from "react";
 import { formatRupiah } from "../helper";
 import NextUITable from "@/app/components/NextUITable";
 import { ProjectWithLeadWithJobAndMembers } from "@/app/prisma";
-import { Chip } from "@nextui-org/chip";
-import { Spinner } from "@nextui-org/spinner";
-import { User } from "@nextui-org/user";
-import { Avatar } from "@nextui-org/avatar";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Chip } from "@heroui/chip";
+import { Spinner } from "@heroui/spinner";
+import { User } from "@heroui/user";
+import { Avatar } from "@heroui/avatar";
+import { Tooltip } from "@heroui/tooltip";
 import {
   Modal,
   ModalContent,
@@ -14,10 +14,10 @@ import {
   ModalBody,
   useDisclosure,
   ModalFooter,
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { MdOutlineEditNote, MdOutlineReadMore } from "react-icons/md";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { toast } from "sonner";
 import { KeyedMutator } from "swr";
 import Link from "next/link";

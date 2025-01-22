@@ -6,9 +6,9 @@ import { company, holidays, logs, DayOffRequest, logs_type } from "@prisma/clien
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
 import totalOvertime from "@helper/totalOvertime";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { UserWithJob } from "../prisma";
-import { Chip } from "@nextui-org/chip";
+import { Chip } from "@heroui/chip";
 import { parseTime, parseDate, startOfMonth, Time } from "@internationalized/date";
 
 // Dates will always be the last day of the month or current day of current month

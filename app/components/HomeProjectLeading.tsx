@@ -3,14 +3,14 @@ import React from "react";
 import { Key } from "@react-types/shared";
 
 import { ProjectWithMembers } from "../prisma";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
-import { Chip } from "@nextui-org/chip";
-import { Divider } from "@nextui-org/divider";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
 import clsx from "clsx";
-import { Tooltip } from "@nextui-org/tooltip";
-import { Avatar } from "@nextui-org/avatar";
+import { Tooltip } from "@heroui/tooltip";
+import { Avatar } from "@heroui/avatar";
 import { toast } from "sonner";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import { IoIosOpen } from "react-icons/io";
 

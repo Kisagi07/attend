@@ -1,7 +1,7 @@
 "use client";
 
 import { fetcher, formatRupiah } from "@/app/helper";
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import { DrinkAndFoodCost } from "@prisma/client";
 import useSWR from "swr";
 import FoodAndDrinkCostForm from "@/app/components/FoodAndDrinkCostForm";

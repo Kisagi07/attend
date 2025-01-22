@@ -1,7 +1,7 @@
 import React from "react";
 import { ActivityWithUser } from "../prisma";
-import { Avatar } from "@nextui-org/avatar";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Avatar } from "@heroui/avatar";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 
 type Props = {
   activities: ActivityWithUser[];

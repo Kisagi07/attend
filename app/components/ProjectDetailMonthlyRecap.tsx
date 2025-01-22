@@ -4,11 +4,11 @@ import ProjectDetailSpendingChart from "./ProjectDetailSpendingChart";
 import ProjectDetailSpendingProgress from "./ProjectDetailSpendingProgress";
 import { ProjectResult } from "../prisma";
 import { formatRupiah } from "../helper";
-import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 import clsx from "clsx";
 import { toast } from "sonner";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Select, SelectItem } from "@heroui/select";
 
 type Props = {
   project: ProjectResult | undefined;
