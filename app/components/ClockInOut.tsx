@@ -263,7 +263,7 @@ const ClockInOut = () => {
     if (
       status.isLate &&
       type !== "clock-out" &&
-      type !== "special_attendance"
+      type !== "special_attendance" && type !== "on_site_work"
     ) {
       sendData["todaysWork"] = [
         "Late Reason: " + lateReason,
