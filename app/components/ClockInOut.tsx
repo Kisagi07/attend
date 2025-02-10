@@ -116,10 +116,11 @@ const ClockInOut = () => {
       );
       // #region //? rejection check
       // if distance is more than 50m and not sick or work with duty then warned user then return
+      console.log(selectedButtonValue);      
       if (
         distance > 100 &&
         selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_atteandance"
+        selectedButtonValue !== "special_attendance"
       ) {
         toast.error(` You are ${distance - 50} meter too far from location!`);
         return;
