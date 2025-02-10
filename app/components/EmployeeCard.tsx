@@ -79,7 +79,7 @@ const EmployeeCard: FC<Props> = ({
 
     // calculate totalWofkFromOffice (include special_attendance)
     const workFromOffice = attendances.filter(
-      (log) => log.type === "special_attendance" || log.type === "work_from_office"
+      (log) => log.type === "special_attendance" || log.type === "work_from_office" || log.type == "on_site_work"
     );
     const workFromHome = attendances.filter((log) => log.type === "work_from_home");
 
