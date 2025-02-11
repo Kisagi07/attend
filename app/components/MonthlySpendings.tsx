@@ -3,7 +3,7 @@ import { fetcher, groupByDate } from "@/app/helper";
 import useSWR from "swr";
 import { DrinkAndFoodCost } from "@prisma/client";
 import { Spinner } from "@heroui/spinner";
-import { Line } from "react-chartjs-2";
+// import { Line } from "react-chartjs-2";
 import { useMemo } from "react";
 import {
   LineChart,
