@@ -35,7 +35,7 @@ const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
 
   const getTotalWorkDay = (): number => {
     return tableData.filter((log) =>
-      ["work_from_office", "work_from_home", "work_with_duty"].includes(log.type)
+      ["work_from_office", "work_from_home", "special_attendance", "on_site_work"].includes(log.type)
     ).length;
   };
 
