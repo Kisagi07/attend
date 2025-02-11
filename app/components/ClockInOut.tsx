@@ -10,16 +10,26 @@ import { Prisma } from "@prisma/client";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/dropdown";
 import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
-const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<any, string> = (...args) =>
+  fetch(...args).then((res) => res.json());
 
 type ButtonOption = Record<
   string,
-  { label: string; color: "secondary" | "primary" | "danger" | "success" | "default" } | undefined
+  | {
+      label: string;
+      color: "secondary" | "primary" | "danger" | "success" | "default";
+    }
+  | undefined
 >;
 
 const ClockInOut = () => {
@@ -32,10 +42,17 @@ const ClockInOut = () => {
     `/api/user/attendance?date=${today(getLocalTimeZone()).toDate(getLocalTimeZone())}`,
     fetcher
   );
-  const { data: company, isLoading: companyLoading } = useSWR<company>(`/api/company`, fetcher);
-  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(`/api/user`, fetcher, {
-    refreshInterval: 1000,
-  });
+  const { data: company, isLoading: companyLoading } = useSWR<company>(
+    `/api/company`,
+    fetcher
+  );
+  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(
+    `/api/user`,
+    fetcher,
+    {
+      refreshInterval: 1000,
+    }
+  );
 
   // hook variable
 
@@ -43,7 +60,8 @@ const ClockInOut = () => {
     new Set(["work_from_office"])
   );
   const selectedButtonValue = Array.from(selectedButton)[0];
-  const showSpecialReason = (selectedButtonValue as logs_type) === "special_attendance";
+  const showSpecialReason =
+    (selectedButtonValue as logs_type) === "special_attendance";
   const [status, setStatus] = useState({
     clockIn: false,
     done: false,
@@ -58,7 +76,10 @@ const ClockInOut = () => {
   const [time, setTime] = useState(0);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
-    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
+    return (
+      user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ??
+      false
+    );
   }, [user]);
 
   const buttonOptions = useMemo<ButtonOption>(() => {
@@ -97,6 +118,10 @@ const ClockInOut = () => {
           label: "Sick Leave",
           color: "danger",
         },
+        on_site_work: {
+          label: "On Site Work",
+          color: "secondary",
+        },
       };
     }
   }, [status.clockIn, isWorkDay]);
@@ -111,16 +136,21 @@ const ClockInOut = () => {
       );
       // calculate distance between location
       const distance = Math.floor(
-        calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) *
-          1000
+        calculateDistance(
+          latitude,
+          longitude,
+          Number(targetLatitude),
+          Number(targetLongitude)
+        ) * 1000
       );
       // #region //? rejection check
       // if distance is more than 50m and not sick or work with duty then warned user then return
-      console.log(selectedButtonValue);      
       if (
         distance > 100 &&
         selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance"
+        selectedButtonValue !== "special_attendance" &&
+        selectedButtonValue !== "on_site_work" &&
+        todayAttendance?.type !== "on_site_work"
       ) {
         toast.error(` You are ${distance - 50} meter too far from location!`);
         return;
@@ -139,7 +169,8 @@ const ClockInOut = () => {
       if (
         status.isLate &&
         !lateReason &&
-        (selectedButtonValue === "work_from_home" || selectedButtonValue === "work_from_office") &&
+        (selectedButtonValue === "work_from_home" ||
+          selectedButtonValue === "work_from_office") &&
         isWorkDay
       ) {
         toast.error("You need to fill reason for being late");
@@ -225,10 +256,20 @@ const ClockInOut = () => {
       sendData["clock_in_longitude"] = longitude;
     }
     if (type === "special_attendance") {
-      sendData["todaysWork"] = ["Reason: " + specialReason, ...sendData["todaysWork"]];
+      sendData["todaysWork"] = [
+        "Reason: " + specialReason,
+        ...sendData["todaysWork"],
+      ];
     }
-    if (status.isLate && type !== "clock-out" && type !== "special_attendance") {
-      sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
+    if (
+      status.isLate &&
+      type !== "clock-out" &&
+      type !== "special_attendance" && type !== "on_site_work"
+    ) {
+      sendData["todaysWork"] = [
+        "Late Reason: " + lateReason,
+        ...sendData["todaysWork"],
+      ];
     }
     try {
       const res = await fetch(`/api/user/attendance`, {
@@ -246,24 +287,26 @@ const ClockInOut = () => {
   };
 
   const getUserLocation = () => {
-    return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          resolve({ latitude, longitude });
-        },
-        (error) => {
-          handleGeolocationError(error);
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        }
-      );
-    });
+    return new Promise<{ latitude: number; longitude: number }>(
+      (resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            handleGeolocationError(error);
+            reject(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          }
+        );
+      }
+    );
   };
 
   const getTargetLocation = (
@@ -324,19 +367,25 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleGeolocationError = useCallback((error: PositionErrorCallback | any) => {
-    if (error.code === error.PERMISSION_DENIED) {
-      toast.error("Location permission denied by user.");
-    } else if (error.code === error.POSITION_UNAVAILABLE) {
-      toast.error("Location information is unavailable.");
-    } else if (error.code === error.TIMEOUT) {
-      toast.error("The request to get user location timed out.");
-    } else {
-      toast.error("An unknown error occurred.");
-    }
-  }, []);
+  const handleGeolocationError = useCallback(
+    (error: PositionErrorCallback | any) => {
+      if (error.code === error.PERMISSION_DENIED) {
+        toast.error("Location permission denied by user.");
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        toast.error("Location information is unavailable.");
+      } else if (error.code === error.TIMEOUT) {
+        toast.error("The request to get user location timed out.");
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    },
+    []
+  );
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {}, handleGeolocationError);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {},
+      handleGeolocationError
+    );
   }, [handleGeolocationError]);
 
   useEffect(() => {
@@ -371,7 +420,7 @@ const ClockInOut = () => {
         !status.clockIn &&
         isWorkDay &&
         selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance" && (
+        selectedButtonValue !== "special_attendance" && selectedButtonValue !== "on_site_work" && (
           <>
             <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
               You are late! hurry up!
@@ -387,7 +436,11 @@ const ClockInOut = () => {
           </>
         )}
       {status.clockIn && !status.done && (
-        <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />
+        <ListInput
+          items={todaysWork}
+          addItem={handleAddItem}
+          removeItem={handleRemoveItem}
+        />
       )}
       {showSpecialReason && (
         <Input
@@ -401,9 +454,13 @@ const ClockInOut = () => {
         <Button
           isLoading={sending}
           onClick={handleButtonClick}
-          color={buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ?? "default"}
+          color={
+            buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ??
+            "default"
+          }
         >
-          {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ?? "Loading"}
+          {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ??
+            "Loading"}
         </Button>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
@@ -415,10 +472,14 @@ const ClockInOut = () => {
             disallowEmptySelection
             selectionMode="single"
             selectedKeys={selectedButton}
-            onSelectionChange={(selected) => setSelectedButton(selected as Set<string>)}
+            onSelectionChange={(selected) =>
+              setSelectedButton(selected as Set<string>)
+            }
           >
             {Object.values(buttonOptions).map((option, index) => (
-              <DropdownItem key={Object.keys(buttonOptions)[index]}>{option!.label}</DropdownItem>
+              <DropdownItem key={Object.keys(buttonOptions)[index]}>
+                {option!.label}
+              </DropdownItem>
             ))}
           </DropdownMenu>
         </Dropdown>
