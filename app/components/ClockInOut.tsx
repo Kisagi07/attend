@@ -149,7 +149,8 @@ const ClockInOut = () => {
         distance > 100 &&
         selectedButtonValue !== "sick" &&
         selectedButtonValue !== "special_attendance" &&
-        selectedButtonValue !== "on_site_work"
+        selectedButtonValue !== "on_site_work" &&
+        todayAttendance?.type !== "on_site_work"
       ) {
         toast.error(` You are ${distance - 50} meter too far from location!`);
         return;
