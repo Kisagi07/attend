@@ -53,7 +53,7 @@ const GET = async (req: NextRequest) => {
         (log) =>
           log.type === "work_from_home" ||
           log.type === "work_from_office" ||
-          log.type === "special_attendance"
+          log.type === "special_attendance" || "on_site_work"
       );
       // initial scrone
       // let initialScore = logs.length;
