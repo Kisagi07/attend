@@ -5,6 +5,8 @@ import HomeCoordinate from "./HomeCoordinate";
 import { FaHome } from "react-icons/fa";
 import { VscGithubProject } from "react-icons/vsc";
 import HomeProjects from "./HomeProjects";
+import { AiOutlineFieldTime } from "react-icons/ai";
+import NonScheduleOvertime from "./NonScheduleOvertime";
 
 const HomeOptions = () => {
   return (
@@ -20,6 +22,12 @@ const HomeOptions = () => {
       >
         <HomeCoordinate />
       </Tab>
+      <Tab key="NSO" title={<div className="flex items-center gap-2">
+            <AiOutlineFieldTime className="size-4" />
+            <span>NS Overtime</span>
+          </div>}>
+            <NonScheduleOvertime />
+          </Tab>
       <Tab
         key="projects"
         title={
@@ -31,6 +39,7 @@ const HomeOptions = () => {
       >
         <HomeProjects />
       </Tab>
+      
     </Tabs>
   );
 };

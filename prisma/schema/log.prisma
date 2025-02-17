@@ -25,4 +25,5 @@ enum logs_type {
   work_from_office   @map("work-from-office")
   special_attendance @map("special-attendance")
   on_site_work
+  non_schedule_overtime
 }

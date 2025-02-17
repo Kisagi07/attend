@@ -48,6 +48,9 @@ const EmployeeCard: FC<Props> = ({
     const passedDate = new Date(date);
     const passedDateString = passedDate.toLocaleDateString();
 
+    // filter NS Overtime
+    const nsOvertime = attendances.filter((log) => log.type  === "non_schedule_overtime");
+    
     if (today.toLocaleDateString() !== passedDateString) {
       todayStatus = "complete";
     }
@@ -60,7 +63,10 @@ const EmployeeCard: FC<Props> = ({
         return new Date(log.date!).toLocaleDateString() === passedDateString;
       });
       if (todayAttendance) {
-        todayStatus = todayAttendance.type;
+        // Exclude NS Overtime
+        if (todayAttendance.type !== "non_schedule_overtime") {
+          todayStatus = todayAttendance.type;
+        }
       }
     }
 
@@ -92,6 +98,10 @@ const EmployeeCard: FC<Props> = ({
     // filter late work
     late = attendances.filter((work) => {
       if (work.type === "sick" || work.isOverTime || work.type === "special_attendance") {
+        return false;
+      }
+      // false if its NS Overtime
+      if (work.type === "non_schedule_overtime") {
         return false;
       }
       // parse the time
@@ -176,6 +186,8 @@ const EmployeeCard: FC<Props> = ({
     }
     // use Math.max incase total absent are less than 0, if so asign it 0
     totalAbsent = Math.max(totalAbsent, 0);
+    // filter out NS Overtime from totalAbsent    
+    totalAbsent += nsOvertime.length;
     return {
       todayStatus,
       totalWorkFromOffice: workFromOffice.length,
@@ -190,6 +202,21 @@ const EmployeeCard: FC<Props> = ({
     const totalHourOvertime = totalOvertime(overtime, user.job_position);
     return totalHourOvertime;
   }, [attendances, user.job_position]);
+
+  const nsOvertimeTotal = useMemo(() => {
+    const nsOvertime = attendances.filter((log) => log.type === "non_schedule_overtime");
+    const total = nsOvertime.reduce((acc, overtime) => {
+      if (overtime.clock_out_time) {
+        const parsedClockIn = parseTime((overtime.clock_in_time as unknown as string).split('T')[1].split(".")[0]);
+        const parsedClockOut = parseTime((overtime.clock_out_time as unknown as string).split('T')[1].split(".")[0]);
+        const subtracted = parsedClockOut.subtract({hours: parsedClockIn.hour, minutes: parsedClockIn.minute});
+        const totalMinutes = subtracted.minute + subtracted.hour * 60;
+        return acc + totalMinutes;
+      }
+      return acc;
+    },0)
+    return total;
+  },[attendances])
 
   const getColor = (todayStatus: Calculated["todayStatus"]) => {
     switch (todayStatus) {
@@ -246,6 +273,9 @@ const EmployeeCard: FC<Props> = ({
             <Chip size="sm" variant="dot" color="success">
               {/* {overtimeAmount.amount} {overtimeAmount.type === "minutes" ? "menit" : "jam"} overtime */}
               {overtimeAmount.hour} jam {overtimeAmount.minute} menit overtime
+            </Chip>
+            <Chip size="sm" variant="dot" color="success">              
+              {nsOvertimeTotal} menit NS overtime
             </Chip>
           </div>
           <Link
