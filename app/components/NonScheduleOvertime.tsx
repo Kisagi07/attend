@@ -1,0 +1,97 @@
+import { Button } from "@heroui/button";
+import { TimeInput } from "@heroui/date-input";
+import { Input } from "@heroui/input";
+import { Time } from "@internationalized/date";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Form } from "@heroui/form";
+import createNSOvertime from "../libs/createNSOvertime";
+import { toast } from "sonner";
+
+const NonScheduleOvertime = () => {  
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+    const resetButton = useRef<HTMLButtonElement>(null);
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData);
+    const errors: Record<string, string> = { };
+    if (!data.checkIn) {
+      errors.checkIn = "Check in dibutuhkan";
+    }
+    if (!data.checkOut) {
+      errors.checkOut = "Check out dibutuhkan";
+    }
+    if (!data.work) {
+      errors.work = "Work dibutuhkan";
+    }
+
+    if (Object.values(errors).length > 0) {
+      setErrors(errors);
+      return;
+    } else {
+        setErrors({});
+    }
+    try {
+        setSubmitting(true);
+        const result = await createNSOvertime(formData);
+        setSubmitting(false);
+        switch (result.status) {
+          case 422:
+            setErrors(result.errors!);
+            return;
+          case 400:
+            toast.error(result.message);
+            return;
+          case 401:
+            toast.error("Session tidak ditemukan, mohon login kembali");
+            return;
+          case 404:
+            toast.error("Session telah berkahir mohon login kembali");
+            return;
+          default:
+            toast.success("Overtime berhasil dikirim");
+            resetButton.current?.click()            
+        }
+    } catch (error) {
+        console.error(error);   
+        setSubmitting(false)     ;
+        toast.error("Terjadi kesalahan, hubungi admin");
+    }
+  };
+
+  return (
+    <Form onSubmit={onSubmit} validationErrors={errors}>
+      <div className="flex gap-2 w-full">
+        <TimeInput
+          hourCycle={24}
+          label="Check In"
+          name="checkIn"
+          isInvalid={!!errors["checkIn"]}
+          errorMessage={errors["checkIn"]}
+        />
+        <TimeInput
+          hourCycle={24}
+          label="Check Out"
+          name="checkOut"
+          isInvalid={!!errors["checkOut"]}
+          errorMessage={errors["checkOut"]}
+        />
+      </div>
+      <Input
+        label="Pekerjaan"
+        className="mt-2"
+        name="work"
+        isInvalid={!!errors["work"]}
+        errorMessage={errors["work"]}
+      />
+      <Button isLoading={submitting} fullWidth className="mt-2" color="primary" type="submit">
+        Send
+      </Button>
+      <Button ref={resetButton} className="invisible absolute z-[-2]" type="reset">Reset</Button>
+    </Form>
+  );
+};
+export default NonScheduleOvertime;
