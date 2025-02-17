@@ -203,6 +203,21 @@ const EmployeeCard: FC<Props> = ({
     return totalHourOvertime;
   }, [attendances, user.job_position]);
 
+  const nsOvertimeTotal = useMemo(() => {
+    const nsOvertime = attendances.filter((log) => log.type === "non_schedule_overtime");
+    const total = nsOvertime.reduce((acc, overtime) => {
+      if (overtime.clock_out_time) {
+        const parsedClockIn = parseTime((overtime.clock_in_time as unknown as string).split('T')[1].split(".")[0]);
+        const parsedClockOut = parseTime((overtime.clock_out_time as unknown as string).split('T')[1].split(".")[0]);
+        const subtracted = parsedClockOut.subtract({hours: parsedClockIn.hour, minutes: parsedClockIn.minute});
+        const totalMinutes = subtracted.minute + subtracted.hour * 60;
+        return acc + totalMinutes;
+      }
+      return acc;
+    },0)
+    return total;
+  },[attendances])
+
   const getColor = (todayStatus: Calculated["todayStatus"]) => {
     switch (todayStatus) {
       case "special_attendance":
@@ -258,6 +273,9 @@ const EmployeeCard: FC<Props> = ({
             <Chip size="sm" variant="dot" color="success">
               {/* {overtimeAmount.amount} {overtimeAmount.type === "minutes" ? "menit" : "jam"} overtime */}
               {overtimeAmount.hour} jam {overtimeAmount.minute} menit overtime
+            </Chip>
+            <Chip size="sm" variant="dot" color="success">              
+              {nsOvertimeTotal} menit NS overtime
             </Chip>
           </div>
           <Link
