@@ -48,6 +48,9 @@ const EmployeeCard: FC<Props> = ({
     const passedDate = new Date(date);
     const passedDateString = passedDate.toLocaleDateString();
 
+    // filter NS Overtime
+    const nsOvertime = attendances.filter((log) => log.type  === "non_schedule_overtime");
+    
     if (today.toLocaleDateString() !== passedDateString) {
       todayStatus = "complete";
     }
@@ -60,7 +63,10 @@ const EmployeeCard: FC<Props> = ({
         return new Date(log.date!).toLocaleDateString() === passedDateString;
       });
       if (todayAttendance) {
-        todayStatus = todayAttendance.type;
+        // Exclude NS Overtime
+        if (todayAttendance.type !== "non_schedule_overtime") {
+          todayStatus = todayAttendance.type;
+        }
       }
     }
 
@@ -92,6 +98,10 @@ const EmployeeCard: FC<Props> = ({
     // filter late work
     late = attendances.filter((work) => {
       if (work.type === "sick" || work.isOverTime || work.type === "special_attendance") {
+        return false;
+      }
+      // false if its NS Overtime
+      if (work.type === "non_schedule_overtime") {
         return false;
       }
       // parse the time
@@ -176,6 +186,8 @@ const EmployeeCard: FC<Props> = ({
     }
     // use Math.max incase total absent are less than 0, if so asign it 0
     totalAbsent = Math.max(totalAbsent, 0);
+    // filter out NS Overtime from totalAbsent    
+    totalAbsent += nsOvertime.length;
     return {
       todayStatus,
       totalWorkFromOffice: workFromOffice.length,

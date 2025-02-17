@@ -20,7 +20,7 @@ const MonthAttendances = ({
   tolerance?: number;
 }) => {
   const isLate = (log: LogWithUserWithJob): boolean => {
-    if (log.type === "sick" || log.type === "special_attendance" || log.type === "on_site_work") return false;
+    if (log.type === "sick" || log.type === "special_attendance" || log.type === "on_site_work" || log.type === "non_schedule_overtime") return false;
     const clockInTime = parseTime(log.clock_in_time!.toString().split("T")[1].split(".")[0]);
     const workTime = parseTime(log.user?.job_position?.shift_start ?? "00:00").add({
       minutes: tolerance,
