@@ -10,7 +10,7 @@ import NonScheduleOvertime from "./NonScheduleOvertime";
 
 const HomeOptions = () => {
   return (
-    <Tabs aria-label="options" color="primary" variant="underlined">
+    <Tabs aria-label="options" color="primary" variant="underlined" className="max-w-full">
       <Tab
         key="home-coordinate"
         title={
