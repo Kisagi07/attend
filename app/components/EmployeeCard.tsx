@@ -2,14 +2,25 @@
 import { FC, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { company, holidays, logs, DayOffRequest, logs_type } from "@prisma/client";
+import {
+  company,
+  holidays,
+  logs,
+  DayOffRequest,
+  logs_type,
+} from "@prisma/client";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
 import totalOvertime from "@helper/totalOvertime";
 import { Spinner } from "@heroui/spinner";
 import { UserWithJob } from "../prisma";
 import { Chip } from "@heroui/chip";
-import { parseTime, parseDate, startOfMonth, Time } from "@internationalized/date";
+import {
+  parseTime,
+  parseDate,
+  startOfMonth,
+  Time,
+} from "@internationalized/date";
 
 // Dates will always be the last day of the month or current day of current month
 interface Props {
@@ -36,7 +47,9 @@ const EmployeeCard: FC<Props> = ({
   date,
 }: Props) => {
   const { data: company, isLoading } = useSWR<company>(`/api/company`, fetcher);
-  const { data: leaveRequest, isLoading: leaveLoading } = useSWR<DayOffRequest[]>(
+  const { data: leaveRequest, isLoading: leaveLoading } = useSWR<
+    DayOffRequest[]
+  >(
     `/api/day-off-request?status=approved&date=${date.getFullYear()}/${date.getMonth() + 1}/01-${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}&user-id=${user.id}`,
     fetcher
   );
@@ -49,45 +62,67 @@ const EmployeeCard: FC<Props> = ({
     const passedDateString = passedDate.toLocaleDateString();
 
     // filter NS Overtime
-    const nsOvertime = attendances.filter((log) => log.type  === "non_schedule_overtime");
-    
+    const nsOvertime = attendances.filter(
+      (log) => log.type === "non_schedule_overtime"
+    );
+
     if (today.toLocaleDateString() !== passedDateString) {
       todayStatus = "complete";
     }
 
-    // Check if today's attendance is logged
     if (todayStatus === "absent") {
-      const todayAttendance = attendances.find((log, index) => {
-        if (index == 0) {
+      let todayAttendance = null;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      for (const log of attendances) {
+        const logDate = new Date(log.date!);
+        logDate.setHours(0, 0, 0, 0);
+
+        if (logDate.getTime() === today.getTime()) {
+          if (log.type !== "non_schedule_overtime") {
+            todayAttendance = log;
+            break;
+          }
+        } else if (logDate.getTime() < today.getTime()) {
+          break;
         }
-        return new Date(log.date!).toLocaleDateString() === passedDateString;
-      });
+      }
+
       if (todayAttendance) {
-        // Exclude NS Overtime
-        if (todayAttendance.type !== "non_schedule_overtime") {
-          todayStatus = todayAttendance.type;
-        }
+        todayStatus = todayAttendance.type
       }
     }
 
     // Check if today is a weekend
-    if (todayStatus === "absent" && (passedDate.getDay() === 0 || passedDate.getDay() === 6)) {
+    if (
+      todayStatus === "absent" &&
+      (passedDate.getDay() === 0 || passedDate.getDay() === 6)
+    ) {
       todayStatus = "weekend";
     }
 
     // Check if today is a holiday
     if (
       todayStatus === "absent" &&
-      holidays.some((holiday) => new Date(holiday.date).toLocaleDateString() === passedDateString)
+      holidays.some(
+        (holiday) =>
+          new Date(holiday.date).toLocaleDateString() === passedDateString
+      )
     ) {
       todayStatus = "holiday";
     }
 
     // calculate totalWofkFromOffice (include special_attendance)
     const workFromOffice = attendances.filter(
-      (log) => log.type === "special_attendance" || log.type === "work_from_office" || log.type == "on_site_work"
+      (log) =>
+        log.type === "special_attendance" ||
+        log.type === "work_from_office" ||
+        log.type == "on_site_work"
     );
-    const workFromHome = attendances.filter((log) => log.type === "work_from_home");
+    const workFromHome = attendances.filter(
+      (log) => log.type === "work_from_home"
+    );
 
     //! calculate totalLate
     let late = 0;
@@ -97,7 +132,11 @@ const EmployeeCard: FC<Props> = ({
     jobStartTime = jobStartTime.add({ minutes: company?.tolerance_time ?? 0 });
     // filter late work
     late = attendances.filter((work) => {
-      if (work.type === "sick" || work.isOverTime || work.type === "special_attendance") {
+      if (
+        work.type === "sick" ||
+        work.isOverTime ||
+        work.type === "special_attendance"
+      ) {
         return false;
       }
       // false if its NS Overtime
@@ -105,7 +144,9 @@ const EmployeeCard: FC<Props> = ({
         return false;
       }
       // parse the time
-      const clockInTime = parseTime(String(work.clock_in_time).split("T")[1].split("Z")[0]);
+      const clockInTime = parseTime(
+        String(work.clock_in_time).split("T")[1].split("Z")[0]
+      );
 
       // compare if more than 0 mean greater
       return clockInTime.compare(jobStartTime) > 0;
@@ -162,11 +203,18 @@ const EmployeeCard: FC<Props> = ({
         let loop = 0;
 
         // ? use @internationalized/date CalendarDate as base date object
-        let startDate = parseDate(new Date(leave.leaveStartDate).toISOString().split("T")[0]);
-        const endDate = parseDate(new Date(leave.leaveEndDate).toISOString().split("T")[0]);
+        let startDate = parseDate(
+          new Date(leave.leaveStartDate).toISOString().split("T")[0]
+        );
+        const endDate = parseDate(
+          new Date(leave.leaveEndDate).toISOString().split("T")[0]
+        );
 
         // ? as long as start loop date still less than passed date and less than leave end date keep running while loop
-        while (startDate.compare(passedMonthDate) <= 0 && startDate.compare(endDate) <= 0) {
+        while (
+          startDate.compare(passedMonthDate) <= 0 &&
+          startDate.compare(endDate) <= 0
+        ) {
           // ! Don't delete in case of infinite loop
           loop++;
           if (loop === MAX_LOOP_COUNT) {
@@ -175,7 +223,10 @@ const EmployeeCard: FC<Props> = ({
           }
 
           // ? check if current start loop date does not exists the end leave date and this month passed/last date
-          if (startDate.compare(startMonthDate) >= 0 && startDate.compare(passedMonthDate) <= 0) {
+          if (
+            startDate.compare(startMonthDate) >= 0 &&
+            startDate.compare(passedMonthDate) <= 0
+          ) {
             totalAbsent--;
           }
 
@@ -186,7 +237,7 @@ const EmployeeCard: FC<Props> = ({
     }
     // use Math.max incase total absent are less than 0, if so asign it 0
     totalAbsent = Math.max(totalAbsent, 0);
-    // filter out NS Overtime from totalAbsent    
+    // filter out NS Overtime from totalAbsent
     totalAbsent += nsOvertime.length;
     return {
       todayStatus,
@@ -198,25 +249,40 @@ const EmployeeCard: FC<Props> = ({
   }, [attendances, holidays, company, user, date, leaveRequest]);
 
   const overtimeAmount = useMemo<{ hour: number; minute: number }>(() => {
-    const overtime = attendances.filter((work) => work.isOverTime || work.afterHourOvertime);
+    const overtime = attendances.filter(
+      (work) => work.isOverTime || work.afterHourOvertime
+    );
     const totalHourOvertime = totalOvertime(overtime, user.job_position);
     return totalHourOvertime;
   }, [attendances, user.job_position]);
 
   const nsOvertimeTotal = useMemo(() => {
-    const nsOvertime = attendances.filter((log) => log.type === "non_schedule_overtime");
+    const nsOvertime = attendances.filter(
+      (log) => log.type === "non_schedule_overtime"
+    );
     const total = nsOvertime.reduce((acc, overtime) => {
       if (overtime.clock_out_time) {
-        const parsedClockIn = parseTime((overtime.clock_in_time as unknown as string).split('T')[1].split(".")[0]);
-        const parsedClockOut = parseTime((overtime.clock_out_time as unknown as string).split('T')[1].split(".")[0]);
-        const subtracted = parsedClockOut.subtract({hours: parsedClockIn.hour, minutes: parsedClockIn.minute});
+        const parsedClockIn = parseTime(
+          (overtime.clock_in_time as unknown as string)
+            .split("T")[1]
+            .split(".")[0]
+        );
+        const parsedClockOut = parseTime(
+          (overtime.clock_out_time as unknown as string)
+            .split("T")[1]
+            .split(".")[0]
+        );
+        const subtracted = parsedClockOut.subtract({
+          hours: parsedClockIn.hour,
+          minutes: parsedClockIn.minute,
+        });
         const totalMinutes = subtracted.minute + subtracted.hour * 60;
         return acc + totalMinutes;
       }
       return acc;
-    },0)
+    }, 0);
     return total;
-  },[attendances])
+  }, [attendances]);
 
   const getColor = (todayStatus: Calculated["todayStatus"]) => {
     switch (todayStatus) {
@@ -253,7 +319,11 @@ const EmployeeCard: FC<Props> = ({
       <div className="flex gap-4 justify-between items-end">
         <div className="space-y-2 p-2">
           {calculated.todayStatus !== "complete" && (
-            <Chip color={getColor(calculated.todayStatus)} className="capitalize" variant="flat">
+            <Chip
+              color={getColor(calculated.todayStatus)}
+              className="capitalize"
+              variant="flat"
+            >
               {calculated.todayStatus.replaceAll("_", " ") || "Hadir"}
             </Chip>
           )}
@@ -274,7 +344,7 @@ const EmployeeCard: FC<Props> = ({
               {/* {overtimeAmount.amount} {overtimeAmount.type === "minutes" ? "menit" : "jam"} overtime */}
               {overtimeAmount.hour} jam {overtimeAmount.minute} menit overtime
             </Chip>
-            <Chip size="sm" variant="dot" color="success">              
+            <Chip size="sm" variant="dot" color="success">
               {nsOvertimeTotal} menit NS overtime
             </Chip>
           </div>
