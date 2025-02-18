@@ -76,24 +76,19 @@ const GET = async (req: NextRequest) => {
     }
   });  
 
-  let lowestTotalLate = 0;
-
-  // find the lowest totalLate number in score
-  for (const key in score) {
-    if (score[key].totalLate < lowestTotalLate) {
-      lowestTotalLate = score[key].totalLate;
-    }
-  }
-
-  let filtered = Object.entries(score).filter((user) => user[1].totalLate === lowestTotalLate);
+  const arrayed = Object.entries(score);
+  const sortedByTotalLate = arrayed.sort((a, b) => a[1].totalLate - b[1].totalLate);
+  const lowestTotalLate = sortedByTotalLate.filter(entry => entry[1].totalLate === sortedByTotalLate[0][1].totalLate);
     
-  if (filtered.length > 1) {
-    // filter with the most attendance
-    filtered = filtered.filter((user) => user[1].attendances === Math.max(...filtered.map((user) => user[1].attendances)));
-    return NextResponse.json(filtered[0])
+
+  let bestEmployee;
+  if (lowestTotalLate.length > 1) {
+    bestEmployee = lowestTotalLate.sort((a, b) => b[1].attendances - a[1].attendances)[0];
+  } else {
+    bestEmployee = lowestTotalLate[0];
   }
 
-  return NextResponse.json({best: filtered[0], score});
+  return NextResponse.json({[bestEmployee[0]] : bestEmployee[1]});
 };
 
 export const dynamic = "force-dynamic";
