@@ -132,18 +132,15 @@ This api will return the best employee with the highest score based on attendanc
 #### Response
 
 ```json
-[
-    ...
-        {
-            "Employee name": {
-                "score": 12,
-                "totalLate": 2,
-                "workFromHome": 7,
-                "attendances": 14
-            }
-        }
-    ...
-]
+
+{
+    "Employee name": {
+        "score": 12,
+        "totalLate": 2,
+        "workFromHome": 7,
+        "attendances": 14
+    }
+}    
 ```
 
 ### 5 Day Summarize
