@@ -90,6 +90,7 @@ Fetches all attendances, by default ordered by created in desc direction
 - `of` (string, optional) : numbers of user id seperated by comas (,). Will return only attendance of said users.
 - `month` (number, optional | required): will query only attendance of said month (1 - 12)
 - `year` (number, optional | required): will query only attendances of said year (if one of month or year are inserted, the other becomes required)
+- `type` (string, optional) : will query only the specified logs with matching type
 
 #### Response
 

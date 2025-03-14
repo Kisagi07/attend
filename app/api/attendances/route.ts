@@ -1,6 +1,7 @@
 import { monthNumberToWord } from "@/app/helper";
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
+import { logs_type } from "@prisma/client";
 
 function getTodayDate() {
   const today = new Date();
@@ -22,11 +23,17 @@ export async function GET(req: NextRequest) {
   const groupedNamedDate = searchParams.has("grouped-name-date");
   const of = searchParams.get("of")?.split(",").map(Number);
   const month = searchParams.get("month") ?? undefined;
+  const type = searchParams.get("type") as logs_type ?? undefined;
   let year = searchParams.get("year") ?? undefined;
   let startDate: Date | undefined = undefined;
-  let endDate: Date | undefined = undefined;
+  let endDate: Date | undefined = undefined;    
 
-  if (!month && year) {
+  // check if type are not logs_type
+  if (type && !Object.values(logs_type).includes(type)) {
+    return NextResponse.json({ message: `Allowed type: ${Object.values(logs_type).join(", ")}` });
+  }
+  
+  if (!year) {
     year = new Date().getFullYear().toString();
   }
 
@@ -41,10 +48,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Month must be between 1 and 12" });
   }
 
-  if (month) {
-    startDate = new Date(Date.UTC(Number(year), Number(month) - 1));
-    endDate = new Date(Date.UTC(Number(year), Number(month), 0));
+  if (year && !month) {
+    startDate = new Date(`${year}-01-01`);
+    endDate =  new Date(`${(Number(year) + 1)}-01-01`);    
   }
+
+  if (year && month) {
+    startDate = new Date(`${year}-${month}-01`);
+    endDate = new Date(`${year}-${(Number(month) + 1)}-01`);
+  }          
 
   let logs = (await prisma.logs.findMany({
     take: limit,
@@ -64,8 +76,9 @@ export async function GET(req: NextRequest) {
       },
       date: {
         lte: endDate,
-        gte: startDate,
+        gte: startDate
       },
+      type
     },
   })) as LogWithUserWithJob[];
 
