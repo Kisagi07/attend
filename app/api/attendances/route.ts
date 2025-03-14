@@ -1,6 +1,7 @@
 import { monthNumberToWord } from "@/app/helper";
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
+import { logs_type } from "@prisma/client";
 
 function getTodayDate() {
   const today = new Date();
@@ -22,9 +23,15 @@ export async function GET(req: NextRequest) {
   const groupedNamedDate = searchParams.has("grouped-name-date");
   const of = searchParams.get("of")?.split(",").map(Number);
   const month = searchParams.get("month") ?? undefined;
+  const type = searchParams.get("type") as logs_type ?? undefined;
   let year = searchParams.get("year") ?? undefined;
   let startDate: Date | undefined = undefined;
-  let endDate: Date | undefined = undefined;
+  let endDate: Date | undefined = undefined;    
+
+  // check if type are not logs_type
+  if (type && !Object.values(logs_type).includes(type)) {
+    return NextResponse.json({ message: `Allowed type: ${Object.values(logs_type).join(", ")}` });
+  }
   
   if (!year) {
     year = new Date().getFullYear().toString();
@@ -71,6 +78,7 @@ export async function GET(req: NextRequest) {
         lte: endDate,
         gte: startDate
       },
+      type
     },
   })) as LogWithUserWithJob[];
 
