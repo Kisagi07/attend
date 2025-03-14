@@ -25,8 +25,8 @@ export async function GET(req: NextRequest) {
   let year = searchParams.get("year") ?? undefined;
   let startDate: Date | undefined = undefined;
   let endDate: Date | undefined = undefined;
-
-  if (!month && year) {
+  
+  if (!year) {
     year = new Date().getFullYear().toString();
   }
 
@@ -41,10 +41,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Month must be between 1 and 12" });
   }
 
-  if (month) {
-    startDate = new Date(Date.UTC(Number(year), Number(month) - 1));
-    endDate = new Date(Date.UTC(Number(year), Number(month), 0));
+  if (year && !month) {
+    startDate = new Date(`${year}-01-01`);
+    endDate =  new Date(`${(Number(year) + 1)}-01-01`);    
   }
+
+  if (year && month) {
+    startDate = new Date(`${year}-${month}-01`);
+    endDate = new Date(`${year}-${(Number(month) + 1)}-01`);
+  }          
 
   let logs = (await prisma.logs.findMany({
     take: limit,
@@ -64,7 +69,7 @@ export async function GET(req: NextRequest) {
       },
       date: {
         lte: endDate,
-        gte: startDate,
+        gte: startDate
       },
     },
   })) as LogWithUserWithJob[];
