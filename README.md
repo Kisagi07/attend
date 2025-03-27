@@ -133,15 +133,14 @@ This api will return the best employee with the highest score based on attendanc
 #### Response
 
 ```json
-
 {
-    "Employee name": {
-        "score": 12,
-        "totalLate": 2,
-        "workFromHome": 7,
-        "attendances": 14
-    }
-}    
+  "Employee name": {
+    "score": 12,
+    "totalLate": 2,
+    "workFromHome": 7,
+    "attendances": 14
+  }
+}
 ```
 
 ### 5 Day Summarize
@@ -213,6 +212,8 @@ Fetches all users, by default ordered by created in desc direction
 ### API Options
 
 - `role` (string: `intern` | `employee`): fetch only users with said role, by default fetch all users except admin
+- `withMonthLogs` (string: `no value`): include fetching the logs of current month of each user
+- `withMonthDayOffRequest` (string: `no value`): include day off request of current month of each user
 
 ### Response
 
