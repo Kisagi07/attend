@@ -1,29 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { UserResultMany } from "@/app/prisma";
 import { $Enums } from "@prisma/client";
+import {
+  endOfMonth,
+  getLocalTimeZone,
+  startOfMonth,
+  today,
+} from "@internationalized/date";
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
-  let role: string | $Enums.users_role[] | undefined = params.get("role") ?? undefined;
-  const monthlyStatus = params.has("monthly-status");
+  let role: string | $Enums.users_role[] | undefined =
+    params.get("role") ?? undefined;
+  let startMonth;
+  let endMonth;
+
+  const withMonthLogs = params.has("withMonthLogs");
+  const withMonthDayoffRequest = params.has("withMonthDayOffRequest");
+  if (withMonthLogs) {
+    const td = today(getLocalTimeZone());
+    startMonth = startOfMonth(td);
+    endMonth = endOfMonth(td);
+  }
+
   if (role) {
     role = role.split(",") as $Enums.users_role[];
   }
 
   let users = await prisma.users.findMany({
-    select: {
+    include: {
       job_position: true,
-      name: true,
-      work_id: true,
-      role: true,
-      job_position_id: true,
-      created_at: true,
-      updated_at: true,
-      gender: true,
-      id: true,
-      profile_picture: true,
-      api_profile_picture: true,
+      logs: withMonthLogs
+        ? {
+            where: {
+              date: {
+                gte: startMonth?.toDate(getLocalTimeZone()),
+                lte: endMonth?.toDate(getLocalTimeZone()),
+              },
+            },
+            orderBy: {
+              date: "desc",
+            },
+          }
+        : undefined,
+      dayOffRequests: withMonthDayoffRequest
+        ? {
+            where: {
+              OR: [
+                {
+                  leaveStartDate: {
+                    gte: startMonth?.toDate(getLocalTimeZone()),
+                    lte: endMonth?.toDate(getLocalTimeZone())
+                  },
+                },
+                {
+                  leaveEndDate: {
+                    gte: startMonth?.toDate(getLocalTimeZone()),
+                    lte: endMonth?.toDate(getLocalTimeZone())
+                  },
+                },
+              ],
+            },
+          }
+        : undefined,
     },
     orderBy: {
       created_at: "desc",
