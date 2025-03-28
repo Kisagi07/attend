@@ -17,15 +17,22 @@ const changeExRole = async (
   return updatedUser;
 };
 
-export async function GET(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ work_id: string }> }
+) {
   const params = await props.params;
   const searchParams = req.nextUrl.searchParams;
   const monthlyStatus = searchParams.has("monthly-status");
 
   const user = await prisma.users.findFirst({
-    where: {
-      work_id: params.work_id,
-    },
+    where: params.work_id.includes("ID")
+      ? {
+          work_id: params.work_id,
+        }
+      : {
+          id: Number(params.work_id),
+        },
     select: {
       name: true,
       work_id: true,
@@ -45,12 +52,15 @@ export async function GET(req: NextRequest, props: { params: Promise<{ work_id: 
   if (!user) return NextResponse.json(null);
 
   user.profile_picture = user.profile_picture
-    ? `${process.env.APP_URL}/api/public${user.profile_picture}`
+    ? `${process.env.APP_URL}/api/images/${user.profile_picture}`
     : null;
   return NextResponse.json(user);
 }
 
-export async function DELETE(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  props: { params: Promise<{ work_id: string }> }
+) {
   const params = await props.params;
   const user = await prisma.users.findFirst({
     where: {
@@ -83,9 +93,13 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ work_i
   return NextResponse.json({ message: "Deleted", data: { deleted } });
 }
 
-export async function PUT(req: NextRequest, props: { params: Promise<{ work_id: string }> }) {
+export async function PUT(
+  req: NextRequest,
+  props: { params: Promise<{ work_id: string }> }
+) {
   const params = await props.params;
-  const { name, job_position_id, gender, role, password, toEx, unEx } = await req.json();
+  const { name, job_position_id, gender, role, password, toEx, unEx } =
+    await req.json();
 
   let user = await prisma.users.findFirst({
     where: {
@@ -124,7 +138,11 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ work_id: 
       }
     }
     // if its not unique return error
-    if (!unique) return NextResponse.json({ error: "PIN already in use" }, { status: 409 });
+    if (!unique)
+      return NextResponse.json(
+        { error: "PIN already in use" },
+        { status: 409 }
+      );
     await prisma.users.update({
       where: {
         id: user.id,
