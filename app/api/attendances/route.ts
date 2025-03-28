@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   // get all allowed search params
   let limit = Number(searchParams.get("limit")) || undefined;
+  const withoutUser = searchParams.has("withoutUser");
   const groupedNamedDate = searchParams.has("grouped-name-date");
   const of = searchParams.get("of")?.split(",").map(Number);
   const month = searchParams.get("month") ?? undefined;
@@ -32,10 +33,7 @@ export async function GET(req: NextRequest) {
   if (type && !Object.values(logs_type).includes(type)) {
     return NextResponse.json({ message: `Allowed type: ${Object.values(logs_type).join(", ")}` });
   }
-  
-  if (!year) {
-    year = new Date().getFullYear().toString();
-  }
+
 
   if (year && isNaN(Number(year))) {
     return NextResponse.json({ message: "Invalid year" });
@@ -53,19 +51,28 @@ export async function GET(req: NextRequest) {
     endDate =  new Date(`${(Number(year) + 1)}-01-01`);    
   }
 
+  if (month && !year) {
+     year = new Date().getFullYear().toString();
+    startDate = new Date(`${year}-01-01`);
+    endDate =  new Date(`${(Number(year) + 1)}-01-01`);    
+  }
+
   if (year && month) {
     startDate = new Date(`${year}-${month}-01`);
     endDate = new Date(`${year}-${(Number(month) + 1)}-01`);
   }          
+  
 
   let logs = (await prisma.logs.findMany({
     take: limit,
     include: {
-      user: {
-        include: {
-          job_position: true,
-        },
-      },
+      user: withoutUser
+        ? undefined
+        : {
+            include: {
+              job_position: true,
+            },
+          },
     },
     orderBy: {
       created_at: "desc",
@@ -76,9 +83,9 @@ export async function GET(req: NextRequest) {
       },
       date: {
         lte: endDate,
-        gte: startDate
+        gte: startDate,
       },
-      type
+      type,
     },
   })) as LogWithUserWithJob[];
 
