@@ -1,12 +1,11 @@
 "use client";
-import InputText from "@/app/components/InputText";
 import { useState } from "react";
 import { toast } from "sonner";
 import WorkDayInput from "@/app/components/WorkDayInput";
 import { extractNumber } from "@/app/helper";
 import { Input } from "@heroui/input";
 import { TimeInput } from "@heroui/date-input";
-import { Time, parseTime } from "@internationalized/date";
+import { Time } from "@react-types/datepicker/node_modules/@internationalized/date"
 import { Button } from "@heroui/button";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
@@ -103,7 +102,8 @@ const JobCreatePage = () => {
           <h6>Shift :</h6>
           <div className="grid grid-cols-3 items-center">
             <TimeInput
-              value={shiftStart}
+            // @ts-ignore
+              value={shiftStart}              
               onChange={setShiftStart}
               isInvalid={Object.hasOwn(formErrors, "shiftStart")}
               errorMessage={formErrors["shiftStart"]}
@@ -111,7 +111,9 @@ const JobCreatePage = () => {
             />
             <span className="text-center">-</span>
             <TimeInput
+              // @ts-ignore
               value={shiftEnd}
+              // @ts-ignore
               onChange={setShiftEnd}
               isInvalid={Object.hasOwn(formErrors, "shiftEnd")}
               errorMessage={formErrors["shiftEnd"]}

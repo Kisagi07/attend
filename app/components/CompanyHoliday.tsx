@@ -70,9 +70,7 @@ const CompanyHoliday: React.FC = () => {
       <hr />
       <div className="space-y-2 md:grid md:grid-cols-2 md:items-center md:gap-2 md:space-y-0">
         <DatePicker
-          label="Pick New Holiday Date"
-          // onSelectedDateChanged={setDate}
-          // defaultDate={date}
+          label="Pick New Holiday Date"        
           value={date}
           onChange={setDate}
         />

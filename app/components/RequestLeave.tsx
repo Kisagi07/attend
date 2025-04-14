@@ -89,6 +89,7 @@ const RequestLeave = () => {
             onValueChange={setComment}
           />
           <DateRangePicker
+          // @ts-ignore
             minValue={today(getLocalTimeZone())}
             variant="underlined"
             startName="leave_start_date"
