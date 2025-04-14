@@ -2,7 +2,7 @@
 import React from "react";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { holidays } from "@prisma/client";
+import { holidays } from "@/prisma/client";
 import { IoIosRemoveCircle } from "react-icons/io";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";

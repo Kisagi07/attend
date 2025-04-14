@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { DayOffRequest } from "@prisma/client";
+import { DayOffRequest } from "@/prisma/client";
 import clsx from "clsx";
 import useSWR from "swr";
 import { fetcher } from "../helper";

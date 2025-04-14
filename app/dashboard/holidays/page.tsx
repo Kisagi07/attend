@@ -4,7 +4,7 @@ import Calendar from "@components/Calendar";
 import { parseDate, CalendarDate } from "@internationalized/date";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { holidays } from "@prisma/client";
+import { holidays } from "@/prisma/client";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 import {

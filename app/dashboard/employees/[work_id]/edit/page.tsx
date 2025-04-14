@@ -1,7 +1,7 @@
 "use client";
 import Select from "@/app/components/Select";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
-import { job_positions, users } from "@prisma/client";
+import { job_positions, users } from "@/prisma/client";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";

@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "../helper";
-import { logs } from "@prisma/client";
+import { logs } from "@/prisma/client";
 import { VerticalChartSkeleton } from "../skeletons";
 import {
   BarChart,

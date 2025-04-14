@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import InputText from "./InputText";
 import { toast } from "sonner";
-import { company } from "@prisma/client";
+import { company } from "@/prisma/client";
 import SettingOfficeSkeleton from "../skeletons/SettingOfficeSkeleton";
 import Confirmation from "./Confirmation";
 import { FaLocationDot } from "react-icons/fa6";

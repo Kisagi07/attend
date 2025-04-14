@@ -11,7 +11,7 @@ import { Button } from "@heroui/button";
 import { MdScheduleSend } from "react-icons/md";
 import { FaLink } from "react-icons/fa";
 import { toast } from "sonner";
-import { Project } from "@prisma/client";
+import { Project } from "@/prisma/client";
 
 type Props = {
   project: Project;

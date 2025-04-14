@@ -1,6 +1,6 @@
 "use client";
 import Table from "@/app/components/Table";
-import { DrinkAndFoodCost } from "@prisma/client";
+import { DrinkAndFoodCost } from "@/prisma/client";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Chip } from "@heroui/chip";
 import { FaBowlFood, FaTrash, FaPencil } from "react-icons/fa6";

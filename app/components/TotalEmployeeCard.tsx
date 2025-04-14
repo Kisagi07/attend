@@ -1,5 +1,5 @@
 "use client";
-import { users } from "@prisma/client";
+import { users } from "@/prisma/client";
 import { FaPeopleGroup } from "react-icons/fa6";
 import useSWR, { Fetcher } from "swr";
 import { SmallCardSkeleton } from "@/app/skeletons";
