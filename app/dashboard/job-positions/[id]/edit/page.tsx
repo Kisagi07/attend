@@ -136,7 +136,10 @@ const JobEditPage = (props: { params: Promise<{ id: number }> }) => {
             <h6>Shift :</h6>
             <div className="grid grid-cols-3 items-center">
               <TimeInput
+              //  @ts-ignore
                 value={shiftStart}
+              //  @ts-ignore
+
                 onChange={setShiftStart}
                 isInvalid={Object.hasOwn(formErrors, "shiftStart")}
                 errorMessage={formErrors["shiftStart"]}
@@ -144,7 +147,9 @@ const JobEditPage = (props: { params: Promise<{ id: number }> }) => {
               />
               <span className="text-center">-</span>
               <TimeInput
+              // @ts-ignore
                 value={shiftEnd}
+                // @ts-ignore
                 onChange={setShiftEnd}
                 isInvalid={Object.hasOwn(formErrors, "shiftEnd")}
                 errorMessage={formErrors["shiftEnd"]}
