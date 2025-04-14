@@ -11,7 +11,8 @@
     "clear": "rm -rf .next"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts",
+    "schema": "./prisma/schema"
   },
   "dependencies": {
     "@heroui/avatar": "2.2.7",
