@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -54,8 +54,9 @@ const ClockInOut = () => {
     }
   );
 
-  // hook variable
+  const inputImageRef = useRef<HTMLInputElement>(null);
 
+  // hook variable
   const [selectedButton, setSelectedButton] = useState<Set<string> | "all">(
     new Set(["work_from_office"])
   );
@@ -339,6 +340,10 @@ const ClockInOut = () => {
     setTodaysWork((prev) => prev.filter((pre) => pre !== value));
   };
 
+  const handleTakePictureButton = () => {
+    inputImageRef.current?.click();
+  };
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const { type, clock_out_time } = todayAttendance;
@@ -417,15 +422,19 @@ const ClockInOut = () => {
     </Button>
   ) : (
     <div className="flex flex-col gap-4 items-center">
-      <div className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg flex-col p-4 w-40 h-40 flex justify-center items-center after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]">
+      <div
+        onClick={handleTakePictureButton}
+        className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg flex-col p-4 w-40 h-40 flex justify-center items-center after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
+      >
         <IoCameraOutline className="size-20" />
         <p className="text-center">Bukti Foto Dibutuhkan</p>
+        <Input
+          ref={inputImageRef}
+          type="file"
+          name="picture-proof"
+          className="absolute z-[-1] opacity-0"
+        />
       </div>
-      <Input
-        type="file"
-        name="picture-proof"
-        className="absolute z-[-1] opacity-0"
-      />
       <div className="space-y-4 w-full">
         {status.isLate &&
           !status.clockIn &&
