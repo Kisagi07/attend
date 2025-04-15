@@ -428,7 +428,9 @@ const ClockInOut = () => {
       >
         <IoCameraOutline className="size-20" />
         <p className="text-center">Bukti Foto Dibutuhkan</p>
-        <Input
+        <input
+          accept="image/*"
+          capture="user"
           ref={inputImageRef}
           type="file"
           name="picture-proof"
