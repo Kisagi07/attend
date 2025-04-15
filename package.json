@@ -12,7 +12,7 @@
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts",
-    "schema": "./prisma/schema"
+    "schema": "./prisma/"
   },
   "dependencies": {
     "@heroui/avatar": "2.2.14-beta.0",

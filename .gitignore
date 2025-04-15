@@ -48,4 +48,4 @@ app/components/plainFall.js
 debug.log
 
 # generated prisma client
-/prisma/client/
+/prisma/client/*

@@ -1,0 +1,7 @@
+model holidays {
+  id         Int      @id @default(autoincrement())
+  date       DateTime @db.DateTime(0)
+  name       String   @db.VarChar(255)
+  created_at DateTime @db.DateTime(0) @default(now())
+  updated_at DateTime @db.DateTime(0) @updatedAt
+}
