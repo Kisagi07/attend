@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, logs_type } from "@/prisma/client";
-
+import { IoCameraOutline } from "react-icons/io5";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
@@ -416,77 +416,88 @@ const ClockInOut = () => {
       Good Work Today!
     </Button>
   ) : (
-    <>
-      {status.isLate &&
-        !status.clockIn &&
-        isWorkDay &&
-        selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance" &&
-        selectedButtonValue !== "on_site_work" && (
-          <>
-            <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
-              You are late! hurry up!
-            </div>
-            <Input
-              label="State your reason for coming in late"
-              color="danger"
-              variant="underlined"
-              name="late-reason"
-              value={lateReason}
-              onValueChange={setLateReason}
-            />
-          </>
+    <div className="flex flex-col gap-4 items-center">
+      <div className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg flex-col p-4 w-40 h-40 flex justify-center items-center after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]">
+        <IoCameraOutline className="size-20" />
+        <p className="text-center">Bukti Foto Dibutuhkan</p>
+      </div>
+      <Input
+        type="file"
+        name="picture-proof"
+        className="absolute z-[-1] opacity-0"
+      />
+      <div className="space-y-4 w-full">
+        {status.isLate &&
+          !status.clockIn &&
+          isWorkDay &&
+          selectedButtonValue !== "sick" &&
+          selectedButtonValue !== "special_attendance" &&
+          selectedButtonValue !== "on_site_work" && (
+            <>
+              <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">
+                You are late! hurry up!
+              </div>
+              <Input
+                label="State your reason for coming in late"
+                color="danger"
+                variant="underlined"
+                name="late-reason"
+                value={lateReason}
+                onValueChange={setLateReason}
+              />
+            </>
+          )}
+        {status.clockIn && !status.done && (
+          <ListInput
+            items={todaysWork}
+            addItem={handleAddItem}
+            removeItem={handleRemoveItem}
+          />
         )}
-      {status.clockIn && !status.done && (
-        <ListInput
-          items={todaysWork}
-          addItem={handleAddItem}
-          removeItem={handleRemoveItem}
-        />
-      )}
-      {showSpecialReason && (
-        <Input
-          variant="underlined"
-          label="Reason"
-          value={specialReason}
-          onChange={(e) => setSpecialReason(e.currentTarget.value)}
-        />
-      )}
-      <ButtonGroup variant="flat" fullWidth>
-        <Button
-          isLoading={sending}
-          onClick={handleButtonClick}
-          color={
-            buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ??
-            "default"
-          }
-        >
-          {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ??
-            "Loading"}
-        </Button>
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Button isIconOnly>
-              <BiChevronDown className="size-6" />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            selectionMode="single"
-            selectedKeys={selectedButton}
-            onSelectionChange={(selected) =>
-              setSelectedButton(selected as Set<string>)
+        {showSpecialReason && (
+          <Input
+            variant="underlined"
+            label="Reason"
+            value={specialReason}
+            onChange={(e) => setSpecialReason(e.currentTarget.value)}
+          />
+        )}
+        <ButtonGroup variant="flat" fullWidth>
+          <Button
+            isLoading={sending}
+            onClick={handleButtonClick}
+            color={
+              buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ??
+              "default"
             }
           >
-            {Object.values(buttonOptions).map((option, index) => (
-              <DropdownItem key={Object.keys(buttonOptions)[index]}>
-                {option!.label}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown>
-      </ButtonGroup>
-    </>
+            {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ??
+              "Loading"}
+          </Button>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button isIconOnly>
+                <BiChevronDown className="size-6" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              disallowEmptySelection
+              selectionMode="single"
+              selectedKeys={selectedButton}
+              onSelectionChange={(selected) =>
+                setSelectedButton(selected as Set<string>)
+              }
+            >
+              {Object.values(buttonOptions).map((option, index) => (
+                <DropdownItem key={Object.keys(buttonOptions)[index]}>
+                  {option!.label}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </ButtonGroup>
+      </div>
+    </div>
   );
 };
 export default ClockInOut;
