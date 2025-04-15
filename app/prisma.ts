@@ -1,5 +1,5 @@
-import { Prisma, PrismaClient, ProjectHistory, users, logs as Log } from "@prisma/client";
-import { parseTime } from "@internationalized/date";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { ProjectHistory, users, logs as Log } from "@/prisma/client";
 
 const prisma = new PrismaClient({
   omit: {
@@ -29,7 +29,9 @@ const prisma = new PrismaClient({
         routeToAPI(history: ProjectHistory) {
           return {
             ...history,
-            file: history.file ? `${process.env.APP_URL}/api/public${history.file}` : null,
+            file: history.file
+              ? `${process.env.APP_URL}/api/public${history.file}`
+              : null,
           } as any;
         },
       },
@@ -102,23 +104,25 @@ const UserOmitPassword = Prisma.validator<Prisma.usersDefaultArgs>()({
 });
 
 // Day Off Requests
-const DayOffRequestWithUser = Prisma.validator<Prisma.DayOffRequestDefaultArgs>()({
-  include: {
-    user: true,
-  },
-});
+const DayOffRequestWithUser =
+  Prisma.validator<Prisma.DayOffRequestDefaultArgs>()({
+    include: {
+      user: true,
+    },
+  });
 
 // Projects
-const ProjectWithLeadWithJobAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
-  include: {
-    projectLead: {
-      include: {
-        job_position: true,
+const ProjectWithLeadWithJobAndMembers =
+  Prisma.validator<Prisma.ProjectDefaultArgs>()({
+    include: {
+      projectLead: {
+        include: {
+          job_position: true,
+        },
       },
+      projectMembers: true,
     },
-    projectMembers: true,
-  },
-});
+  });
 
 const ProjectWithMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
   include: {
@@ -126,12 +130,14 @@ const ProjectWithMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
   },
 });
 
-const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()({
-  include: {
-    projectLead: true,
-    projectMembers: true,
-  },
-});
+const ProjectWithLeadAndMembers = Prisma.validator<Prisma.ProjectDefaultArgs>()(
+  {
+    include: {
+      projectLead: true,
+      projectMembers: true,
+    },
+  }
+);
 
 // Activities
 const ActivityWithUser = Prisma.validator<Prisma.ProjectActivityDefaultArgs>()({
@@ -149,22 +155,36 @@ const HistoryWithUser = Prisma.validator<Prisma.ProjectHistoryDefaultArgs>()({
 
 // Types from validator
 export type LogWithUser = Prisma.logsGetPayload<typeof LogWithUser>;
-export type LogWithUserWithJob = Prisma.logsGetPayload<typeof LogWithUserWithJob>;
+export type LogWithUserWithJob = Prisma.logsGetPayload<
+  typeof LogWithUserWithJob
+>;
 
-export type UserJobExPassword = Prisma.usersGetPayload<typeof UserJobExPassword>;
+export type UserJobExPassword = Prisma.usersGetPayload<
+  typeof UserJobExPassword
+>;
 export type UserWithJob = Prisma.usersGetPayload<typeof UserWithJob>;
 export type UserOmitPassword = Prisma.usersGetPayload<typeof UserOmitPassword>;
 
-export type DayOffRequestWithUser = Prisma.DayOffRequestGetPayload<typeof DayOffRequestWithUser>;
+export type DayOffRequestWithUser = Prisma.DayOffRequestGetPayload<
+  typeof DayOffRequestWithUser
+>;
 
 export type ProjectWithLeadWithJobAndMembers = Prisma.ProjectGetPayload<
   typeof ProjectWithLeadWithJobAndMembers
 >;
-export type ProjectWithMembers = Prisma.ProjectGetPayload<typeof ProjectWithMembers>;
-export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<typeof ProjectWithLeadAndMembers>;
+export type ProjectWithMembers = Prisma.ProjectGetPayload<
+  typeof ProjectWithMembers
+>;
+export type ProjectWithLeadAndMembers = Prisma.ProjectGetPayload<
+  typeof ProjectWithLeadAndMembers
+>;
 
-export type ActivityWithUser = Prisma.ProjectActivityGetPayload<typeof ActivityWithUser>;
-export type HistoryWithUser = Prisma.ProjectHistoryGetPayload<typeof HistoryWithUser>;
+export type ActivityWithUser = Prisma.ProjectActivityGetPayload<
+  typeof ActivityWithUser
+>;
+export type HistoryWithUser = Prisma.ProjectHistoryGetPayload<
+  typeof HistoryWithUser
+>;
 
 // Type results
 export type UserApiProfile = Prisma.Result<
@@ -233,7 +253,12 @@ export type withStatus = UserJobExPassword & {
   totalAbsent: number;
   totalWorkFromHome: number;
   totalWorkFromOffice: number;
-  todayStatus: "work_from_home" | "work_from_office" | "sick" | "absent" | "work_with_duty";
+  todayStatus:
+    | "work_from_home"
+    | "work_from_office"
+    | "sick"
+    | "absent"
+    | "work_with_duty";
 };
 
 async () => {

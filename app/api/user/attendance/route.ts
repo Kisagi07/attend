@@ -2,7 +2,8 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-import { Prisma, logs as Log, logs_type } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { logs as Log, logs_type } from "@/prisma/client";
 import { parseTime } from "@internationalized/date";
 
 interface PostJson {
@@ -70,7 +71,9 @@ export async function POST(req: NextRequest) {
   // #region //? basic store data functionality
   if (type === "sick") {
     const [hours, minutes, seconds] = clock_in_time.split(":");
-    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_in_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
 
     log = await prisma.logs.create({
       data: {
@@ -103,7 +106,9 @@ export async function POST(req: NextRequest) {
     }
 
     const [hours, minutes, seconds] = clock_out_time.split(":");
-    const clock_out_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_out_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
 
     log = await prisma.logs.update({
       where: {
@@ -133,7 +138,9 @@ export async function POST(req: NextRequest) {
     });
   } else {
     const [hours, minutes, seconds] = clock_in_time.split(":");
-    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_in_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
     log = await prisma.logs.create({
       data: {
         type: type.replaceAll("-", "_") as logs_type,

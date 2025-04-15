@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, logs_type } from "@/prisma/client";
-import { Prisma } from "@/prisma/client";
+import { Prisma } from "@prisma/client";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
@@ -264,7 +264,8 @@ const ClockInOut = () => {
     if (
       status.isLate &&
       type !== "clock-out" &&
-      type !== "special_attendance" && type !== "on_site_work"
+      type !== "special_attendance" &&
+      type !== "on_site_work"
     ) {
       sendData["todaysWork"] = [
         "Late Reason: " + lateReason,
@@ -420,7 +421,8 @@ const ClockInOut = () => {
         !status.clockIn &&
         isWorkDay &&
         selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance" && selectedButtonValue !== "on_site_work" && (
+        selectedButtonValue !== "special_attendance" &&
+        selectedButtonValue !== "on_site_work" && (
           <>
             <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
               You are late! hurry up!
