@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, logs_type } from "@/prisma/client";
-import { Prisma } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
@@ -313,17 +313,17 @@ const ClockInOut = () => {
   const getTargetLocation = (
     fromHome: boolean
   ): {
-    targetLatitude: Prisma.Decimal;
-    targetLongitude: Prisma.Decimal;
+    targetLatitude: Decimal;
+    targetLongitude: Decimal;
   } => {
-    let targetLatitude = new Prisma.Decimal(0.0);
-    let targetLongitude = new Prisma.Decimal(0.0);
+    let targetLatitude = new Decimal(0.0);
+    let targetLongitude = new Decimal(0.0);
     if (fromHome) {
-      targetLatitude = new Prisma.Decimal(user?.home_latitude || 0);
-      targetLongitude = new Prisma.Decimal(user?.home_longitude || 0);
+      targetLatitude = new Decimal(user?.home_latitude || 0);
+      targetLongitude = new Decimal(user?.home_longitude || 0);
     } else {
-      targetLatitude = new Prisma.Decimal(company?.latitude || 0);
-      targetLongitude = new Prisma.Decimal(company?.longitude || 0);
+      targetLatitude = new Decimal(company?.latitude || 0);
+      targetLongitude = new Decimal(company?.longitude || 0);
     }
     return {
       targetLatitude,
