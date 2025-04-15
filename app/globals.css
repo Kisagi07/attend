@@ -1,8 +1,47 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 @font-face {
   font-family: Sixtyfour;
-  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf") format("truetype");
+  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf")
+    format("truetype");
+}
+
+@theme {
+  --color-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --color-gradient-conic: conic-gradient(
+      from 180deg at 50% 50%,
+      var(--tw-gradient-stops) ;
+    )
+    --animate-fade-up: fade-up 150ms forwards;
+  --animate-fade-down: fade-down 150ms forwards;
+
+  --font-sixtyFour: "SixtyFour", "Helvetica";
+
+  --shadow-around:
+    0 0 6px -1px rgba(0, 0, 0, 0.1), 0 0 4px -1px rgba(0, 0, 0, 0.06);
+
+  @keyframes fade-down {
+    0% {
+      transform: translateY(50%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(100%);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-up {
+    0% {
+      transform: translateY(100%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(50%);
+      opacity: 0;
+    }
+  }
 }
 
 :root {
@@ -33,28 +72,6 @@ body {
 @layer base {
   main > section {
     @apply px-4;
-  }
-}
-
-@keyframes fade-down {
-  0% {
-    transform: translateY(50%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(100%);
-    opacity: 1;
-  }
-}
-
-@keyframes fade-up {
-  0% {
-    transform: translateY(100%);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(50%);
-    opacity: 0;
   }
 }
 
