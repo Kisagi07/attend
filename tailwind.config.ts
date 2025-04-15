@@ -2,10 +2,7 @@ import { heroui } from "@heroui/theme";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  content: [    
     "./node_modules/@heroui/theme/dist/components/(avatar|button|calendar|card|checkbox|chip|date-input|date-picker|divider|dropdown|form|input|link|modal|pagination|progress|select|skeleton|spinner|table|tabs|popover|user|ripple|menu|listbox|scroll-shadow|spacer).js"
   ],
   theme: {
