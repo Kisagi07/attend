@@ -1,5 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { ProjectHistory, users, logs as Log } from "@/prisma/client";
+import {
+  ProjectHistory,
+  users,
+  logs as Log,
+  PrismaClient,
+  Prisma,
+} from "@/prisma/client";
 
 const prisma = new PrismaClient({
   omit: {
