@@ -208,20 +208,21 @@ const ClockInOut = () => {
     latitude: number;
     longitude: number;
   }) => {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("clock_in_time", getTimeOnly());
+    formData.append("clock_in_latitude", latitude.toString());
+    formData.append("clock_in_longitude", longitude.toString());
+    if (capturedProof) {
+      formData.append("proof", capturedProof);
+    }
+    todaysWork.forEach((work) => {
+      formData.append("todaysWork[]", work);
+    })
     try {
       const response = await fetch(`/api/user/attendance`, {
         method: "POST",
-        body: JSON.stringify({
-          type,
-          clock_in_time: getTimeOnly(),
-          date: getDateOnly(),
-          clock_in_latitude: latitude,
-          clock_in_longitude: longitude,
-          todaysWork,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body:formData,       
       });
       const data = await response.json();
       mutateAttendance();
@@ -248,6 +249,7 @@ const ClockInOut = () => {
       date: getDateOnly(),
       isOverTime,
       todaysWork: todaysWork,
+      proof: capturedProof
     };
     if (type === "clock-out") {
       sendData["clock_out_time"] = getTimeOnly();
@@ -276,12 +278,19 @@ const ClockInOut = () => {
       ];
     }
     try {
+      const formData = new FormData();
+      Object.entries(sendData).forEach(([key, value]) => {
+        if (key === "todaysWork" && Array.isArray(value)) {
+          value.forEach((work) => {
+            formData.append("todaysWork[]", work);
+          })
+        } else {
+          formData.append(key, value);
+        }
+      }) 
       const res = await fetch(`/api/user/attendance`, {
         method: "POST",
-        body: JSON.stringify(sendData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,        
       });
       mutateAttendance();
       setStatus((prev) => ({ ...prev, clockin: true }));
