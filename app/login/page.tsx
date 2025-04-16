@@ -24,17 +24,23 @@ const LoginPage = () => {
       return;
     }
 
+
+    const host = window.location.host;
+    const protocol = window.location.protocol;
+    const baseUrl = `${protocol}//${host}`;    
+
     const res = await signIn("credentials", {
-      PIN,
-      callbackUrl: searchParams.get("callbackUrl") ?? "/home",
+      PIN,      
       redirect: false,
     });
     setSubmitting(false);
 
     if (res && res.error) {
       setIncorrect(true);
-    } else {
-      router.push(res?.url!);
+    } else {      
+    const callbackUrl = searchParams.get("callbackUrl") ? `${baseUrl}${searchParams.get("callbackUrl")}` : `${baseUrl}/home`;    
+
+      router.push(callbackUrl);
       setRedirecting(true);
     }
   };
