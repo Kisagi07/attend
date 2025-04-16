@@ -2,8 +2,10 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-import { Prisma, logs as Log, logs_type } from "@prisma/client";
+import { Prisma } from "@/prisma/client";
+import { logs as Log, logs_type } from "@/prisma/client";
 import { parseTime } from "@internationalized/date";
+import { storeFile } from "@/app/file";
 
 interface PostJson {
   type: logs_type | "clock-out";
@@ -18,19 +20,24 @@ interface PostJson {
   isOverTime: boolean;
 }
 
-export async function POST(req: NextRequest) {
-  const {
-    type,
-    clock_in_time,
-    date,
-    clock_in_latitude,
-    clock_in_longitude,
-    todaysWork,
-    clock_out_time,
-    clock_out_latitude,
-    clock_out_longitude,
-    isOverTime,
-  }: PostJson = await req.json();
+export async function POST(req: NextRequest) {  
+  const formData = await req.formData();
+  const type = formData.get("type") as string;
+  const clock_in_time = formData.get("clock_in_time") as string | null;
+  const date = formData.get("date") as string | null;
+  const clock_in_latitude = formData.get("clock_in_latitude") as string | null;
+  const clock_in_longitude = formData.get("clock_in_longitude") as string | null;
+  const todaysWork = formData.getAll("todaysWork[]") as string[];
+  const clock_out_time = formData.get("clock_out_time") as string | null;
+  const clock_out_latitude = formData.get("clock_out_latitude") as string | null;
+  const clock_out_longitude = formData.get("clock_out_longitude") as string | null;
+  const isOverTime = formData.get("isOverTime") as string | null;
+  const proof = formData.get("proof") as File | null;  
+  if (!proof) {
+    return NextResponse.json({error: "Bukti absen tidak ditemukan, tolong ambil gambar"}, {status: 422});
+  }
+
+  const proofPath = await storeFile(proof, {storePath: "/upload/log-proof"});
 
   // #region //? session authentication
   const session = await auth();
@@ -65,12 +72,24 @@ export async function POST(req: NextRequest) {
   }
   // #endregion
 
+  if (!date) {
+    return NextResponse.json({error: "Tanggal tidak ditemukan"}, {status: 422})
+  }
+
   let log: Log;
 
   // #region //? basic store data functionality
   if (type === "sick") {
+    if (!clock_in_time) {
+      return NextResponse.json({error: "Clock in time required when sending sick log"}, {status: 422});
+    }
+    if (!clock_in_latitude || !clock_out_latitude) {
+      return NextResponse.json({error: "Latitude dan Longitude tidak ditemukan"}, {status: 422});
+    }
     const [hours, minutes, seconds] = clock_in_time.split(":");
-    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_in_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
 
     log = await prisma.logs.create({
       data: {
@@ -81,6 +100,7 @@ export async function POST(req: NextRequest) {
         clock_in_longitude,
         work: todaysWork,
         user_id: user.id,
+        clock_in_picture: proofPath
       },
     });
     await prisma.timelines.create({
@@ -102,8 +122,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json("Not Found", { status: 404 });
     }
 
+    if (!clock_out_time) {
+      return NextResponse.json({error: "Waktu pulang tidak ditemukan"}, {status: 422});
+    }
     const [hours, minutes, seconds] = clock_out_time.split(":");
-    const clock_out_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_out_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
 
     log = await prisma.logs.update({
       where: {
@@ -114,6 +139,7 @@ export async function POST(req: NextRequest) {
         clock_out_latitude,
         clock_out_longitude,
         work: [...todaysWork, ...(existingLog.work as Prisma.JsonArray)],
+        clock_out_picture: proofPath
       },
     });
 
@@ -132,8 +158,16 @@ export async function POST(req: NextRequest) {
       },
     });
   } else {
+    if (!clock_in_time) {
+      return NextResponse.json({error: "Clock in time required when sending sick log"}, {status: 422});
+    }
+    if (!isOverTime) {
+      return NextResponse.json({error: "Ada kesalahan dalam menentukan absensi termasuk lembur apa tidak."}, {status: 422});
+    }
     const [hours, minutes, seconds] = clock_in_time.split(":");
-    const clock_in_time_object = new Date(`2024-04-21T${hours}:${minutes}:${seconds}Z`);
+    const clock_in_time_object = new Date(
+      `2024-04-21T${hours}:${minutes}:${seconds}Z`
+    );
     log = await prisma.logs.create({
       data: {
         type: type.replaceAll("-", "_") as logs_type,
@@ -143,7 +177,8 @@ export async function POST(req: NextRequest) {
         clock_in_longitude,
         work: todaysWork,
         user_id: user.id,
-        isOverTime,
+        isOverTime: JSON.parse(isOverTime),
+        clock_in_picture: proofPath
       },
     });
 
@@ -181,6 +216,9 @@ export async function POST(req: NextRequest) {
       if (user.job_position) {
         // parse job end shift & clock out time
         const jobShiftEnd = parseTime(user.job_position.shift_end);
+        if (!clock_out_time) {
+          return NextResponse.json({error: "Gagal menemukan jam pulang untuk menentukan absensi lembur atau tidak."}, {status: 422})
+        }
         const clockOutTime = parseTime(clock_out_time);
         // check if clock out time are 15 minutes after job shift end
         const comparedResult = clockOutTime.compare(jobShiftEnd);

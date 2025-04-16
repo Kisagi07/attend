@@ -6,7 +6,11 @@ export default auth(async function middleware(req) {
     return NextResponse.next();
   }
 
-  const { pathname, origin } = req.nextUrl;
+  const { pathname } = req.nextUrl;
+  const host = req.headers.get("host")  ;
+  const protocol = req.headers.get("x-forwarded-proto") || "http";
+  const origin = `${protocol}://${host}`;  
+
   const apiKey = req.headers.get("X-Uroboros") ?? null;
   const xUroborosKey = process.env.APP_API_KEY;
 
@@ -22,7 +26,7 @@ export default auth(async function middleware(req) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
     } else if (!isLoginRoute && !isApiRoute) {
-      const pathToGo = req.nextUrl.pathname;
+      const pathToGo = req.nextUrl.pathname;      
       return NextResponse.redirect(new URL(`/login?callbackUrl=${pathToGo}`, origin));
     }
   }

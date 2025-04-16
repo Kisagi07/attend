@@ -1,6 +1,6 @@
 "use server";
 import { parseTime } from "@internationalized/date";
-import { logs } from "@prisma/client";
+import { logs } from "@/prisma/client";
 
 const calculateLateInLogs = (logs: logs[], tolerance: number, jobShiftStart: string) => {
   

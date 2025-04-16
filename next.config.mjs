@@ -50,12 +50,16 @@ const nextConfig = {
     ];
   },
   output: "standalone",
+  allowedDevOrigins: [
+    "local-origin.dev",
+    "*.local-origin.dev",
+    "192.168.159.156",
+    "192.168.159.27"
+  ],
 };
-
 
 const withAnalyzer = NextBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
 export default withAnalyzer(nextConfig);
-
