@@ -49,3 +49,4 @@ debug.log
 
 # generated prisma client
 /prisma/client/*
+certificates
