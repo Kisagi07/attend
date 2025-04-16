@@ -100,6 +100,7 @@ export async function POST(req: NextRequest) {
         clock_in_longitude,
         work: todaysWork,
         user_id: user.id,
+        clock_in_picture: proofPath
       },
     });
     await prisma.timelines.create({
@@ -138,6 +139,7 @@ export async function POST(req: NextRequest) {
         clock_out_latitude,
         clock_out_longitude,
         work: [...todaysWork, ...(existingLog.work as Prisma.JsonArray)],
+        clock_out_picture: proofPath
       },
     });
 
@@ -176,6 +178,7 @@ export async function POST(req: NextRequest) {
         work: todaysWork,
         user_id: user.id,
         isOverTime: JSON.parse(isOverTime),
+        clock_in_picture: proofPath
       },
     });
 
