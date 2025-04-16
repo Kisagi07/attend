@@ -434,15 +434,15 @@ const ClockInOut = () => {
     <div className="flex flex-col gap-4 items-center">
       <div
         onClick={handleTakePictureButton}
-        className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg flex-col p-4 w-40 h-40 flex justify-center items-center after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
+        className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg  size-40 after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
       >
         {capturedProof ? (
-          <Image src={URL.createObjectURL(capturedProof)} className="size-20" height={160} width={160} alt="captured proof" />
+          <Image src={URL.createObjectURL(capturedProof)} className="size-40 object-cover object-center rounded-lg" height={160} width={160} alt="captured proof" />
         ) : (
-          <>
+          <div className="p-4 flex justify-center flex-col items-center space-y-4">
         <IoCameraOutline className="size-20" />
         <p className="text-center">Bukti Foto Dibutuhkan</p>
-        </>
+        </div>
         )}
         <input
           onChange={handleProofChange}
