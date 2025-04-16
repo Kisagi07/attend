@@ -5,6 +5,7 @@ import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { Prisma } from "@prisma/client";
 import { logs as Log, logs_type } from "@/prisma/client";
 import { parseTime } from "@internationalized/date";
+import { storeFile } from "@/app/file";
 
 interface PostJson {
   type: logs_type | "clock-out";
@@ -31,7 +32,12 @@ export async function POST(req: NextRequest) {
   const clock_out_latitude = formData.get("clock_out_latitude") as string | null;
   const clock_out_longitude = formData.get("clock_out_longitude") as string | null;
   const isOverTime = formData.get("isOverTime") as string | null;
-  const proof = formData.get("proof");  
+  const proof = formData.get("proof") as File | null;  
+  if (!proof) {
+    return NextResponse.json({error: "Bukti absen tidak ditemukan, tolong ambil gambar"}, {status: 422});
+  }
+
+  const proofPath = await storeFile(proof, {storePath: "/upload/log-proof"});
 
   // #region //? session authentication
   const session = await auth();
