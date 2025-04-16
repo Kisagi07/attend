@@ -478,7 +478,7 @@ const ClockInOut = () => {
           ref={inputImageRef}
           type="file"
           name="picture-proof"
-          className="absolute z-[-1] opacity-0"
+          className="absolute z-[-1] opacity-0 wi-0 h-0 "
         />
       </div>
       <div className="space-y-4 w-full">
