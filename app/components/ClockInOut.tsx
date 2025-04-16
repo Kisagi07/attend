@@ -77,6 +77,7 @@ const ClockInOut = () => {
   const [lateReason, setLateReason] = useState<string>("");
   const [time, setTime] = useState(0);
   const [capturedProof, setCapturedProof] = useState<File | null>(null);
+  const [capturedProofUrl, setCapturedProofUrl] = useState<string | null>(null);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
     return (
@@ -423,6 +424,14 @@ const ClockInOut = () => {
   }, [handleGeolocationError]);
 
   useEffect(() => {
+    if (capturedProof) {
+      setCapturedProofUrl(URL.createObjectURL(capturedProof));
+    } else {
+      setCapturedProofUrl(null);
+    }
+  },[capturedProof])
+
+  useEffect(() => {
     if (user) {
       const workStart = new Date();
       const shiftStart = user.job_position?.shift_start ?? "09:00";
@@ -454,8 +463,8 @@ const ClockInOut = () => {
         onClick={handleTakePictureButton}
         className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg  size-40 after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
       >
-        {capturedProof ? (
-          <Image src={URL.createObjectURL(capturedProof)} className="size-40 object-cover object-center rounded-lg" height={160} width={160} alt="captured proof" />
+        {capturedProofUrl ? (
+          <Image src={capturedProofUrl} className="size-40 object-cover object-center rounded-lg" height={160} width={160} alt="captured proof" />
         ) : (
           <div className="p-4 flex justify-center flex-col items-center space-y-4">
         <IoCameraOutline className="size-20" />
