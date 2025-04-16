@@ -1,7 +1,7 @@
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { formatRupiah } from "@/app/helper";
 import prisma from "@/app/prisma";
-import { $Enums } from "@prisma/client";
+import { $Enums } from "@/prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 
 const POST = async (req: NextRequest, props: { params: Promise<{ id: string }> }) => {

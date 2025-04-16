@@ -2,7 +2,7 @@ import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 import { monthNumberToWord } from "@/app/helper";
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { LogWithUserWithJob } from "@/app/prisma";
-import { logs } from "@prisma/client";
+import { logs } from "@/prisma/client";
 
 const GET = async (req: NextRequest, props: { params: Promise<{ work_id: string }> }): Promise<NextResponse> => {
   const params = await props.params;
