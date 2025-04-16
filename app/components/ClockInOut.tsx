@@ -132,6 +132,13 @@ const ClockInOut = () => {
   const handleButtonClick = async () => {
     try {
       setSending(true);
+
+      // validate the proof picture are taken
+      if (!capturedProof) {
+        toast.error("Bukti foto dibutuhkan");
+        return;
+      }
+
       // get user and terget compare location
       const { latitude, longitude } = await getUserLocation();
       const { targetLatitude, targetLongitude } = getTargetLocation(
