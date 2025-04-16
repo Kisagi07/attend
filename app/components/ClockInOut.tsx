@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
 import { logs, company, logs_type } from "@prisma/client";
-import { Prisma } from "@prisma/client";
+import { IoCameraOutline } from "react-icons/io5";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
@@ -19,6 +19,7 @@ import {
 import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import Image from "next/image";
 
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
@@ -54,8 +55,9 @@ const ClockInOut = () => {
     }
   );
 
-  // hook variable
+  const inputImageRef = useRef<HTMLInputElement>(null);
 
+  // hook variable
   const [selectedButton, setSelectedButton] = useState<Set<string> | "all">(
     new Set(["work_from_office"])
   );
@@ -74,6 +76,8 @@ const ClockInOut = () => {
   const [specialReason, setSpecialReason] = useState<string>("");
   const [lateReason, setLateReason] = useState<string>("");
   const [time, setTime] = useState(0);
+  const [capturedProof, setCapturedProof] = useState<File | null>(null);
+  const [capturedProofUrl, setCapturedProofUrl] = useState<string | null>(null);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
     return (
@@ -129,6 +133,13 @@ const ClockInOut = () => {
   const handleButtonClick = async () => {
     try {
       setSending(true);
+
+      // validate the proof picture are taken
+      if (!capturedProof) {
+        toast.error("Bukti foto dibutuhkan");
+        return;
+      }
+
       // get user and terget compare location
       const { latitude, longitude } = await getUserLocation();
       const { targetLatitude, targetLongitude } = getTargetLocation(
@@ -205,23 +216,25 @@ const ClockInOut = () => {
     latitude: number;
     longitude: number;
   }) => {
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("clock_in_time", getTimeOnly());
+    formData.append("clock_in_latitude", latitude.toString());
+    formData.append("clock_in_longitude", longitude.toString());
+    if (capturedProof) {
+      formData.append("proof", capturedProof);
+    }
+    todaysWork.forEach((work) => {
+      formData.append("todaysWork[]", work);
+    });
     try {
       const response = await fetch(`/api/user/attendance`, {
         method: "POST",
-        body: JSON.stringify({
-          type,
-          clock_in_time: getTimeOnly(),
-          date: getDateOnly(),
-          clock_in_latitude: latitude,
-          clock_in_longitude: longitude,
-          todaysWork,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
       });
       const data = await response.json();
       mutateAttendance();
+      setCapturedProof(null);
     } catch (error) {
       console.error(error);
     }
@@ -245,6 +258,7 @@ const ClockInOut = () => {
       date: getDateOnly(),
       isOverTime,
       todaysWork: todaysWork,
+      proof: capturedProof,
     };
     if (type === "clock-out") {
       sendData["clock_out_time"] = getTimeOnly();
@@ -264,7 +278,8 @@ const ClockInOut = () => {
     if (
       status.isLate &&
       type !== "clock-out" &&
-      type !== "special_attendance" && type !== "on_site_work"
+      type !== "special_attendance" &&
+      type !== "on_site_work"
     ) {
       sendData["todaysWork"] = [
         "Late Reason: " + lateReason,
@@ -272,15 +287,23 @@ const ClockInOut = () => {
       ];
     }
     try {
+      const formData = new FormData();
+      Object.entries(sendData).forEach(([key, value]) => {
+        if (key === "todaysWork" && Array.isArray(value)) {
+          value.forEach((work) => {
+            formData.append("todaysWork[]", work);
+          });
+        } else {
+          formData.append(key, value);
+        }
+      });
       const res = await fetch(`/api/user/attendance`, {
         method: "POST",
-        body: JSON.stringify(sendData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
       });
       mutateAttendance();
       setStatus((prev) => ({ ...prev, clockin: true }));
+      setCapturedProof(null);
     } catch (error) {
       console.error(error);
     }
@@ -312,17 +335,17 @@ const ClockInOut = () => {
   const getTargetLocation = (
     fromHome: boolean
   ): {
-    targetLatitude: Prisma.Decimal;
-    targetLongitude: Prisma.Decimal;
+    targetLatitude: number;
+    targetLongitude: number;
   } => {
-    let targetLatitude = new Prisma.Decimal(0.0);
-    let targetLongitude = new Prisma.Decimal(0.0);
+    let targetLatitude = Number(0.0);
+    let targetLongitude = Number(0.0);
     if (fromHome) {
-      targetLatitude = new Prisma.Decimal(user?.home_latitude || 0);
-      targetLongitude = new Prisma.Decimal(user?.home_longitude || 0);
+      targetLatitude = Number(user?.home_latitude || 0);
+      targetLongitude = Number(user?.home_longitude || 0);
     } else {
-      targetLatitude = new Prisma.Decimal(company?.latitude || 0);
-      targetLongitude = new Prisma.Decimal(company?.longitude || 0);
+      targetLatitude = Number(company?.latitude || 0);
+      targetLongitude = Number(company?.longitude || 0);
     }
     return {
       targetLatitude,
@@ -336,6 +359,18 @@ const ClockInOut = () => {
 
   const handleRemoveItem = (value: string) => {
     setTodaysWork((prev) => prev.filter((pre) => pre !== value));
+  };
+
+  const handleTakePictureButton = () => {
+    inputImageRef.current?.click();
+  };
+
+  const handleProofChange = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setCapturedProof(files[0]);
+    }
   };
 
   useEffect(() => {
@@ -389,6 +424,14 @@ const ClockInOut = () => {
   }, [handleGeolocationError]);
 
   useEffect(() => {
+    if (capturedProof) {
+      setCapturedProofUrl(URL.createObjectURL(capturedProof));
+    } else {
+      setCapturedProofUrl(null);
+    }
+  }, [capturedProof]);
+
+  useEffect(() => {
     if (user) {
       const workStart = new Date();
       const shiftStart = user.job_position?.shift_start ?? "09:00";
@@ -415,76 +458,107 @@ const ClockInOut = () => {
       Good Work Today!
     </Button>
   ) : (
-    <>
-      {status.isLate &&
-        !status.clockIn &&
-        isWorkDay &&
-        selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance" && selectedButtonValue !== "on_site_work" && (
-          <>
-            <div className="bg-red-500 px-2 py-1 text-center text-sm text-white">
-              You are late! hurry up!
-            </div>
-            <Input
-              label="State your reason for coming in late"
-              color="danger"
-              variant="underlined"
-              name="late-reason"
-              value={lateReason}
-              onValueChange={setLateReason}
-            />
-          </>
+    <div className="flex flex-col gap-4 items-center">
+      <div
+        onClick={handleTakePictureButton}
+        className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg  size-40 after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
+      >
+        {capturedProofUrl ? (
+          <Image
+            src={capturedProofUrl}
+            className="size-40 object-cover object-center rounded-lg"
+            height={160}
+            width={160}
+            alt="captured proof"
+          />
+        ) : (
+          <div className="p-4 flex justify-center flex-col items-center space-y-4">
+            <IoCameraOutline className="size-20" />
+            <p className="text-center">Bukti Foto Dibutuhkan</p>
+          </div>
         )}
-      {status.clockIn && !status.done && (
-        <ListInput
-          items={todaysWork}
-          addItem={handleAddItem}
-          removeItem={handleRemoveItem}
+        <input
+          onChange={handleProofChange}
+          accept="image/*"
+          capture="user"
+          ref={inputImageRef}
+          type="file"
+          name="picture-proof"
+          className="absolute z-[-1] opacity-0 wi-0 h-0 "
         />
-      )}
-      {showSpecialReason && (
-        <Input
-          variant="underlined"
-          label="Reason"
-          value={specialReason}
-          onChange={(e) => setSpecialReason(e.currentTarget.value)}
-        />
-      )}
-      <ButtonGroup variant="flat" fullWidth>
-        <Button
-          isLoading={sending}
-          onClick={handleButtonClick}
-          color={
-            buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ??
-            "default"
-          }
-        >
-          {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ??
-            "Loading"}
-        </Button>
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Button isIconOnly>
-              <BiChevronDown className="size-6" />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            selectionMode="single"
-            selectedKeys={selectedButton}
-            onSelectionChange={(selected) =>
-              setSelectedButton(selected as Set<string>)
+      </div>
+      <div className="space-y-4 w-full">
+        {status.isLate &&
+          !status.clockIn &&
+          isWorkDay &&
+          selectedButtonValue !== "sick" &&
+          selectedButtonValue !== "special_attendance" &&
+          selectedButtonValue !== "on_site_work" && (
+            <>
+              <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">
+                You are late! hurry up!
+              </div>
+              <Input
+                label="State your reason for coming in late"
+                color="danger"
+                variant="underlined"
+                name="late-reason"
+                value={lateReason}
+                onValueChange={setLateReason}
+              />
+            </>
+          )}
+        {status.clockIn && !status.done && (
+          <ListInput
+            items={todaysWork}
+            addItem={handleAddItem}
+            removeItem={handleRemoveItem}
+          />
+        )}
+        {showSpecialReason && (
+          <Input
+            variant="underlined"
+            label="Reason"
+            value={specialReason}
+            onChange={(e) => setSpecialReason(e.currentTarget.value)}
+          />
+        )}
+        <ButtonGroup variant="flat" fullWidth>
+          <Button
+            isLoading={sending}
+            onClick={handleButtonClick}
+            color={
+              buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ??
+              "default"
             }
           >
-            {Object.values(buttonOptions).map((option, index) => (
-              <DropdownItem key={Object.keys(buttonOptions)[index]}>
-                {option!.label}
-              </DropdownItem>
-            ))}
-          </DropdownMenu>
-        </Dropdown>
-      </ButtonGroup>
-    </>
+            {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ??
+              "Loading"}
+          </Button>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button isIconOnly>
+                <BiChevronDown className="size-6" />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              disallowEmptySelection
+              selectionMode="single"
+              selectedKeys={selectedButton}
+              onSelectionChange={(selected) =>
+                setSelectedButton(selected as Set<string>)
+              }
+            >
+              {Object.values(buttonOptions).map((option, index) => (
+                <DropdownItem key={Object.keys(buttonOptions)[index]}>
+                  {option!.label}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </ButtonGroup>
+      </div>
+    </div>
   );
 };
 export default ClockInOut;
