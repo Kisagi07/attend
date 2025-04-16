@@ -5,8 +5,8 @@ import WorkDayInput from "@/app/components/WorkDayInput";
 import { extractNumber } from "@/app/helper";
 import { Input } from "@heroui/input";
 import { TimeInput } from "@heroui/date-input";
-import { Time } from "@react-types/datepicker/node_modules/@internationalized/date"
 import { Button } from "@heroui/button";
+import { Time } from "@internationalized/date";
 const JobCreatePage = () => {
   const [name, setName] = useState<string>("");
   const [salary, setSalary] = useState<string>("Rp.0");
