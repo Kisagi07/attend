@@ -233,6 +233,7 @@ const ClockInOut = () => {
       });
       const data = await response.json();
       mutateAttendance();
+      setCapturedProof(null)
     } catch (error) {
       console.error(error);
     }
@@ -301,6 +302,7 @@ const ClockInOut = () => {
       });
       mutateAttendance();
       setStatus((prev) => ({ ...prev, clockin: true }));
+      setCapturedProof(null);
     } catch (error) {
       console.error(error);
     }
