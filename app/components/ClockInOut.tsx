@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { ListInput } from "@/app/components";
 import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -19,6 +19,7 @@ import {
 import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import Image from "next/image";
 
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
@@ -75,6 +76,7 @@ const ClockInOut = () => {
   const [specialReason, setSpecialReason] = useState<string>("");
   const [lateReason, setLateReason] = useState<string>("");
   const [time, setTime] = useState(0);
+  const [capturedProof, setCapturedProof] = useState<File | null>(null);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
     return (
@@ -344,6 +346,14 @@ const ClockInOut = () => {
     inputImageRef.current?.click();
   };
 
+  const handleProofChange = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setCapturedProof(files[0]);
+    }
+  }
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const { type, clock_out_time } = todayAttendance;
@@ -426,9 +436,16 @@ const ClockInOut = () => {
         onClick={handleTakePictureButton}
         className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg flex-col p-4 w-40 h-40 flex justify-center items-center after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
       >
+        {capturedProof ? (
+          <Image src={URL.createObjectURL(capturedProof)} className="size-20" height={160} width={160} alt="captured proof" />
+        ) : (
+          <>
         <IoCameraOutline className="size-20" />
         <p className="text-center">Bukti Foto Dibutuhkan</p>
+        </>
+        )}
         <input
+          onChange={handleProofChange}
           accept="image/*"
           capture="user"
           ref={inputImageRef}
