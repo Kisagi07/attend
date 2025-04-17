@@ -87,5 +87,16 @@
   },
   "resolutions": {
     "@tanstack/react-virtual": "^3.11.2"
+  },
+  "pnpm": {
+    "supportedArchitectures": {
+      "os": [
+        "current",
+        "linux"
+      ],
+      "cpu": [
+        "x64"
+      ]
+    }
   }
 }
