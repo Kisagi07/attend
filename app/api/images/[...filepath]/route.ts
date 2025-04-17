@@ -14,7 +14,7 @@ const GET = async (req: NextRequest, props: { params: Promise<{ filepath: string
   const exists = existsSync(directory);
   if (!exists) return NextResponse.json("Not Found", { status: 404 });
   const image = readFileSync(directory);
-  const optimizedImage = await sharp(Buffer.from(image)).resize(width).toBuffer();
+  const optimizedImage = await sharp(Buffer.from(image)).resize(width).webp().toBuffer();
   
 
   const fileinfo = await fileTypeFromBuffer(optimizedImage);
