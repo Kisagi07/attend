@@ -332,7 +332,7 @@ const ClockInOut = () => {
           },
           {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 300000,
             maximumAge: 0,
           }
         );
