@@ -78,6 +78,7 @@ const ClockInOut = () => {
   const [time, setTime] = useState(0);
   const [capturedProof, setCapturedProof] = useState<File | null>(null);
   const [capturedProofUrl, setCapturedProofUrl] = useState<string | null>(null);
+  const clickedTimeRef = useRef<string | null>(null);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
     return (
@@ -131,6 +132,14 @@ const ClockInOut = () => {
   }, [status.clockIn, isWorkDay]);
 
   const handleButtonClick = async () => {
+    if (!clickedTimeRef.current) {
+      const clickedTime = getTimeOnly();
+      console.log("time clicked", clickedTime);
+      clickedTimeRef.current = clickedTime;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     try {
       setSending(true);
 
@@ -218,7 +227,7 @@ const ClockInOut = () => {
   }) => {
     const formData = new FormData();
     formData.append("type", type);
-    formData.append("clock_in_time", getTimeOnly());
+    formData.append("clock_in_time", clickedTimeRef.current!);
     formData.append("clock_in_latitude", latitude.toString());
     formData.append("clock_in_longitude", longitude.toString());
     if (capturedProof) {
@@ -261,11 +270,11 @@ const ClockInOut = () => {
       proof: capturedProof,
     };
     if (type === "clock-out") {
-      sendData["clock_out_time"] = getTimeOnly();
+      sendData["clock_out_time"] = clickedTimeRef.current!;
       sendData["clock_out_latitude"] = latitude;
       sendData["clock_out_longitude"] = longitude;
     } else {
-      sendData["clock_in_time"] = getTimeOnly();
+      sendData["clock_in_time"] = clickedTimeRef.current!;
       sendData["clock_in_latitude"] = latitude;
       sendData["clock_in_longitude"] = longitude;
     }
@@ -296,7 +305,7 @@ const ClockInOut = () => {
         } else {
           formData.append(key, value);
         }
-      });
+      });      
       const res = await fetch(`/api/user/attendance`, {
         method: "POST",
         body: formData,
@@ -400,7 +409,7 @@ const ClockInOut = () => {
       setTime(Date.now());
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, []);  
 
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any) => {
