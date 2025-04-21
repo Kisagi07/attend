@@ -133,8 +133,7 @@ const ClockInOut = () => {
 
   const handleButtonClick = async () => {
     if (!clickedTimeRef.current) {
-      const clickedTime = getTimeOnly();
-      console.log("time clicked", clickedTime);
+      const clickedTime = getTimeOnly();      
       clickedTimeRef.current = clickedTime;
     }
 
@@ -333,7 +332,7 @@ const ClockInOut = () => {
           },
           {
             enableHighAccuracy: true,
-            timeout: 5000,
+            timeout: 15000,
             maximumAge: 0,
           }
         );
