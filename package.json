@@ -97,6 +97,12 @@
       "cpu": [
         "x64"
       ]
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "sharp"
+    ]
   }
 }

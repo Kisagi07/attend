@@ -133,11 +133,9 @@ const ClockInOut = () => {
 
   const handleButtonClick = async () => {
     if (!clickedTimeRef.current) {
-      const clickedTime = getTimeOnly();      
+      const clickedTime = getTimeOnly();
       clickedTimeRef.current = clickedTime;
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     try {
       setSending(true);
@@ -304,7 +302,7 @@ const ClockInOut = () => {
         } else {
           formData.append(key, value);
         }
-      });      
+      });
       const res = await fetch(`/api/user/attendance`, {
         method: "POST",
         body: formData,
@@ -408,7 +406,7 @@ const ClockInOut = () => {
       setTime(Date.now());
     }, 1000);
     return () => clearInterval(interval);
-  }, []);  
+  }, []);
 
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any) => {
