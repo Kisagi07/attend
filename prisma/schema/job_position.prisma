@@ -7,5 +7,6 @@ model job_positions {
   updated_at  DateTime @db.DateTime(0) @updatedAt
   work_day    String?  @default("1,2,3,4,5") @db.VarChar(255)
   salary      Int
+  flexibleWork Boolean @default(false) @map("flexible_work")
   users       users[]
 }
