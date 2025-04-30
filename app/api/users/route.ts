@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
   if (role) {
     role = role.split(",") as $Enums.users_role[];
   }
+  
 
   let users = await prisma.users.findMany({
     include: {
@@ -35,8 +36,8 @@ export async function GET(req: NextRequest) {
         ? {
             where: {
               date: {
-                gte: startMonth?.toDate(getLocalTimeZone()),
-                lte: endMonth?.toDate(getLocalTimeZone()),
+                gte: startMonth?.toDate('UTC'),
+                lte: endMonth?.toDate('UTC'),
               },
             },
             orderBy: {
@@ -50,14 +51,14 @@ export async function GET(req: NextRequest) {
               OR: [
                 {
                   leaveStartDate: {
-                    gte: startMonth?.toDate(getLocalTimeZone()),
-                    lte: endMonth?.toDate(getLocalTimeZone())
+                    gte: startMonth?.toDate('UTC'),
+                    lte: endMonth?.toDate('UTC')
                   },
                 },
                 {
                   leaveEndDate: {
-                    gte: startMonth?.toDate(getLocalTimeZone()),
-                    lte: endMonth?.toDate(getLocalTimeZone())
+                    gte: startMonth?.toDate('UTC'),
+                    lte: endMonth?.toDate('UTC')
                   },
                 },
               ],
