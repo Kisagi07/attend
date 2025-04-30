@@ -21,6 +21,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "attend.melianetworkid.com",
       },
+      {
+        protocol: "https",
+        hostname: "absensi.bgroup.id"
+      }
     ],
   },
   async headers() {
