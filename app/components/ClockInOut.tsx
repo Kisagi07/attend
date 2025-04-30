@@ -20,6 +20,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import Image from "next/image";
+import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
@@ -453,7 +454,10 @@ const ClockInOut = () => {
     }
   }, [time, user, company]);
 
-  return isLoading && userLoading && companyLoading ? (
+  return (
+    <>
+      <LocationFetchPopup />
+      {isLoading && userLoading && companyLoading ? (
     <Skeleton className="h-10 w-full rounded" />
   ) : status.isSick ? (
     <Button color="primary" variant="flat" fullWidth>
@@ -565,6 +569,8 @@ const ClockInOut = () => {
         </ButtonGroup>
       </div>
     </div>
-  );
+  )}
+    </>
+  )
 };
 export default ClockInOut;
