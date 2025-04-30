@@ -17,9 +17,11 @@ const config: Config = {
       animation: {
         "fade-up": "fade-up 150ms forwards",
         "fade-down": "fade-down 150ms forwards",
+        "modal-bop": "modal-bop 150ms forwards"
       },
       fontFamily: {
         sixtyfour: ["Sixtyfour", "Helvetica"],
+        courierPrime: ["var(--font-courier-prime)"]
       },
       boxShadow: {
         around: "0 0 6px -1px rgba(0,0,0,0.1), 0 0 4px -1px rgba(0,0,0,0.06)",
