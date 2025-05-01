@@ -229,26 +229,55 @@ const ClockInOut = () => {
     }
   };
 
-  const getDistanceFromLocation = (location: {
-    latitude: number;
-    longitude: number;
-  }) => {
-    const { latitude, longitude } = location;
-    // get user and terget compare location
-    const { targetLatitude, targetLongitude } = getTargetLocation(
-      selectedButtonValue === "work_from_home" || status.fromHome
-    );
-    // calculate distance between location
-    const distance = Math.floor(
-      calculateDistance(
-        latitude,
-        longitude,
-        Number(targetLatitude),
-        Number(targetLongitude)
-      ) * 1000
-    );
-    return distance;
-  };
+  const getTargetLocation = useCallback(
+    (
+      fromHome: boolean
+    ): {
+      targetLatitude: number;
+      targetLongitude: number;
+    } => {
+      let targetLatitude = Number(0.0);
+      let targetLongitude = Number(0.0);
+      if (fromHome) {
+        targetLatitude = Number(user?.home_latitude || 0);
+        targetLongitude = Number(user?.home_longitude || 0);
+      } else {
+        targetLatitude = Number(company?.latitude || 0);
+        targetLongitude = Number(company?.longitude || 0);
+      }
+      return {
+        targetLatitude,
+        targetLongitude,
+      };
+    },
+    [
+      company?.latitude,
+      company?.longitude,
+      user?.home_latitude,
+      user?.home_longitude,
+    ]
+  );
+
+  const getDistanceFromLocation = useCallback(
+    (location: { latitude: number; longitude: number }) => {
+      const { latitude, longitude } = location;
+      // get user and terget compare location
+      const { targetLatitude, targetLongitude } = getTargetLocation(
+        selectedButtonValue === "work_from_home" || status.fromHome
+      );
+      // calculate distance between location
+      const distance = Math.floor(
+        calculateDistance(
+          latitude,
+          longitude,
+          Number(targetLatitude),
+          Number(targetLongitude)
+        ) * 1000
+      );
+      return distance;
+    },
+    [getTargetLocation, selectedButtonValue, status.fromHome]
+  );
 
   const sendSickDay = async ({
     type,
@@ -351,50 +380,52 @@ const ClockInOut = () => {
       console.error(error);
     }
   };
-
-  const getUserLocation = (onlyNotPermittedReject: boolean = false) => {
-    return new Promise<{ latitude: number; longitude: number }>(
-      (resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            handleGeolocationError(error, onlyNotPermittedReject);
-            reject(error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 300000,
-            maximumAge: 0,
-          }
-        );
+  const handleGeolocationError = useCallback(
+    (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
+      if (error.code === error.PERMISSION_DENIED) {
+        toast.error("Location permission denied by user.");
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        if (!onlyNotPermittedReject) {
+          toast.error("Location information is unavailable.");
+        }
+      } else if (error.code === error.TIMEOUT) {
+        if (!onlyNotPermittedReject) {
+          toast.error("The request to get user location timed out.");
+        }
+      } else {
+        if (!onlyNotPermittedReject) {
+          toast.error("An unknown error occurred.");
+        }
       }
-    );
-  };
+    },
+    []
+  );
 
-  const getTargetLocation = (
-    fromHome: boolean
-  ): {
-    targetLatitude: number;
-    targetLongitude: number;
-  } => {
-    let targetLatitude = Number(0.0);
-    let targetLongitude = Number(0.0);
-    if (fromHome) {
-      targetLatitude = Number(user?.home_latitude || 0);
-      targetLongitude = Number(user?.home_longitude || 0);
-    } else {
-      targetLatitude = Number(company?.latitude || 0);
-      targetLongitude = Number(company?.longitude || 0);
-    }
-    return {
-      targetLatitude,
-      targetLongitude,
-    };
-  };
+  const getUserLocation = useCallback(
+    (onlyNotPermittedReject: boolean = false) => {
+      return new Promise<{ latitude: number; longitude: number }>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              resolve({ latitude, longitude });
+            },
+            (error) => {
+              handleGeolocationError(error, onlyNotPermittedReject);
+              reject(error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 300000,
+              maximumAge: 0,
+            }
+          );
+        }
+      );
+    },
+    [handleGeolocationError]
+  );
 
   const handleAddItem = (value: string) => {
     setTodaysWork((prev) => [...prev, value]);
@@ -416,10 +447,10 @@ const ClockInOut = () => {
     }
   };
 
-  const handleLocationFetchPopupCancel = () => {
+  const handleLocationFetchPopupCancel = useCallback(() => {
     setWaitingForSyncroizingToComplete(false);
     setOpenSynchronizeLoading(false);
-  };
+  }, []);
 
   const handleLocationFetchPopupDone = () => {
     setOpenSynchronizeLoading(false);
@@ -461,26 +492,6 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleGeolocationError = useCallback(
-    (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {
-        toast.error("Location permission denied by user.");
-      } else if (error.code === error.POSITION_UNAVAILABLE) {
-        if (!onlyNotPermittedReject) {
-          toast.error("Location information is unavailable.");
-        }
-      } else if (error.code === error.TIMEOUT) {
-        if (!onlyNotPermittedReject) {
-          toast.error("The request to get user location timed out.");
-        }
-      } else {
-        if (!onlyNotPermittedReject) {
-          toast.error("An unknown error occurred.");
-        }
-      }
-    },
-    []
-  );
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {},
@@ -529,7 +540,7 @@ const ClockInOut = () => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, []);
+  }, [syncTimeLeft]);
 
   // Keep fetching location as long as sync time are not 0
   useEffect(() => {
@@ -553,7 +564,7 @@ const ClockInOut = () => {
     return () => {
       isCancelled = true;
     };
-  }, [syncTimeLeft]);
+  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation]);
 
   // #endregion
 

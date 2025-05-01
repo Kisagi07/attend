@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 interface LocationFetchPopupProps {
   timeLeft: number;
@@ -24,26 +24,29 @@ const LocationFetchPopup = ({
     animateClosing("cancel");
   };
 
-  const animateClosing = (type: "cancel" | "done" = "done") => {
-    contentRef.current?.classList.replace(
-      "animate-modal-bop",
-      "animate-modal-bop-close"
-    );
+  const animateClosing = useCallback(
+    (type: "cancel" | "done" = "done") => {
+      contentRef.current?.classList.replace(
+        "animate-modal-bop",
+        "animate-modal-bop-close"
+      );
 
-    setTimeout(() => {
-      if (type === "cancel") {
-        onCancel();
-      } else {
-        onDone();
-      }
-    }, 160);
-  };
+      setTimeout(() => {
+        if (type === "cancel") {
+          onCancel();
+        } else {
+          onDone();
+        }
+      }, 160);
+    },
+    [onCancel, onDone]
+  );
 
   useEffect(() => {
     if (timeLeft === 0) {
       animateClosing();
     }
-  }, [timeLeft]);
+  }, [timeLeft, animateClosing]);
 
   return (
     <section className="fixed top-0 !mt-0 left-0 w-full h-screen flex items-center justify-center z-50 bg-black/10 ">
