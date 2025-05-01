@@ -55,6 +55,7 @@ const ClockInOut = () => {
       refreshInterval: 1000,
     }
   );
+  const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
 
   const inputImageRef = useRef<HTMLInputElement>(null);
 
@@ -454,10 +455,29 @@ const ClockInOut = () => {
     }
   }, [time, user, company]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (syncTimeLeft > 0) {
+      const endTime = Date.now() + 2 * 60 * 1000;
+      timer = setInterval(() => {
+        const newTimeLeft = Math.round((endTime - Date.now()) / 1000);
+
+        if (newTimeLeft <= 0) {
+          clearInterval(timer);
+          setSyncTimeLeft(0);
+        } else {
+          setSyncTimeLeft(newTimeLeft);
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <>
       <LocationFetchPopup
-        timeLeft={5 * 60}
+        timeLeft={syncTimeLeft}
         onCancel={() => console.log("canceled")}
         onSkip={() => console.log("skipped")}
       />
