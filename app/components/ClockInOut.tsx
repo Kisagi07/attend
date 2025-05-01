@@ -438,6 +438,7 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // TODO: if geolocation are not allowed then stop the synchronization
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any) => {
       if (error.code === error.PERMISSION_DENIED) {
@@ -501,6 +502,20 @@ const ClockInOut = () => {
     }
     return () => clearInterval(timer);
   }, []);
+
+  // Keep fetching location as long as sync time are not 0
+  useEffect(() => {
+    let isCancelled = false;
+    const keepFetching = async () => {
+      while (syncTimeLeft > 0 && !isCancelled) {
+        const location = await getUserLocation();
+      }
+    };
+    keepFetching();
+    return () => {
+      isCancelled = true;
+    };
+  }, [syncTimeLeft]);
 
   // #endregion
 
