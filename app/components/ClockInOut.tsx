@@ -56,6 +56,7 @@ const ClockInOut = () => {
     }
   );
   const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
+  const [openSynchronizeLoading, setOpenSynchronizeLoading] = useState(false);
 
   const inputImageRef = useRef<HTMLInputElement>(null);
 
@@ -134,84 +135,88 @@ const ClockInOut = () => {
   }, [status.clockIn, isWorkDay]);
 
   const handleButtonClick = async () => {
-    if (!clickedTimeRef.current) {
-      const clickedTime = getTimeOnly();
-      clickedTimeRef.current = clickedTime;
-    }
-
-    try {
-      setSending(true);
-
-      // validate the proof picture are taken
-      if (!capturedProof) {
-        toast.error("Bukti foto dibutuhkan");
-        return;
+    if (syncTimeLeft > 0) {
+      setOpenSynchronizeLoading(true);
+    } else {
+      if (!clickedTimeRef.current) {
+        const clickedTime = getTimeOnly();
+        clickedTimeRef.current = clickedTime;
       }
 
-      // get user and terget compare location
-      const { latitude, longitude } = await getUserLocation();
-      const { targetLatitude, targetLongitude } = getTargetLocation(
-        selectedButtonValue === "work_from_home" || status.fromHome
-      );
-      // calculate distance between location
-      const distance = Math.floor(
-        calculateDistance(
-          latitude,
-          longitude,
-          Number(targetLatitude),
-          Number(targetLongitude)
-        ) * 1000
-      );
-      // #region //? rejection check
-      // if distance is more than 50m and not sick or work with duty then warned user then return
-      if (
-        distance > 100 &&
-        selectedButtonValue !== "sick" &&
-        selectedButtonValue !== "special_attendance" &&
-        selectedButtonValue !== "on_site_work" &&
-        todayAttendance?.type !== "on_site_work"
-      ) {
-        toast.error(` You are ${distance - 50} meter too far from location!`);
-        return;
+      try {
+        setSending(true);
+
+        // validate the proof picture are taken
+        if (!capturedProof) {
+          toast.error("Bukti foto dibutuhkan");
+          return;
+        }
+
+        // get user and terget compare location
+        const { latitude, longitude } = await getUserLocation();
+        const { targetLatitude, targetLongitude } = getTargetLocation(
+          selectedButtonValue === "work_from_home" || status.fromHome
+        );
+        // calculate distance between location
+        const distance = Math.floor(
+          calculateDistance(
+            latitude,
+            longitude,
+            Number(targetLatitude),
+            Number(targetLongitude)
+          ) * 1000
+        );
+        // #region //? rejection check
+        // if distance is more than 50m and not sick or work with duty then warned user then return
+        if (
+          distance > 100 &&
+          selectedButtonValue !== "sick" &&
+          selectedButtonValue !== "special_attendance" &&
+          selectedButtonValue !== "on_site_work" &&
+          todayAttendance?.type !== "on_site_work"
+        ) {
+          toast.error(` You are ${distance - 50} meter too far from location!`);
+          return;
+        }
+        // if clock out but no work filled then warned user then return
+        if (selectedButtonValue === "clock-out" && todaysWork.length === 0) {
+          toast.error("You need to fill today's work in order to clockout");
+          return;
+        }
+        // if work with duty but duty is not filled then warned user then return
+        if (selectedButtonValue === "special_attendance" && !specialReason) {
+          toast.error("You need to fill reason in order to clockin");
+          return;
+        }
+        // if user is late but reason for late is not filled then warned user then return
+        if (
+          status.isLate &&
+          !lateReason &&
+          (selectedButtonValue === "work_from_home" ||
+            selectedButtonValue === "work_from_office") &&
+          isWorkDay
+        ) {
+          toast.error("You need to fill reason for being late");
+          return;
+        }
+        // #endregion //? rejection check
+        // ? next operation
+        if (selectedButtonValue === "sick") {
+          await sendSickDay({ type: selectedButtonValue, latitude, longitude });
+        } else {
+          await sendWork({
+            type: selectedButtonValue,
+            latitude,
+            longitude,
+            todaysWork,
+            isOverTime: !isWorkDay,
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setSending(false);
       }
-      // if clock out but no work filled then warned user then return
-      if (selectedButtonValue === "clock-out" && todaysWork.length === 0) {
-        toast.error("You need to fill today's work in order to clockout");
-        return;
-      }
-      // if work with duty but duty is not filled then warned user then return
-      if (selectedButtonValue === "special_attendance" && !specialReason) {
-        toast.error("You need to fill reason in order to clockin");
-        return;
-      }
-      // if user is late but reason for late is not filled then warned user then return
-      if (
-        status.isLate &&
-        !lateReason &&
-        (selectedButtonValue === "work_from_home" ||
-          selectedButtonValue === "work_from_office") &&
-        isWorkDay
-      ) {
-        toast.error("You need to fill reason for being late");
-        return;
-      }
-      // #endregion //? rejection check
-      // ? next operation
-      if (selectedButtonValue === "sick") {
-        await sendSickDay({ type: selectedButtonValue, latitude, longitude });
-      } else {
-        await sendWork({
-          type: selectedButtonValue,
-          latitude,
-          longitude,
-          todaysWork,
-          isOverTime: !isWorkDay,
-        });
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSending(false);
     }
   };
 
@@ -476,11 +481,13 @@ const ClockInOut = () => {
 
   return (
     <>
-      <LocationFetchPopup
-        timeLeft={syncTimeLeft}
-        onCancel={() => console.log("canceled")}
-        onSkip={() => console.log("skipped")}
-      />
+      {openSynchronizeLoading && (
+        <LocationFetchPopup
+          timeLeft={syncTimeLeft}
+          onCancel={() => console.log("canceled")}
+          onSkip={() => console.log("skipped")}
+        />
+      )}
       {isLoading && userLoading && companyLoading ? (
         <Skeleton className="h-10 w-full rounded" />
       ) : status.isSick ? (
