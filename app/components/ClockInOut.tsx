@@ -35,7 +35,7 @@ type ButtonOption = Record<
 >;
 
 const ClockInOut = () => {
-  //fetched data
+  // #region data fetching
   const {
     data: todayAttendance,
     isLoading,
@@ -50,13 +50,15 @@ const ClockInOut = () => {
   );
   const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(
     `/api/user`,
-    fetcher,
-    {
-      refreshInterval: 1000,
-    }
+    fetcher
   );
-  const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
+  // #endregion
+
+  // #region states
+  const [syncTimeLeft, setSyncTimeLeft] = useState(30);
   const [openSynchronizeLoading, setOpenSynchronizeLoading] = useState(false);
+  const [watingForSynchronizingToComplete, setWaitingForSyncroizingToComplete] =
+    useState(false);
 
   const inputImageRef = useRef<HTMLInputElement>(null);
 
@@ -134,9 +136,14 @@ const ClockInOut = () => {
     }
   }, [status.clockIn, isWorkDay]);
 
+  // #endregion
+
+  // #region functions
+
   const handleButtonClick = async () => {
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
+      setWaitingForSyncroizingToComplete(true);
     } else {
       if (!clickedTimeRef.current) {
         const clickedTime = getTimeOnly();
@@ -386,6 +393,22 @@ const ClockInOut = () => {
     }
   };
 
+  const handleLocationFetchPopupCancel = () => {
+    setWaitingForSyncroizingToComplete(false);
+    setOpenSynchronizeLoading(false);
+  };
+
+  const handleLocationFetchPopupDone = () => {
+    setOpenSynchronizeLoading(false);
+    if (watingForSynchronizingToComplete) {
+      handleButtonClick();
+    }
+  };
+
+  // #endregion
+
+  // #region useEffects
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const { type, clock_out_time } = todayAttendance;
@@ -464,7 +487,7 @@ const ClockInOut = () => {
     let timer: NodeJS.Timeout;
 
     if (syncTimeLeft > 0) {
-      const endTime = Date.now() + 2 * 60 * 1000;
+      const endTime = Date.now() + syncTimeLeft * 1000;
       timer = setInterval(() => {
         const newTimeLeft = Math.round((endTime - Date.now()) / 1000);
 
@@ -479,13 +502,15 @@ const ClockInOut = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // #endregion
+
   return (
     <>
       {openSynchronizeLoading && (
         <LocationFetchPopup
           timeLeft={syncTimeLeft}
-          onCancel={() => console.log("canceled")}
-          onSkip={() => console.log("skipped")}
+          onCancel={handleLocationFetchPopupCancel}
+          onDone={handleLocationFetchPopupDone}
         />
       )}
       {isLoading && userLoading && companyLoading ? (

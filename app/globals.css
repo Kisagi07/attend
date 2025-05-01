@@ -4,7 +4,8 @@
 
 @font-face {
   font-family: Sixtyfour;
-  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf") format("truetype");
+  src: url("/font/Sixtyfour-Regular-VariableFont_BLED,SCAN.ttf")
+    format("truetype");
 }
 
 :root {
@@ -63,11 +64,22 @@ body {
 @keyframes modal-bop {
   0% {
     transform: scale(0.8);
-    opacity:0;    
+    opacity: 0;
   }
   100% {
     transform: scale(1);
-    opacity:1;
+    opacity: 1;
+  }
+}
+
+@keyframes modal-bop-close {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
   }
 }
 
