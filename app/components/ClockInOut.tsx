@@ -136,6 +136,11 @@ const ClockInOut = () => {
     }
   }, [status.clockIn, isWorkDay]);
 
+  const closestDistanceLocation = useRef<{
+    distance: number;
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   // #endregion
 
   // #region functions
@@ -225,6 +230,27 @@ const ClockInOut = () => {
         setSending(false);
       }
     }
+  };
+
+  const getDistanceFromLocation = (location: {
+    latitude: number;
+    longitude: number;
+  }) => {
+    const { latitude, longitude } = location;
+    // get user and terget compare location
+    const { targetLatitude, targetLongitude } = getTargetLocation(
+      selectedButtonValue === "work_from_home" || status.fromHome
+    );
+    // calculate distance between location
+    const distance = Math.floor(
+      calculateDistance(
+        latitude,
+        longitude,
+        Number(targetLatitude),
+        Number(targetLongitude)
+      ) * 1000
+    );
+    return distance;
   };
 
   const sendSickDay = async ({
@@ -329,7 +355,7 @@ const ClockInOut = () => {
     }
   };
 
-  const getUserLocation = () => {
+  const getUserLocation = (onlyNotPermittedReject: boolean = false) => {
     return new Promise<{ latitude: number; longitude: number }>(
       (resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -339,7 +365,7 @@ const ClockInOut = () => {
             resolve({ latitude, longitude });
           },
           (error) => {
-            handleGeolocationError(error);
+            handleGeolocationError(error, onlyNotPermittedReject);
             reject(error);
           },
           {
@@ -440,15 +466,21 @@ const ClockInOut = () => {
 
   // TODO: if geolocation are not allowed then stop the synchronization
   const handleGeolocationError = useCallback(
-    (error: PositionErrorCallback | any) => {
+    (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
       if (error.code === error.PERMISSION_DENIED) {
         toast.error("Location permission denied by user.");
       } else if (error.code === error.POSITION_UNAVAILABLE) {
-        toast.error("Location information is unavailable.");
+        if (!onlyNotPermittedReject) {
+          toast.error("Location information is unavailable.");
+        }
       } else if (error.code === error.TIMEOUT) {
-        toast.error("The request to get user location timed out.");
+        if (!onlyNotPermittedReject) {
+          toast.error("The request to get user location timed out.");
+        }
       } else {
-        toast.error("An unknown error occurred.");
+        if (!onlyNotPermittedReject) {
+          toast.error("An unknown error occurred.");
+        }
       }
     },
     []
@@ -456,7 +488,7 @@ const ClockInOut = () => {
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {},
-      handleGeolocationError
+      (error) => handleGeolocationError(error, false)
     );
   }, [handleGeolocationError]);
 
@@ -509,6 +541,16 @@ const ClockInOut = () => {
     const keepFetching = async () => {
       while (syncTimeLeft > 0 && !isCancelled) {
         const location = await getUserLocation();
+        console.log(location);
+        const distance = getDistanceFromLocation(location);
+        const { latitude, longitude } = location;
+        if (!closestDistanceLocation.current) {
+          closestDistanceLocation.current = { latitude, longitude, distance };
+        } else {
+          if (closestDistanceLocation.current.distance > distance) {
+            closestDistanceLocation.current = { latitude, longitude, distance };
+          }
+        }
       }
     };
     keepFetching();
