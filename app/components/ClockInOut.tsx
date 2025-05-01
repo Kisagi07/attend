@@ -715,6 +715,11 @@ const ClockInOut = () => {
           </div>
         </div>
       )}
+      {syncTimeLeft === 0 && (
+        <Button size="sm" color="primary">
+          Sinkronasi Lokasi Lagi
+        </Button>
+      )}
     </>
   );
 };
