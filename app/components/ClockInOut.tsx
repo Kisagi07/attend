@@ -140,7 +140,9 @@ const ClockInOut = () => {
     distance: number;
     latitude: number;
     longitude: number;
+    useTarget: "office" | "home";
   } | null>(null);
+  const deniedGeolocation = useRef<boolean>(false);
   // #endregion
 
   // #region functions
@@ -167,18 +169,21 @@ const ClockInOut = () => {
         // #region //? rejection check
         // if distance is more than 50m and not sick or work with duty then warned user then return
         if (!closestDistanceLocation.current) {
-          // TODO: have a button to retry synchronizing
           toast.error(
             "Gagal mengambil lokasi dalam waktu yang ditentukan, pastikan gps aktif dan coba lagi"
           );
           return;
         }
 
-        const { distance, latitude, longitude } =
+        let { distance, latitude, longitude, useTarget } =
           closestDistanceLocation.current;
 
+        if (useTarget !== getTargetType()) {
+          distance = getDistanceFromLocation({ latitude, longitude });
+        }
+
         if (
-          distance > 100 &&
+          distance > 50 &&
           selectedButtonValue !== "sick" &&
           selectedButtonValue !== "special_attendance" &&
           selectedButtonValue !== "on_site_work" &&
@@ -258,12 +263,16 @@ const ClockInOut = () => {
     ]
   );
 
+  const getTargetType = () => {
+    return selectedButtonValue === "work_from_home" ? "home" : "office";
+  };
+
   const getDistanceFromLocation = useCallback(
     (location: { latitude: number; longitude: number }) => {
       const { latitude, longitude } = location;
       // get user and terget compare location
       const { targetLatitude, targetLongitude } = getTargetLocation(
-        selectedButtonValue === "work_from_home" || status.fromHome
+        getTargetType() === "home"
       );
       // calculate distance between location
       const distance = Math.floor(
@@ -383,7 +392,16 @@ const ClockInOut = () => {
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
       if (error.code === error.PERMISSION_DENIED) {
-        toast.error("Location permission denied by user.");
+        console.log({
+          onlyNotPermittedReject,
+          first: deniedGeolocation.current,
+        });
+        if (onlyNotPermittedReject && !deniedGeolocation.current) {
+          toast.error("Location permission denied by user.");
+          deniedGeolocation.current = true;
+        } else if (!onlyNotPermittedReject) {
+          toast.error("Location permission denied by user.");
+        }
       } else if (error.code === error.POSITION_UNAVAILABLE) {
         if (!onlyNotPermittedReject) {
           toast.error("Location information is unavailable.");
@@ -547,16 +565,30 @@ const ClockInOut = () => {
     let isCancelled = false;
     const keepFetching = async () => {
       while (syncTimeLeft > 0 && !isCancelled) {
-        const location = await getUserLocation();
-        console.log(location);
-        const distance = getDistanceFromLocation(location);
-        const { latitude, longitude } = location;
-        if (!closestDistanceLocation.current) {
-          closestDistanceLocation.current = { latitude, longitude, distance };
-        } else {
-          if (closestDistanceLocation.current.distance > distance) {
-            closestDistanceLocation.current = { latitude, longitude, distance };
+        try {
+          const location = await getUserLocation(true);
+          const distance = getDistanceFromLocation(location);
+          const { latitude, longitude } = location;
+          const target = getTargetType();
+          if (!closestDistanceLocation.current) {
+            closestDistanceLocation.current = {
+              latitude,
+              longitude,
+              distance,
+              useTarget: target,
+            };
+          } else {
+            if (closestDistanceLocation.current.distance > distance) {
+              closestDistanceLocation.current = {
+                latitude,
+                longitude,
+                distance,
+                useTarget: target,
+              };
+            }
           }
+        } catch (error) {
+          console.error(error);
         }
       }
     };
