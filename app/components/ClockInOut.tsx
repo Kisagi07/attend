@@ -511,13 +511,6 @@ const ClockInOut = () => {
   }, []);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {},
-      (error) => handleGeolocationError(error, false)
-    );
-  }, [handleGeolocationError]);
-
-  useEffect(() => {
     if (capturedProof) {
       setCapturedProofUrl(URL.createObjectURL(capturedProof));
     } else {
@@ -588,7 +581,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.error(error);
+          console.log(error);
         }
       }
     };
