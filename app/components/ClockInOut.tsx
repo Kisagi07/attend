@@ -164,22 +164,19 @@ const ClockInOut = () => {
           return;
         }
 
-        // get user and terget compare location
-        const { latitude, longitude } = await getUserLocation();
-        const { targetLatitude, targetLongitude } = getTargetLocation(
-          selectedButtonValue === "work_from_home" || status.fromHome
-        );
-        // calculate distance between location
-        const distance = Math.floor(
-          calculateDistance(
-            latitude,
-            longitude,
-            Number(targetLatitude),
-            Number(targetLongitude)
-          ) * 1000
-        );
         // #region //? rejection check
         // if distance is more than 50m and not sick or work with duty then warned user then return
+        if (!closestDistanceLocation.current) {
+          // TODO: have a button to retry synchronizing
+          toast.error(
+            "Gagal mengambil lokasi dalam waktu yang ditentukan, pastikan gps aktif dan coba lagi"
+          );
+          return;
+        }
+
+        const { distance, latitude, longitude } =
+          closestDistanceLocation.current;
+
         if (
           distance > 100 &&
           selectedButtonValue !== "sick" &&
@@ -464,7 +461,6 @@ const ClockInOut = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // TODO: if geolocation are not allowed then stop the synchronization
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
       if (error.code === error.PERMISSION_DENIED) {
