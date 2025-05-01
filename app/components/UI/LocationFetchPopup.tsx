@@ -48,6 +48,22 @@ const LocationFetchPopup = ({
     }
   }, [timeLeft, animateClosing]);
 
+  useEffect(() => {
+    // Calculate scrollbar width
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+
+    // Hide body scroll and add padding to compensate for scrollbar width
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      // Restore body scroll and remove padding
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, []);
+
   return (
     <section className="fixed top-0 !mt-0 left-0 w-full h-screen flex items-center justify-center z-50 bg-black/10 ">
       <div
