@@ -263,9 +263,9 @@ const ClockInOut = () => {
     ]
   );
 
-  const getTargetType = () => {
+  const getTargetType = useCallback(() => {
     return selectedButtonValue === "work_from_home" ? "home" : "office";
-  };
+  },[selectedButtonValue]);
 
   const getDistanceFromLocation = useCallback(
     (location: { latitude: number; longitude: number }) => {
@@ -285,7 +285,7 @@ const ClockInOut = () => {
       );
       return distance;
     },
-    [getTargetLocation, selectedButtonValue, status.fromHome]
+    [getTargetLocation, getTargetType]
   );
 
   const sendSickDay = async ({
@@ -593,7 +593,7 @@ const ClockInOut = () => {
     return () => {
       isCancelled = true;
     };
-  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation]);
+  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation, getTargetType]);
 
   // #endregion
 
