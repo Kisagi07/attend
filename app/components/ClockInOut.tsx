@@ -477,6 +477,10 @@ const ClockInOut = () => {
     }
   };
 
+  const handleRetrySyncLocation = () => {
+    setSyncTimeLeft(2 *60);
+  }
+
   // #endregion
 
   // #region useEffects
@@ -716,7 +720,7 @@ const ClockInOut = () => {
         </div>
       )}
       {syncTimeLeft === 0 && (
-        <Button size="sm" color="primary">
+        <Button size="sm" color="primary" variant="flat" onPress={handleRetrySyncLocation}>
           Sinkronasi Lokasi Lagi
         </Button>
       )}
