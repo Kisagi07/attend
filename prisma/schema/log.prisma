@@ -17,6 +17,7 @@ model logs {
   afterHourOvertime   Boolean   @default(false)
   clock_in_picture    String?
   clock_out_picture   String?
+  onSiteCoordinates   Json?     @map("on_site_work")
 
   @@index([user_id], map: "user_id")
 }
