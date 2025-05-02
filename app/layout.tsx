@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Courier_Prime, Inter } from "next/font/google";
 import "./globals.css";
 import Provider from "./components/Provider";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 
 
 const inter = Inter({ subsets: ["latin"] });
+const courierPrime = Courier_Prime({subsets: ["latin"], variable: "--font-courier-prime", weight: "700"});
 
 export const metadata: Metadata = {
   title: "Attendance",
@@ -30,7 +31,7 @@ export default async function RootLayout({
     if (key.value !== process.env.MAINTENANCE_KEY) {
       return (
         <html lang="en">
-          <body className={`${inter.className} bg-white`}>
+          <body className={`${inter.className} ${courierPrime.variable} bg-white`}>
             <Maintenance />
           </body>
         </html>
@@ -40,7 +41,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-white`}>
+      <body className={`${inter.className} ${courierPrime.variable} bg-white`}>
         <Provider session={session}>
           <Toaster richColors />
           <SWR>{children}</SWR>
