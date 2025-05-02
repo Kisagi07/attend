@@ -22,6 +22,14 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 
+declare global {
+  interface Window {
+    AndroidBridge?: {
+      triggerHourlyCoordinate: () => void;
+    }
+  }
+}
+
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
 
@@ -385,6 +393,22 @@ const ClockInOut = () => {
       mutateAttendance();
       setStatus((prev) => ({ ...prev, clockin: true }));
       setCapturedProof(null);
+
+      // if type is on site work trigger WebViewInterface
+      if (type === "on_site_work") {
+        console.log("start web interface function");
+        try {
+          if (window.AndroidBridge) {
+            window.AndroidBridge.triggerHourlyCoordinate();
+          } else {
+            throw Error("Anroid bridge not found");
+          }
+          console.log("Called android bridge successfully")
+        } catch (error) {
+          console.warn("Android Bridge not available", error);
+        }
+      }
+
     } catch (error) {
       console.error(error);
     }
