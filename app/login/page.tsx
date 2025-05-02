@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getCsrfToken, signIn, signOut } from "next-auth/react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 
@@ -22,7 +22,7 @@ const LoginPage = () => {
     if (PIN.length === 0) {
       setIncorrect(true);
       return;
-    }
+    }        
 
     const res = await signIn("credentials", {
       PIN,
