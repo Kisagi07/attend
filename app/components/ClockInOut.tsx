@@ -148,14 +148,14 @@ const ClockInOut = () => {
   // #region functions
 
   const handleButtonClick = async () => {
+    if (!clickedTimeRef.current) {
+      const clickedTime = getTimeOnly();
+      clickedTimeRef.current = clickedTime;
+    }
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
       setWaitingForSyncroizingToComplete(true);
     } else {
-      if (!clickedTimeRef.current) {
-        const clickedTime = getTimeOnly();
-        clickedTimeRef.current = clickedTime;
-      }
 
       try {
         setSending(true);
