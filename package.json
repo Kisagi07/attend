@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
     "start": "next start",
-    "lint": "next lint",
-    "test": "jest",
+    "lint": "next lint",    
     "clear": "rm -rf .next"
   },
   "prisma": {
@@ -67,17 +66,12 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/react": "^16.0.0",
-    "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "15.1.5",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "prisma": "^6.2.1",
