@@ -598,7 +598,7 @@ const ClockInOut = () => {
   // #endregion
 
   return (
-    <>
+    <div className="space-y-4" data-testid="clock-in-out">
       {openSynchronizeLoading && (
         <LocationFetchPopup
           timeLeft={syncTimeLeft}
@@ -724,7 +724,7 @@ const ClockInOut = () => {
           Sinkronasi Lokasi Lagi
         </Button>
       )}
-    </>
+    </div>
   );
 };
 export default ClockInOut;
