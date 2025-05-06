@@ -264,7 +264,7 @@ const ClockInOut = () => {
   );
 
   const getTargetType = useCallback(() => {
-    return selectedButtonValue === "work_from_home" ? "home" : "office";
+    return selectedButtonValue === "work_from_home" || todayAttendance?.type === "work_from_home" ? "home" : "office";
   },[selectedButtonValue]);
 
   const getDistanceFromLocation = useCallback(
