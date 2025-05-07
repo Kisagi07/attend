@@ -1,72 +1,35 @@
-import { expect, test, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import ClockInOut from "@/app/components/ClockInOut";
+import { describe, expect, it, test, vi } from "vitest";
+import getTargetType from "@/utils/getTargetType";
+import { logs } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
-// test("Clock In", () => {
-//     const getCurrentPosition = vi.fn().mockReturnValue({coords:{latitude: -7.570369935745772,longitude: 112.72464932553629}});
-//     const navigator = {
-//         geolocation: {
-//             getCurrentPosition
-//         }
-//     }
+describe("Clock in Out", () => {    
+            
+        it("GetTargetType return home when today attendance type are work from home" , () => {                       
+            const todayAttendance: logs = {
+                id: 1,
+                afterHourOvertime: false,
+                clock_in_latitude: new Decimal(-7.619792855394331),
+                clock_in_longitude: new Decimal(112.77486112096604),
+                clock_in_picture: "proof",
+                clock_in_time: new Date(new Date().setHours(9,0,0)),                
+                type: "work_from_home",
+                user_id: 2,
+                date: new Date(),
+                created_at: new Date(),
+                updated_at: new Date(),
+                work: [],
+                clock_out_latitude: null,
+                clock_out_longitude: null,
+                clock_out_picture: null,
+                clock_out_time: null,
+                isOverTime: false
+            }
 
-//     render(<ClockInOut />);
-//     expect(screen.getByTestId("clock-in-out")).toBeDefined();
-// });
+            const target = getTargetType("clock-out", todayAttendance)
+                    
+            expect(target).toBe("home");                                
+        })    
 
-test("Clock In with mocked getCurrentPosition", () => {
-    const mockGetCurrentPosition = vi.fn((successCallback) => {
-        successCallback({ coords: { latitude: 37.7749, longitude: -122.4194 } });
-    });
-
-    Object.defineProperty(global.navigator, "geolocation", {
-        value: {
-            getCurrentPosition: mockGetCurrentPosition,
-        },
-        writable: true,
-    });
-
-    render(<ClockInOut />);
-
-    expect(mockGetCurrentPosition).toHaveBeenCalled();
-    // expect(screen.getByTestId("clock-in-out")).toBeDefined();
+   
 });
-
-// test("Clock In button click", () => {
-//     render(<ClockInOut />);
-//     const clockInButton = screen.getByText("Clock In");
-//     fireEvent.click(clockInButton);
-//     expect(screen.getByText("Clocked In")).toBeDefined();
-// });
-
-// test("Clock Out button click", () => {
-//     render(<ClockInOut />);
-//     const clockOutButton = screen.getByText("Clock Out");
-//     fireEvent.click(clockOutButton);
-//     expect(screen.getByText("Clocked Out")).toBeDefined();
-// });
-
-// test("Mock nested function", () => {
-//     const mockNestedFunction = vi.fn();
-//     const something = {
-//         something: {
-//             mockThis: mockNestedFunction,
-//         },
-//     };
-
-//     something.something.mockThis();
-//     expect(mockNestedFunction).toHaveBeenCalled();
-// });
-
-// test("Mock nested function with return value", () => {
-//     const mockNestedFunction = vi.fn().mockReturnValue("mocked value");
-//     const something = {
-//         something: {
-//             mockThis: mockNestedFunction,
-//         },
-//     };
-
-//     const result = something.something.mockThis();
-//     expect(mockNestedFunction).toHaveBeenCalled();
-//     expect(result).toBe("mocked value");
-// });
