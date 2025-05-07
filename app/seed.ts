@@ -66,6 +66,17 @@ async function main() {
       },
     },
   });
+
+  // create company 
+  await prisma.company.create({
+    data: {
+      latitude:-7.5706682246443915, longitude: 112.72443367041296,
+      created_at: new Date(),
+      tolerance_active: true,
+      tolerance_time: 100,
+      updated_at: new Date()
+    }
+  })
   
 }
 
