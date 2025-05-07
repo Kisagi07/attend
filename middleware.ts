@@ -7,6 +7,7 @@ export default auth(async function middleware(req) {
   }
 
   const { pathname, origin } = req.nextUrl;
+  // console.log(req.nextUrl);
   const apiKey = req.headers.get("X-Uroboros") ?? null;
   const xUroborosKey = process.env.APP_API_KEY;
 
