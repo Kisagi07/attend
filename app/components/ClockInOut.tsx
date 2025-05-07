@@ -282,7 +282,7 @@ const ClockInOut = () => {
       );
       return distance;
     },
-    [getTargetLocation, getTargetType]
+    [getTargetLocation, selectedButtonValue, todayAttendance]
   );
 
   const sendSickDay = async ({
@@ -592,7 +592,7 @@ const ClockInOut = () => {
     return () => {
       isCancelled = true;
     };
-  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation, getTargetType]);
+  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation, selectedButtonValue, todayAttendance]);
 
   // #endregion
 
