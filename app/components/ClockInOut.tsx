@@ -21,6 +21,7 @@ import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
+import getTargetType from "@/utils/getTargetType";
 
 declare global {
   interface Window {
@@ -155,15 +156,15 @@ const ClockInOut = () => {
 
   // #region functions
 
-  const handleButtonClick = async () => {
+   const handleButtonClick = async () => {
+    if (!clickedTimeRef.current) {
+      const clickedTime = getTimeOnly();
+      clickedTimeRef.current = clickedTime;
+    }
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
       setWaitingForSyncroizingToComplete(true);
     } else {
-      if (!clickedTimeRef.current) {
-        const clickedTime = getTimeOnly();
-        clickedTimeRef.current = clickedTime;
-      }
 
       try {
         setSending(true);
@@ -186,7 +187,7 @@ const ClockInOut = () => {
         let { distance, latitude, longitude, useTarget } =
           closestDistanceLocation.current;
 
-        if (useTarget !== getTargetType()) {
+        if (useTarget !== getTargetType(selectedButtonValue, todayAttendance)) {
           distance = getDistanceFromLocation({ latitude, longitude });
         }
 
@@ -271,16 +272,12 @@ const ClockInOut = () => {
     ]
   );
 
-  const getTargetType = useCallback(() => {
-    return selectedButtonValue === "work_from_home" ? "home" : "office";
-  },[selectedButtonValue]);
-
   const getDistanceFromLocation = useCallback(
     (location: { latitude: number; longitude: number }) => {
       const { latitude, longitude } = location;
       // get user and terget compare location
       const { targetLatitude, targetLongitude } = getTargetLocation(
-        getTargetType() === "home"
+        getTargetType(selectedButtonValue, todayAttendance) === "home"
       );
       // calculate distance between location
       const distance = Math.floor(
@@ -293,7 +290,7 @@ const ClockInOut = () => {
       );
       return distance;
     },
-    [getTargetLocation, getTargetType]
+    [getTargetLocation, selectedButtonValue, todayAttendance]
   );
 
   const sendSickDay = async ({
@@ -509,6 +506,8 @@ const ClockInOut = () => {
 
   // #region useEffects
 
+  
+
   useEffect(() => {
     if (!isLoading && todayAttendance) {
       const { type, clock_out_time } = todayAttendance;
@@ -563,8 +562,7 @@ const ClockInOut = () => {
   }, [time, user, company]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
+    let timer: NodeJS.Timeout;            
     if (syncTimeLeft > 0) {
       const endTime = Date.now() + syncTimeLeft * 1000;
       timer = setInterval(() => {
@@ -575,9 +573,9 @@ const ClockInOut = () => {
           setSyncTimeLeft(0);
         } else {
           setSyncTimeLeft(newTimeLeft);
-        }
+        }        
       }, 1000);
-    }
+    }    
     return () => clearInterval(timer);
   }, [syncTimeLeft]);
 
@@ -586,11 +584,12 @@ const ClockInOut = () => {
     let isCancelled = false;
     const keepFetching = async () => {
       while (syncTimeLeft > 0 && !isCancelled) {
+        console.log({syncTimeLeft, isCancelled})
         try {
           const location = await getUserLocation(true);
           const distance = getDistanceFromLocation(location);
           const { latitude, longitude } = location;
-          const target = getTargetType();
+          const target = getTargetType(selectedButtonValue, todayAttendance);
           if (!closestDistanceLocation.current) {
             closestDistanceLocation.current = {
               latitude,
@@ -617,7 +616,7 @@ const ClockInOut = () => {
     return () => {
       isCancelled = true;
     };
-  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation, getTargetType]);
+  }, [syncTimeLeft, getUserLocation, getDistanceFromLocation, selectedButtonValue, todayAttendance]);
 
   // #endregion
 
@@ -751,4 +750,5 @@ const ClockInOut = () => {
     </>
   );
 };
+
 export default ClockInOut;

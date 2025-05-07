@@ -38,6 +38,6 @@
     "migrations/20240125041904-create-user.js",
     "babel.config.js",
     "app/components/plainFall.js"
-  ],
+, "vite.config.mts"  ],
   "exclude": ["node_modules"]
 }
