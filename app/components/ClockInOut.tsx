@@ -389,11 +389,7 @@ const ClockInOut = () => {
   };
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {
-        console.log({
-          onlyNotPermittedReject,
-          first: deniedGeolocation.current,
-        });
+      if (error.code === error.PERMISSION_DENIED) {        
         if (onlyNotPermittedReject && !deniedGeolocation.current) {
           toast.error("Location permission denied by user.");
           deniedGeolocation.current = true;
@@ -561,8 +557,7 @@ const ClockInOut = () => {
   useEffect(() => {
     let isCancelled = false;
     const keepFetching = async () => {
-      while (syncTimeLeft > 0 && !isCancelled) {
-        console.log({syncTimeLeft, isCancelled})
+      while (syncTimeLeft > 0 && !isCancelled) {        
         try {
           const location = await getUserLocation(true);
           const distance = getDistanceFromLocation(location);
