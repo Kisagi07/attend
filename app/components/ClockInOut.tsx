@@ -381,7 +381,11 @@ const ClockInOut = () => {
         body: formData,
       });
       mutateAttendance();
-      setStatus((prev) => ({ ...prev, clockin: true }));
+      if (type === "clock-out") {
+        setStatus((prev) => ({ ...prev, done: true }));
+      } else {
+        setStatus((prev) => ({ ...prev, clockin: true }));
+      }
       setCapturedProof(null);
     } catch (error) {
       console.error(error);
