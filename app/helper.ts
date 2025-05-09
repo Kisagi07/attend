@@ -24,8 +24,10 @@ export function formatRupiah(value: number) {
   return `Rp. ${format}`;
 }
 
-export function getDateOnly() {
-  const date = new Date();
+export function getDateOnly(date?: Date) {
+  if (!date) {
+    date = new Date();
+  }  
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const day = date.getDate().toString().padStart(2, "0");
