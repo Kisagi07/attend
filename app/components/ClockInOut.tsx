@@ -156,6 +156,7 @@ const ClockInOut = () => {
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
       setWaitingForSyncroizingToComplete(true);
+      setSending(true);
     } else {
 
       try {
@@ -465,6 +466,7 @@ const ClockInOut = () => {
   const handleLocationFetchPopupCancel = useCallback(() => {
     setWaitingForSyncroizingToComplete(false);
     setOpenSynchronizeLoading(false);
+    setSending(false);
   }, []);
 
   const handleLocationFetchPopupDone = () => {
