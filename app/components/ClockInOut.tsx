@@ -216,7 +216,7 @@ const ClockInOut = () => {
           return;
         }
         // #endregion //? rejection check
-        // ? next operation
+        // ? next operation        
         if (selectedButtonValue === "sick") {
           await sendSickDay({ type: selectedButtonValue, latitude, longitude });
         } else {
@@ -526,14 +526,29 @@ const ClockInOut = () => {
   useEffect(() => {
     if (user) {
       const workStart = new Date();
-      const shiftStart = user.job_position?.shift_start ?? "09:00";
-      workStart.setHours(parseInt(shiftStart.split(":")[0]));
+      const shiftStart = user.job_position?.shift_start ?? "09:00";      
+      workStart.setHours(parseInt(shiftStart.split(":")[0]));            
       workStart.setMinutes(parseInt(shiftStart.split(":")[1]));
+      workStart.setSeconds(0);
       if (company?.tolerance_active) {
         workStart.setMinutes(workStart.getMinutes() + company.tolerance_time);
-      }
-      const shiftStartTime = workStart.getTime();
-      if (time > shiftStartTime) {
+      }      
+      
+
+      const shiftStartTime = workStart.getTime();             
+      
+      if (clickedTimeRef.current) {        
+        const clickedTime = new Date();
+        const [hours, minutes, seconds] = clickedTimeRef.current.split(":").map(Number);
+        clickedTime.setHours(hours);
+        clickedTime.setMinutes(minutes);
+        clickedTime.setSeconds(seconds);        
+
+        if (clickedTime.getTime() > shiftStartTime) {
+          setStatus((prev) => ({ ...prev, isLate: true }));          
+        }
+        
+      } else  if (time > shiftStartTime) {        
         setStatus((prev) => ({ ...prev, isLate: true }));
       }
     }
@@ -585,7 +600,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     };
