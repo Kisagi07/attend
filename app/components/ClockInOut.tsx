@@ -26,7 +26,7 @@ import getTargetType from "@/utils/getTargetType";
 declare global {
   interface Window {
     AndroidBridge?: {
-      triggerHourlyCoordinate: () => void;
+      triggerHourlyCoordinate: (id:number) => void;
     }
   }
 }
@@ -64,7 +64,7 @@ const ClockInOut = () => {
   // #endregion
 
   // #region states
-  const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
+  const [syncTimeLeft, setSyncTimeLeft] = useState(30);
   const [openSynchronizeLoading, setOpenSynchronizeLoading] = useState(false);
   const [watingForSynchronizingToComplete, setWaitingForSyncroizingToComplete] =
     useState(false);
@@ -396,7 +396,11 @@ const ClockInOut = () => {
         console.log("start web interface function");
         try {
           if (window.AndroidBridge) {
-            window.AndroidBridge.triggerHourlyCoordinate();
+            if (user) {
+              window.AndroidBridge.triggerHourlyCoordinate(user.id);
+            } else {
+              throw Error("User not found");
+            }
           } else {
             throw Error("Anroid bridge not found");
           }
