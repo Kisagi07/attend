@@ -22,6 +22,8 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 import getTargetType from "@/utils/getTargetType";
+import { getToken } from "next-auth/jwt";
+import { useSession } from "next-auth/react";
 
 declare global {
   interface Window {
@@ -392,11 +394,10 @@ const ClockInOut = () => {
       setCapturedProof(null);
 
       // if type is on site work trigger WebViewInterface
-      if (type === "on_site_work") {
-        console.log("start web interface function");
+      if (type === "on_site_work") {        
         try {
           if (window.AndroidBridge) {
-            if (user) {
+            if (user) {                            
               window.AndroidBridge.triggerHourlyCoordinate(user.id);
             } else {
               throw Error("User not found");
@@ -506,7 +507,10 @@ const ClockInOut = () => {
 
   // #region useEffects
 
-  
+  const token = useSession()
+  useEffect(() => {
+    console.log(token);
+  },[token])
 
   useEffect(() => {
     if (!isLoading && todayAttendance) {
