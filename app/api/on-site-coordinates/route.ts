@@ -73,12 +73,14 @@ const POST = async (req: NextRequest) => {
         if (log.type === "on_site_work") {
             // append the new coordinate
             const oldCoordinate = log.onSiteCoordinates as JsonArray;
+            let newCoordinate = []
             if (oldCoordinate) {
-                const newCoordinate = [...oldCoordinate, { timestamp, latitude, longitude}];
-            } else {
-                
-                const newCoordinate = [{ timestamp, latitude, longitude}];
-                await prisma.logs.update({
+                 newCoordinate = [...oldCoordinate, { timestamp, latitude, longitude}];                
+            } else {                
+                 newCoordinate = [{ timestamp, latitude, longitude}];               
+            }
+
+            await prisma.logs.update({
                     where: {
                         id: log.id
                     },
@@ -86,7 +88,6 @@ const POST = async (req: NextRequest) => {
                         onSiteCoordinates: newCoordinate
                     }
                 })
-            }
 
             return NextResponse.json({message: "Coordinate saved"}, {status: 200})
         } else {
