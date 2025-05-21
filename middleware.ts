@@ -16,10 +16,11 @@ export default auth(async function middleware(req) {
   const isNextAuthRoute = pathname.startsWith("/api/auth");
   const hasKeyAndMatch = apiKey ? apiKey === xUroborosKey : false;
   const isImageApi = pathname.startsWith("/api/images");
+  const allowedEndpoint = ["/on-site-coordinates"];
 
   if (!req.auth) {
     if (isApiRoute && !isLoginRoute && !isNextAuthRoute && !isImageApi) {
-      if (!hasKeyAndMatch) {
+      if (!hasKeyAndMatch && allowedEndpoint.includes(pathname)) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
     } else if (!isLoginRoute && !isApiRoute) {
