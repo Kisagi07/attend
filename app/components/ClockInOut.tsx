@@ -10,12 +10,7 @@ import { IoCameraOutline } from "react-icons/io5";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";
 import { Button, ButtonGroup } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { BiChevronDown } from "react-icons/bi";
 import { Skeleton } from "@heroui/skeleton";
 import { getLocalTimeZone, today } from "@internationalized/date";
@@ -23,8 +18,7 @@ import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 import getTargetType from "@/utils/getTargetType";
 
-const fetcher: Fetcher<any, string> = (...args) =>
-  fetch(...args).then((res) => res.json());
+const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 
 type ButtonOption = Record<
   string,
@@ -41,35 +35,23 @@ const ClockInOut = () => {
     data: todayAttendance,
     isLoading,
     mutate: mutateAttendance,
-  } = useSWR<logs>(
-    `/api/user/attendance?date=${today(getLocalTimeZone()).toDate(getLocalTimeZone())}`,
-    fetcher
-  );
-  const { data: company, isLoading: companyLoading } = useSWR<company>(
-    `/api/company`,
-    fetcher
-  );
-  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(
-    `/api/user`,
-    fetcher
-  );
+  } = useSWR<logs>(`/api/user/attendance?date=${today(getLocalTimeZone()).toDate(getLocalTimeZone())}`, fetcher);
+  const { data: company, isLoading: companyLoading } = useSWR<company>(`/api/company`, fetcher);
+  const { data: user, isLoading: userLoading } = useSWR<UserWithJob>(`/api/user`, fetcher);
+  const { data: isHoliday, isLoading: holidayLoading } = useSWR(`/api/holidays/date/${today(getLocalTimeZone()).toString()}`, fetcher);
   // #endregion
 
   // #region states
   const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
   const [openSynchronizeLoading, setOpenSynchronizeLoading] = useState(false);
-  const [watingForSynchronizingToComplete, setWaitingForSyncroizingToComplete] =
-    useState(false);
+  const [watingForSynchronizingToComplete, setWaitingForSyncroizingToComplete] = useState(false);
 
   const inputImageRef = useRef<HTMLInputElement>(null);
 
   // hook variable
-  const [selectedButton, setSelectedButton] = useState<Set<string> | "all">(
-    new Set(["work_from_office"])
-  );
+  const [selectedButton, setSelectedButton] = useState<Set<string> | "all">(new Set(["work_from_office"]));
   const selectedButtonValue = Array.from(selectedButton)[0];
-  const showSpecialReason =
-    (selectedButtonValue as logs_type) === "special_attendance";
+  const showSpecialReason = (selectedButtonValue as logs_type) === "special_attendance";
   const [status, setStatus] = useState({
     clockIn: false,
     done: false,
@@ -87,10 +69,7 @@ const ClockInOut = () => {
   const clickedTimeRef = useRef<string | null>(null);
   const isWorkDay = useMemo(() => {
     const todayDay = new Date().getDay();
-    return (
-      user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ??
-      false
-    );
+    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
   }, [user]);
 
   const buttonOptions = useMemo<ButtonOption>(() => {
@@ -102,7 +81,7 @@ const ClockInOut = () => {
           color: "danger",
         },
       };
-    } else if (!isWorkDay) {
+    } else if (!isWorkDay || isHoliday) {
       setSelectedButton(new Set(["work_overtime"]));
       return {
         work_overtime: {
@@ -135,7 +114,7 @@ const ClockInOut = () => {
         },
       };
     }
-  }, [status.clockIn, isWorkDay]);
+  }, [status.clockIn, isWorkDay, isHoliday]);
 
   const closestDistanceLocation = useRef<{
     distance: number;
@@ -148,7 +127,7 @@ const ClockInOut = () => {
 
   // #region functions
 
-   const handleButtonClick = async () => {
+  const handleButtonClick = async () => {
     if (!clickedTimeRef.current) {
       const clickedTime = getTimeOnly();
       clickedTimeRef.current = clickedTime;
@@ -158,7 +137,6 @@ const ClockInOut = () => {
       setWaitingForSyncroizingToComplete(true);
       setSending(true);
     } else {
-
       try {
         setSending(true);
 
@@ -171,14 +149,11 @@ const ClockInOut = () => {
         // #region //? rejection check
         // if distance is more than 50m and not sick or work with duty then warned user then return
         if (!closestDistanceLocation.current) {
-          toast.error(
-            "Gagal mengambil lokasi dalam waktu yang ditentukan, pastikan gps aktif dan coba lagi"
-          );
+          toast.error("Gagal mengambil lokasi dalam waktu yang ditentukan, pastikan gps aktif dan coba lagi");
           return;
         }
 
-        let { distance, latitude, longitude, useTarget } =
-          closestDistanceLocation.current;
+        let { distance, latitude, longitude, useTarget } = closestDistanceLocation.current;
 
         if (useTarget !== getTargetType(selectedButtonValue, todayAttendance)) {
           distance = getDistanceFromLocation({ latitude, longitude });
@@ -205,18 +180,12 @@ const ClockInOut = () => {
           return;
         }
         // if user is late but reason for late is not filled then warned user then return
-        if (
-          status.isLate &&
-          !lateReason &&
-          (selectedButtonValue === "work_from_home" ||
-            selectedButtonValue === "work_from_office") &&
-          isWorkDay
-        ) {
+        if (status.isLate && !lateReason && (selectedButtonValue === "work_from_home" || selectedButtonValue === "work_from_office") && isWorkDay) {
           toast.error("You need to fill reason for being late");
           return;
         }
         // #endregion //? rejection check
-        // ? next operation        
+        // ? next operation
         if (selectedButtonValue === "sick") {
           await sendSickDay({ type: selectedButtonValue, latitude, longitude });
         } else {
@@ -257,44 +226,22 @@ const ClockInOut = () => {
         targetLongitude,
       };
     },
-    [
-      company?.latitude,
-      company?.longitude,
-      user?.home_latitude,
-      user?.home_longitude,
-    ]
+    [company?.latitude, company?.longitude, user?.home_latitude, user?.home_longitude]
   );
 
   const getDistanceFromLocation = useCallback(
     (location: { latitude: number; longitude: number }) => {
       const { latitude, longitude } = location;
       // get user and terget compare location
-      const { targetLatitude, targetLongitude } = getTargetLocation(
-        getTargetType(selectedButtonValue, todayAttendance) === "home"
-      );
+      const { targetLatitude, targetLongitude } = getTargetLocation(getTargetType(selectedButtonValue, todayAttendance) === "home");
       // calculate distance between location
-      const distance = Math.floor(
-        calculateDistance(
-          latitude,
-          longitude,
-          Number(targetLatitude),
-          Number(targetLongitude)
-        ) * 1000
-      );
+      const distance = Math.floor(calculateDistance(latitude, longitude, Number(targetLatitude), Number(targetLongitude)) * 1000);
       return distance;
     },
     [getTargetLocation, selectedButtonValue, todayAttendance]
   );
 
-  const sendSickDay = async ({
-    type,
-    latitude,
-    longitude,
-  }: {
-    type: string;
-    latitude: number;
-    longitude: number;
-  }) => {
+  const sendSickDay = async ({ type, latitude, longitude }: { type: string; latitude: number; longitude: number }) => {
     const formData = new FormData();
     formData.append("type", type);
     formData.append("clock_in_time", clickedTimeRef.current!);
@@ -349,21 +296,10 @@ const ClockInOut = () => {
       sendData["clock_in_longitude"] = longitude;
     }
     if (type === "special_attendance") {
-      sendData["todaysWork"] = [
-        "Reason: " + specialReason,
-        ...sendData["todaysWork"],
-      ];
+      sendData["todaysWork"] = ["Reason: " + specialReason, ...sendData["todaysWork"]];
     }
-    if (
-      status.isLate &&
-      type !== "clock-out" &&
-      type !== "special_attendance" &&
-      type !== "on_site_work"
-    ) {
-      sendData["todaysWork"] = [
-        "Late Reason: " + lateReason,
-        ...sendData["todaysWork"],
-      ];
+    if (status.isLate && type !== "clock-out" && type !== "special_attendance" && type !== "on_site_work") {
+      sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
     }
     try {
       const formData = new FormData();
@@ -391,54 +327,49 @@ const ClockInOut = () => {
       console.error(error);
     }
   };
-  const handleGeolocationError = useCallback(
-    (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {        
-        if (onlyNotPermittedReject && !deniedGeolocation.current) {
-          toast.error("Location permission denied by user.");
-          deniedGeolocation.current = true;
-        } else if (!onlyNotPermittedReject) {
-          toast.error("Location permission denied by user.");
-        }
-      } else if (error.code === error.POSITION_UNAVAILABLE) {
-        if (!onlyNotPermittedReject) {
-          toast.error("Location information is unavailable.");
-        }
-      } else if (error.code === error.TIMEOUT) {
-        if (!onlyNotPermittedReject) {
-          toast.error("The request to get user location timed out.");
-        }
-      } else {
-        if (!onlyNotPermittedReject) {
-          toast.error("An unknown error occurred.");
-        }
+  const handleGeolocationError = useCallback((error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
+    if (error.code === error.PERMISSION_DENIED) {
+      if (onlyNotPermittedReject && !deniedGeolocation.current) {
+        toast.error("Location permission denied by user.");
+        deniedGeolocation.current = true;
+      } else if (!onlyNotPermittedReject) {
+        toast.error("Location permission denied by user.");
       }
-    },
-    []
-  );
+    } else if (error.code === error.POSITION_UNAVAILABLE) {
+      if (!onlyNotPermittedReject) {
+        toast.error("Location information is unavailable.");
+      }
+    } else if (error.code === error.TIMEOUT) {
+      if (!onlyNotPermittedReject) {
+        toast.error("The request to get user location timed out.");
+      }
+    } else {
+      if (!onlyNotPermittedReject) {
+        toast.error("An unknown error occurred.");
+      }
+    }
+  }, []);
 
   const getUserLocation = useCallback(
     (onlyNotPermittedReject: boolean = false) => {
-      return new Promise<{ latitude: number; longitude: number }>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const latitude = position.coords.latitude;
-              const longitude = position.coords.longitude;
-              resolve({ latitude, longitude });
-            },
-            (error) => {
-              handleGeolocationError(error, onlyNotPermittedReject);
-              reject(error);
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 300000,
-              maximumAge: 0,
-            }
-          );
-        }
-      );
+      return new Promise<{ latitude: number; longitude: number }>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            handleGeolocationError(error, onlyNotPermittedReject);
+            reject(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 300000,
+            maximumAge: 0,
+          }
+        );
+      });
     },
     [handleGeolocationError]
   );
@@ -477,14 +408,12 @@ const ClockInOut = () => {
   };
 
   const handleRetrySyncLocation = () => {
-    setSyncTimeLeft(2 *60);
-  }
+    setSyncTimeLeft(2 * 60);
+  };
 
   // #endregion
 
   // #region useEffects
-
-  
 
   useEffect(() => {
     if (!isLoading && todayAttendance) {
@@ -526,36 +455,34 @@ const ClockInOut = () => {
   useEffect(() => {
     if (user) {
       const workStart = new Date();
-      const shiftStart = user.job_position?.shift_start ?? "09:00";      
-      workStart.setHours(parseInt(shiftStart.split(":")[0]));            
+      const shiftStart = user.job_position?.shift_start ?? "09:00";
+      workStart.setHours(parseInt(shiftStart.split(":")[0]));
       workStart.setMinutes(parseInt(shiftStart.split(":")[1]));
       workStart.setSeconds(0);
       if (company?.tolerance_active) {
         workStart.setMinutes(workStart.getMinutes() + company.tolerance_time);
-      }      
-      
+      }
 
-      const shiftStartTime = workStart.getTime();             
-      
-      if (clickedTimeRef.current) {        
+      const shiftStartTime = workStart.getTime();
+
+      if (clickedTimeRef.current) {
         const clickedTime = new Date();
         const [hours, minutes, seconds] = clickedTimeRef.current.split(":").map(Number);
         clickedTime.setHours(hours);
         clickedTime.setMinutes(minutes);
-        clickedTime.setSeconds(seconds);        
+        clickedTime.setSeconds(seconds);
 
         if (clickedTime.getTime() > shiftStartTime) {
-          setStatus((prev) => ({ ...prev, isLate: true }));          
+          setStatus((prev) => ({ ...prev, isLate: true }));
         }
-        
-      } else  if (time > shiftStartTime) {        
+      } else if (time > shiftStartTime) {
         setStatus((prev) => ({ ...prev, isLate: true }));
       }
     }
   }, [time, user, company]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;            
+    let timer: NodeJS.Timeout;
     if (syncTimeLeft > 0) {
       const endTime = Date.now() + syncTimeLeft * 1000;
       timer = setInterval(() => {
@@ -566,9 +493,9 @@ const ClockInOut = () => {
           setSyncTimeLeft(0);
         } else {
           setSyncTimeLeft(newTimeLeft);
-        }        
+        }
       }, 1000);
-    }    
+    }
     return () => clearInterval(timer);
   }, [syncTimeLeft]);
 
@@ -576,7 +503,7 @@ const ClockInOut = () => {
   useEffect(() => {
     let isCancelled = false;
     const keepFetching = async () => {
-      while (syncTimeLeft > 0 && !isCancelled) {        
+      while (syncTimeLeft > 0 && !isCancelled) {
         try {
           const location = await getUserLocation(true);
           const distance = getDistanceFromLocation(location);
@@ -615,13 +542,9 @@ const ClockInOut = () => {
   return (
     <>
       {openSynchronizeLoading && (
-        <LocationFetchPopup
-          timeLeft={syncTimeLeft}
-          onCancel={handleLocationFetchPopupCancel}
-          onDone={handleLocationFetchPopupDone}
-        />
+        <LocationFetchPopup timeLeft={syncTimeLeft} onCancel={handleLocationFetchPopupCancel} onDone={handleLocationFetchPopupDone} />
       )}
-      {isLoading && userLoading && companyLoading ? (
+      {isLoading && userLoading && companyLoading && holidayLoading ? (
         <Skeleton className="h-10 w-full rounded" />
       ) : status.isSick ? (
         <Button color="primary" variant="flat" fullWidth>
@@ -638,13 +561,7 @@ const ClockInOut = () => {
             className="bg-neutral-200 cursor-pointer relative rounded-lg shadow-lg  size-40 after:content-[''] after:absolute after:w-full after:h-full after:top-0 after:left-0 after:rounded-[inherit] after:bg-purple-950 after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus:after:opacity-[0.1] active:after:opacity-[0.16]"
           >
             {capturedProofUrl ? (
-              <Image
-                src={capturedProofUrl}
-                className="size-40 object-cover object-center rounded-lg"
-                height={160}
-                width={160}
-                alt="captured proof"
-              />
+              <Image src={capturedProofUrl} className="size-40 object-cover object-center rounded-lg" height={160} width={160} alt="captured proof" />
             ) : (
               <div className="p-4 flex justify-center flex-col items-center space-y-4">
                 <IoCameraOutline className="size-20" />
@@ -669,9 +586,7 @@ const ClockInOut = () => {
               selectedButtonValue !== "special_attendance" &&
               selectedButtonValue !== "on_site_work" && (
                 <>
-                  <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">
-                    You are late! hurry up!
-                  </div>
+                  <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">You are late! hurry up!</div>
                   <Input
                     label="State your reason for coming in late"
                     color="danger"
@@ -682,32 +597,17 @@ const ClockInOut = () => {
                   />
                 </>
               )}
-            {status.clockIn && !status.done && (
-              <ListInput
-                items={todaysWork}
-                addItem={handleAddItem}
-                removeItem={handleRemoveItem}
-              />
-            )}
+            {status.clockIn && !status.done && <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />}
             {showSpecialReason && (
-              <Input
-                variant="underlined"
-                label="Reason"
-                value={specialReason}
-                onChange={(e) => setSpecialReason(e.currentTarget.value)}
-              />
+              <Input variant="underlined" label="Reason" value={specialReason} onChange={(e) => setSpecialReason(e.currentTarget.value)} />
             )}
             <ButtonGroup variant="flat" fullWidth>
               <Button
                 isLoading={sending}
                 onClick={handleButtonClick}
-                color={
-                  buttonOptions[selectedButtonValue as keyof ButtonOption]
-                    ?.color ?? "default"
-                }
+                color={buttonOptions[selectedButtonValue as keyof ButtonOption]?.color ?? "default"}
               >
-                {buttonOptions[selectedButtonValue as keyof ButtonOption]
-                  ?.label ?? "Loading"}
+                {buttonOptions[selectedButtonValue as keyof ButtonOption]?.label ?? "Loading"}
               </Button>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
@@ -719,14 +619,10 @@ const ClockInOut = () => {
                   disallowEmptySelection
                   selectionMode="single"
                   selectedKeys={selectedButton}
-                  onSelectionChange={(selected) =>
-                    setSelectedButton(selected as Set<string>)
-                  }
+                  onSelectionChange={(selected) => setSelectedButton(selected as Set<string>)}
                 >
                   {Object.values(buttonOptions).map((option, index) => (
-                    <DropdownItem key={Object.keys(buttonOptions)[index]}>
-                      {option!.label}
-                    </DropdownItem>
+                    <DropdownItem key={Object.keys(buttonOptions)[index]}>{option!.label}</DropdownItem>
                   ))}
                 </DropdownMenu>
               </Dropdown>
