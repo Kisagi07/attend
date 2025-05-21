@@ -29,6 +29,7 @@ declare global {
   interface Window {
     AndroidBridge?: {
       triggerHourlyCoordinate: (id:number) => void;
+      stopHourlyCoordinate: (id: number) => void;
     }
   }
 }
@@ -393,7 +394,7 @@ const ClockInOut = () => {
       setStatus((prev) => ({ ...prev, clockin: true }));
       setCapturedProof(null);
 
-      // if type is on site work trigger WebViewInterface
+      // #region  if type is on site work trigger WebViewInterface
       if (type === "on_site_work") {        
         try {
           if (window.AndroidBridge) {
@@ -410,6 +411,25 @@ const ClockInOut = () => {
           console.warn("Android Bridge not available", error);
         }
       }
+      // #endregion
+
+      // #region if type is clock out then call stop worker from WebViewInterface
+      if (type === "clock-out") {
+        try {
+          if (window.AndroidBridge) {
+            if (user) {
+              window.AndroidBridge.stopHourlyCoordinate(user.id);
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Android bridge not found")
+          }
+        } catch (error)  {
+          console.warn("Failed stoping hourly coordinate", error);
+        }
+      }
+      // #endregion
 
     } catch (error) {
       console.error(error);
