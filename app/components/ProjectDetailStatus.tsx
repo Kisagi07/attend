@@ -6,6 +6,8 @@ import { FaUserFriends } from "react-icons/fa";
 import { GrStatusInfo } from "react-icons/gr";
 import { MdOutlinePriorityHigh } from "react-icons/md";
 import { AiFillFund } from "react-icons/ai";
+import translateStatus from "@/utils/translateStatus";
+import translatePriority from "@/utils/translatePriority";
 
 type Props = {
   project: undefined | ProjectResult;
@@ -14,7 +16,7 @@ type Props = {
 const ProjectDetailStatus = ({ project }: Props) => {  
   return (
     <section>
-      <h3 className="text-xl font-bold">Detail Regarding : {project?.title}</h3>
+      <h3 className="text-xl font-bold">Detail Proyek : {project?.title}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <Card shadow="sm">
           <CardHeader>
@@ -24,7 +26,7 @@ const ProjectDetailStatus = ({ project }: Props) => {
               </div>
               <div>
                 <h4 className="text-lg font-medium">Status</h4>
-                <p data-testid="status">{project?.status.replaceToSpaceAndCapitalize("_")}</p>
+                <p data-testid="status">{project ? translateStatus(project.status): ""}</p>
               </div>
             </div>
           </CardHeader>
@@ -36,8 +38,8 @@ const ProjectDetailStatus = ({ project }: Props) => {
                 <MdOutlinePriorityHigh className="w-8 h-8 text-blue-600" />
               </div>
               <div>
-                <h4 className="text-lg font-medium">Priority</h4>
-                <p data-testid="priority">{project?.priority.replaceToSpaceAndCapitalize("_")}</p>
+                <h4 className="text-lg font-medium">Prioritas</h4>
+                <p data-testid="priority">{project ? translatePriority(project.priority) : ""}</p>
               </div>
             </div>
           </CardHeader>
@@ -49,7 +51,7 @@ const ProjectDetailStatus = ({ project }: Props) => {
                 <AiFillFund className="w-8 h-8 text-emerald-600" />
               </div>
               <div>
-                <h4 className="text-lg font-medium">Fund</h4>
+                <h4 className="text-lg font-medium">Dana</h4>
                 <p data-testid="fund">{formatRupiah(project?.fund ?? 0)}</p>
               </div>
             </div>
@@ -62,7 +64,7 @@ const ProjectDetailStatus = ({ project }: Props) => {
                 <FaUserFriends className="w-8 h-8 text-violet-600" />
               </div>
               <div>
-                <h4 className="text-lg font-medium">Members</h4>
+                <h4 className="text-lg font-medium">Anggota</h4>
                 <p data-testid="members">{project?.projectMembers.length}</p>
               </div>
             </div>

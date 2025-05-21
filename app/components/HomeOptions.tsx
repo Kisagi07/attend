@@ -16,7 +16,7 @@ const HomeOptions = () => {
         title={
           <div className="flex items-center gap-2">
             <FaHome className="size-4" />
-            <span>Home Coordinate</span>
+            <span>Kordinat Rumah</span>
           </div>
         }
       >
@@ -24,7 +24,7 @@ const HomeOptions = () => {
       </Tab>
       <Tab key="NSO" title={<div className="flex items-center gap-2">
             <AiOutlineFieldTime className="size-4" />
-            <span>NS Overtime</span>
+            <span>Lembur Luar Jadwal</span>
           </div>}>
             <NonScheduleOvertime />
           </Tab>
@@ -33,7 +33,7 @@ const HomeOptions = () => {
         title={
           <div className="flex items-center gap-2">
             <VscGithubProject className="size-4" />
-            <span>Projects</span>
+            <span>Proyek</span>
           </div>
         }
       >

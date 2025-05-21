@@ -45,19 +45,19 @@ const ProjectHistories = ({ histories, project }: Props) => {
   }));
   const getFilename = (text: string): string => {
     if (typeof text !== "string") {
-      throw new Error(`expected passed text to be string, ${typeof text} received.`);
+      throw new Error(`text yang diterima seharusnya tipe string, ${typeof text} diterima.`);
     }
 
     const splitted = text.split("/");
     if (splitted.length === 0) {
-      return "No filename";
+      return "filename tidak ditemukan";
     }
     return splitted.pop() as string;
   };
   const sendHistory = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!description.trim()) {
-      toast.error("Description is needed");
+      toast.error("Deskripsi dibutuhkan");
       return;
     }
     const formData = new FormData(e.currentTarget);
@@ -69,7 +69,7 @@ const ProjectHistories = ({ histories, project }: Props) => {
       });
       setSubmitting(false);
       if (!res.ok) {
-        const error: CustomError = Error("Something went wrong");
+        const error: CustomError = Error("Ada yang salah dengan server");
         error.status === res.status;
         error.info = await res.json();
         throw error;
@@ -85,24 +85,24 @@ const ProjectHistories = ({ histories, project }: Props) => {
       if (error.status && error.status === 422) {
         toast.error(error.info.message);
       } else {
-        toast.error("Something went wrong");
+        toast.error("Ada yang salah dengan server");
       }
     }
   };
   return (
     <section>
-      <h3 className="font-semibold text-lg">Project Histories</h3>
+      <h3 className="font-semibold text-lg">Riwayat Proyek</h3>
       <form onSubmit={sendHistory} className="flex gap-4 items-stretch">
         <Input
           name="description"
           variant="flat"
           color="success"
-          label="New History"
+          label="Riwayat Baru"
           value={description}
           onValueChange={setDescription}
         />
         <Input type="file" className="hidden" name="file" ref={inputRef} />
-        <Tooltip content="Attach File" color="primary">
+        <Tooltip content="Kaitkan File" color="primary">
           <Button
             onClick={() => inputRef.current?.click()}
             color="success"
@@ -113,7 +113,7 @@ const ProjectHistories = ({ histories, project }: Props) => {
             <FaLink className="w-6 h-6" />
           </Button>
         </Tooltip>
-        <Tooltip content="Send History" color="primary">
+        <Tooltip content="Kirim Riwayat" color="primary">
           <Button
             isLoading={submitting}
             type="submit"

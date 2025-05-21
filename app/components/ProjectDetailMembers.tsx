@@ -13,7 +13,7 @@ const ProjectDetailMembers = ({ members }: Props) => {
     <article data-testid="project-members" className="h-full">
       <Card shadow="sm" className="h-full">
         <CardHeader>
-          <span className="font-semibold">Project Members</span>
+          <span className="font-semibold">Anggota Proyek</span>
         </CardHeader>
         <CardBody>
           <div className="flex flex-wrap gap-4">

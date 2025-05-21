@@ -106,7 +106,7 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["clock-out"]));
       return {
         "clock-out": {
-          label: "Clock Out",
+          label: "Pulang",
           color: "danger",
         },
       };
@@ -114,7 +114,7 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["work_overtime"]));
       return {
         work_overtime: {
-          label: "Work Overtime",
+          label: "Kerja Lembur",
           color: "primary",
         },
       };
@@ -122,23 +122,23 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["work_from_office"]));
       return {
         work_from_home: {
-          label: "Work From Home",
+          label: "Kerja dari Rumah",
           color: "success",
         },
         work_from_office: {
-          label: "Work From Office",
+          label: "Kerja dari Kantor",
           color: "secondary",
         },
         special_attendance: {
-          label: "Special Attendance",
+          label: "Absen Special",
           color: "primary",
         },
         sick: {
-          label: "Sick Leave",
+          label: "Sakit",
           color: "danger",
         },
         on_site_work: {
-          label: "On Site Work",
+          label: "Kerja Lapangan",
           color: "secondary",
         },
       };
@@ -198,17 +198,17 @@ const ClockInOut = () => {
           selectedButtonValue !== "on_site_work" &&
           todayAttendance?.type !== "on_site_work"
         ) {
-          toast.error(` You are ${distance - 50} meter too far from location!`);
+          toast.error(`${distance - 50} meter terlalu jauh dari lokasi!`);
           return;
         }
         // if clock out but no work filled then warned user then return
         if (selectedButtonValue === "clock-out" && todaysWork.length === 0) {
-          toast.error("You need to fill today's work in order to clockout");
+          toast.error("Pekerjaan hari ini harus di isi untuk absen pulang");
           return;
         }
         // if work with duty but duty is not filled then warned user then return
         if (selectedButtonValue === "special_attendance" && !specialReason) {
-          toast.error("You need to fill reason in order to clockin");
+          toast.error("Harus mengisi alasan absen special");
           return;
         }
         // if user is late but reason for late is not filled then warned user then return
@@ -219,7 +219,7 @@ const ClockInOut = () => {
             selectedButtonValue === "work_from_office") &&
           isWorkDay
         ) {
-          toast.error("You need to fill reason for being late");
+          toast.error("Harus mengisi alasan telat");
           return;
         }
         // #endregion //? rejection check
@@ -392,8 +392,7 @@ const ClockInOut = () => {
       setCapturedProof(null);
 
       // if type is on site work trigger WebViewInterface
-      if (type === "on_site_work") {
-        console.log("start web interface function");
+      if (type === "on_site_work") {        
         try {
           if (window.AndroidBridge) {
             window.AndroidBridge.triggerHourlyCoordinate();
@@ -628,11 +627,11 @@ const ClockInOut = () => {
         <Skeleton className="h-10 w-full rounded" />
       ) : status.isSick ? (
         <Button color="primary" variant="flat" fullWidth>
-          Rest Well!
+          Semoga Segera Sembuh
         </Button>
       ) : status.done ? (
         <Button color="default" variant="flat" fullWidth>
-          Good Work Today!
+          Kerja Bagus
         </Button>
       ) : (
         <div className="flex flex-col gap-4 items-center">
@@ -673,10 +672,10 @@ const ClockInOut = () => {
               selectedButtonValue !== "on_site_work" && (
                 <>
                   <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">
-                    You are late! hurry up!
+                    Terlambat
                   </div>
                   <Input
-                    label="State your reason for coming in late"
+                    label="Tulis alasan telat"
                     color="danger"
                     variant="underlined"
                     name="late-reason"
@@ -695,7 +694,7 @@ const ClockInOut = () => {
             {showSpecialReason && (
               <Input
                 variant="underlined"
-                label="Reason"
+                label="Tulis Alasan"
                 value={specialReason}
                 onChange={(e) => setSpecialReason(e.currentTarget.value)}
               />

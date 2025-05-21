@@ -35,13 +35,13 @@ const Page = (props: Props) => {
 
   return isLoading ? (
     <div className="flex justify-center w-full">
-      <Spinner label="Loading Project" />
+      <Spinner label="Memuat Proyek" />
     </div>
   ) : (
     <>
       <section>
         <Button as={Link} href="/home" variant="flat" color="secondary" startContent={<FaHome />}>
-          Go Back Home
+          Kembali ke Beranda
         </Button>
       </section>
       <ProjectDetailStatus project={project} />

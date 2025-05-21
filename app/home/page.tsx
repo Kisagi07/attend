@@ -29,7 +29,7 @@ const Home = () => {
               title="Profile"
               startContent={<ImProfile />}
             >
-              Profile
+              Profil
             </Button>
             <Button
               variant="bordered"
@@ -39,7 +39,7 @@ const Home = () => {
               title="Time Off"
               startContent={<FaRegCalendarTimes />}
             >
-              Day Off
+              Cuti
             </Button>
           </ButtonGroup>
         </div>
