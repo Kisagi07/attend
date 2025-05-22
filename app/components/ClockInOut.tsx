@@ -417,7 +417,7 @@ const ClockInOut = () => {
       // #endregion
 
       // #region if type is clock out then call stop worker from WebViewInterface
-      if (type === "clock-out") {
+      if (type === "clock-out" && todayAttendance?.type === "on_site_work") {
         try {
           if (window.AndroidBridge) {
             console.log(window.AndroidBridge);
