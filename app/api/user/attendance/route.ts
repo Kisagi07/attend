@@ -33,13 +33,20 @@ const userAlreadyCheckIn = async (type: string, date: string, id: number) => {
       }
     })
 
-    console.log(getDateOnly(lastLog!.date!), date);
-
-    if (lastLog && getDateOnly(lastLog.date!) === date) {
-      return true
+    if (lastLog) {
+      if (lastLog.date) {
+        if (lastLog && getDateOnly(lastLog.date) === date) {
+          return true
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
     } else {
       return false
-    }
+    }    
+
   } else {
     return false;
   }
