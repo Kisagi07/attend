@@ -165,6 +165,7 @@ const ClockInOut = () => {
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
       setWaitingForSyncroizingToComplete(true);
+      setSending(true);
     } else {
 
       try {
@@ -224,7 +225,7 @@ const ClockInOut = () => {
           return;
         }
         // #endregion //? rejection check
-        // ? next operation
+        // ? next operation        
         if (selectedButtonValue === "sick") {
           await sendSickDay({ type: selectedButtonValue, latitude, longitude });
         } else {
@@ -389,7 +390,11 @@ const ClockInOut = () => {
         body: formData,
       });
       mutateAttendance();
-      setStatus((prev) => ({ ...prev, clockin: true }));
+      if (type === "clock-out") {
+        setStatus((prev) => ({ ...prev, done: true }));
+      } else {
+        setStatus((prev) => ({ ...prev, clockin: true }));
+      }
       setCapturedProof(null);
 
       // #region  if type is on site work trigger WebViewInterface
@@ -509,6 +514,7 @@ const ClockInOut = () => {
   const handleLocationFetchPopupCancel = useCallback(() => {
     setWaitingForSyncroizingToComplete(false);
     setOpenSynchronizeLoading(false);
+    setSending(false);
   }, []);
 
   const handleLocationFetchPopupDone = () => {
@@ -566,14 +572,29 @@ const ClockInOut = () => {
   useEffect(() => {
     if (user) {
       const workStart = new Date();
-      const shiftStart = user.job_position?.shift_start ?? "09:00";
-      workStart.setHours(parseInt(shiftStart.split(":")[0]));
+      const shiftStart = user.job_position?.shift_start ?? "09:00";      
+      workStart.setHours(parseInt(shiftStart.split(":")[0]));            
       workStart.setMinutes(parseInt(shiftStart.split(":")[1]));
+      workStart.setSeconds(0);
       if (company?.tolerance_active) {
         workStart.setMinutes(workStart.getMinutes() + company.tolerance_time);
-      }
-      const shiftStartTime = workStart.getTime();
-      if (time > shiftStartTime) {
+      }      
+      
+
+      const shiftStartTime = workStart.getTime();             
+      
+      if (clickedTimeRef.current) {        
+        const clickedTime = new Date();
+        const [hours, minutes, seconds] = clickedTimeRef.current.split(":").map(Number);
+        clickedTime.setHours(hours);
+        clickedTime.setMinutes(minutes);
+        clickedTime.setSeconds(seconds);        
+
+        if (clickedTime.getTime() > shiftStartTime) {
+          setStatus((prev) => ({ ...prev, isLate: true }));          
+        }
+        
+      } else  if (time > shiftStartTime) {        
         setStatus((prev) => ({ ...prev, isLate: true }));
       }
     }
@@ -625,7 +646,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.warn(error);
+          console.log(error);
         }
       }
     };
