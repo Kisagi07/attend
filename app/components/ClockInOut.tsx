@@ -29,7 +29,7 @@ declare global {
   interface Window {
     AndroidBridge?: {
       triggerHourlyCoordinate: (id:number) => void;
-      stopHourlyCoordinate: (id: number) => void;
+      stopHourlyCoordinate: () => void;
     }
   }
 }
@@ -417,8 +417,9 @@ const ClockInOut = () => {
       if (type === "clock-out") {
         try {
           if (window.AndroidBridge) {
+            console.log(window.AndroidBridge);
             if (user) {
-              window.AndroidBridge.stopHourlyCoordinate(user.id);
+              window.AndroidBridge.stopHourlyCoordinate();
             } else {
               throw Error("User not found");
             }
