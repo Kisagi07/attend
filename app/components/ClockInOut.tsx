@@ -67,7 +67,7 @@ const ClockInOut = () => {
   // #endregion
 
   // #region states
-  const [syncTimeLeft, setSyncTimeLeft] = useState(30);
+  const [syncTimeLeft, setSyncTimeLeft] = useState(2 * 60);
   const [openSynchronizeLoading, setOpenSynchronizeLoading] = useState(false);
   const [watingForSynchronizingToComplete, setWaitingForSyncroizingToComplete] =
     useState(false);
