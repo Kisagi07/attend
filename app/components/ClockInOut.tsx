@@ -23,6 +23,15 @@ import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 import getTargetType from "@/utils/getTargetType";
 
+declare global {
+  interface Window {
+    AndroidBridge?: {
+      triggerHourlyCoordinate: (id:number) => void;
+      stopHourlyCoordinate: () => void;
+    }
+  }
+}
+
 const fetcher: Fetcher<any, string> = (...args) =>
   fetch(...args).then((res) => res.json());
 
@@ -387,13 +396,52 @@ const ClockInOut = () => {
         setStatus((prev) => ({ ...prev, clockin: true }));
       }
       setCapturedProof(null);
+
+      // #region  if type is on site work trigger WebViewInterface
+      if (type === "on_site_work") {        
+        try {
+          if (window.AndroidBridge) {
+            if (user) {                            
+              window.AndroidBridge.triggerHourlyCoordinate(user.id);
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Anroid bridge not found");
+          }
+          console.log("Called android bridge successfully")
+        } catch (error) {
+          console.warn("Android Bridge not available", error);
+        }
+      }
+      // #endregion
+
+      // #region if type is clock out then call stop worker from WebViewInterface
+      if (type === "clock-out") {
+        try {
+          if (window.AndroidBridge) {
+            console.log(window.AndroidBridge);
+            if (user) {
+              window.AndroidBridge.stopHourlyCoordinate();
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Android bridge not found")
+          }
+        } catch (error)  {
+          console.warn("Failed stoping hourly coordinate", error);
+        }
+      }
+      // #endregion
+
     } catch (error) {
       console.error(error);
     }
   };
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {        
+      if (error.code === error.PERMISSION_DENIED) {
         if (onlyNotPermittedReject && !deniedGeolocation.current) {
           toast.error("Location permission denied by user.");
           deniedGeolocation.current = true;
@@ -483,8 +531,6 @@ const ClockInOut = () => {
   // #endregion
 
   // #region useEffects
-
-  
 
   useEffect(() => {
     if (!isLoading && todayAttendance) {
@@ -600,7 +646,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.error(error);
+          console.log(error);
         }
       }
     };
