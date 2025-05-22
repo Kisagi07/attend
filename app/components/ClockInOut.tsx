@@ -68,9 +68,16 @@ const ClockInOut = () => {
   const [capturedProofUrl, setCapturedProofUrl] = useState<string | null>(null);
   const clickedTimeRef = useRef<string | null>(null);
   const isWorkDay = useMemo(() => {
-    const todayDay = new Date().getDay();
-    return user?.job_position?.work_day?.split(",").map(Number).includes(todayDay) ?? false;
-  }, [user]);
+  const todayDay = new Date().getDay();
+  const workDays = user?.job_position?.work_day;
+
+  if (!workDays) return false;
+
+  return workDays
+    .split(",")
+    .map(Number)
+    .includes(todayDay) && !isHoliday;
+}, [user, isHoliday]);  
 
   const buttonOptions = useMemo<ButtonOption>(() => {
     if (status.clockIn) {
