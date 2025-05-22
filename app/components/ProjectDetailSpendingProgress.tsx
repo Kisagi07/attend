@@ -24,10 +24,10 @@ const ProjectDetailSpendingProgress = ({ project }: Props) => {
   }, [project]);
   return (
     <article className="space-y-4 px-4">
-      <h4 className="text-center font-semibold">Necessity</h4>
+      <h4 className="text-center font-semibold">Kebutuhan</h4>
       <Progress
         data-testid="progress-transportation"
-        label="Transportation"
+        label="Transportasi"
         size="md"
         value={percentageValue?.[0] ?? 0}
         color="primary"
@@ -36,7 +36,7 @@ const ProjectDetailSpendingProgress = ({ project }: Props) => {
       />
       <Progress
         data-testid="progress-food"
-        label="Food"
+        label="Makanan"
         size="md"
         value={percentageValue?.[1] ?? 0}
         color="danger"
@@ -45,7 +45,7 @@ const ProjectDetailSpendingProgress = ({ project }: Props) => {
       />
       <Progress
         data-testid="progress-lodging"
-        label="Lodging"
+        label="Penginapan"
         size="md"
         value={percentageValue?.[2] ?? 0}
         color="success"
@@ -54,7 +54,7 @@ const ProjectDetailSpendingProgress = ({ project }: Props) => {
       />
       <Progress
         data-testid="progress-entertainment"
-        label="Entertainment"
+        label="Hiburan"
         size="md"
         value={percentageValue?.[3] ?? 0}
         color="warning"

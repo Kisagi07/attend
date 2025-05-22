@@ -26,7 +26,7 @@ const RequestLeave = () => {
 
     // validate all value is not empty
     if (!reason || !comment || !dateRange) {
-      setAlert({ error: "All fields are required", success: "" });
+      setAlert({ error: "Semua isian harus di isi", success: "" });
       return;
     }
 
@@ -45,7 +45,7 @@ const RequestLeave = () => {
         setAlert({ error: error.message, success: "" });
         throw new Error(error.message);
       }
-      setAlert({ error: "", success: "Request sent successfully" });
+      setAlert({ error: "", success: "Permintaan berhasil dikirim" });
       e.currentTarget.reset();
     } catch (error) {
       console.error(error);
@@ -59,17 +59,20 @@ const RequestLeave = () => {
       });
     }
   };
+
+  
+
   return (
     <section className="space-y-4">
-      <h2 className="text-3xl font-semibold">Request Leave</h2>
+      <h2 className="text-3xl font-semibold">Ajukan Hari Cuti</h2>
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         {alert.error && <p className="text-red-500">{alert.error}</p>}
         {alert.success && <p className="text-green-500">{alert.success}</p>}
         <div className="space-y-4 lg:grid lg:grid-cols-2 lg:items-center lg:gap-4 lg:space-y-0">
           <DatePicker
-            label="Date Requested"
+            label="Tanggal Ajuan"
             name="request_date"
-            aria-label="Request Date"
+            aria-label="Tanggal Cuti"
             variant="underlined"
             isReadOnly
             value={today(getLocalTimeZone())}
@@ -77,14 +80,14 @@ const RequestLeave = () => {
           <Input
             variant="underlined"
             name="leave_type"
-            label="Reason"
+            label="Alasan"
             value={reason}
             onValueChange={setReason}
           />
           <Input
             variant="underlined"
             name="comment"
-            label="Comment"
+            label="Komen"
             value={comment}
             onValueChange={setComment}
           />
@@ -95,13 +98,13 @@ const RequestLeave = () => {
             endName="leave_end_date"
             aria-label="Leave Date"
             aria-labelledby="leave-date"
-            label="Leave Date"
+            label="Tanggal Cuti"
             value={dateRange}
             onChange={setDateRange}
           />
         </div>
         <Button isLoading={isSubmitting} type="submit" color="success">
-          Send Request
+          Kirim Ajuan Cuti
         </Button>
       </form>
     </section>

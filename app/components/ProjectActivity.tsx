@@ -28,7 +28,7 @@ const ProjectActivity = (props: Props) => {
     <article className="h-full">
       <Card shadow="sm">
         <CardHeader>
-          <h3 className="font-semibold">Activities</h3>
+          <h3 className="font-semibold">Aktivitas</h3>
         </CardHeader>
         <CardBody>
           <div className="max-h-60 overflow-y-auto overflow-x-hidden">

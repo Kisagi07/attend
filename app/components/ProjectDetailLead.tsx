@@ -12,7 +12,7 @@ const ProjectDetailLead = (props: Props) => {
     <article data-testid="project-lead-card" className="h-full">
       <Card shadow="sm" className="h-full">
         <CardHeader>
-          <span className="font-semibold">Project Lead</span>
+          <span className="font-semibold">Peminpin Proyek</span>
         </CardHeader>
         <CardBody>
           <div className="flex flex-col gap-4 items-center">

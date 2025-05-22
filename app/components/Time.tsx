@@ -15,7 +15,7 @@ const Time = () => {
   return (
     <Card>
       <h3>
-        Time{" : "}
+        Jam{" : "}
         {currentTime ? (
           <span>
             {currentTime.getHours()}:

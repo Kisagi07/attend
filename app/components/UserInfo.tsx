@@ -11,15 +11,15 @@ const UserInfo: React.FC<UserInfoProps> = async ({ promise }) => {
   return (
     <Card>
       <article className="grid grid-cols-[auto_10px_auto]">
-        <span>Name</span>
+        <span>Nama</span>
         <span>:</span>
         <span>{user?.name}</span>
 
-        <span>Job Position</span>
+        <span>Profesi</span>
         <span>:</span>
         <span>{user?.job_position?.name || "No Position"}</span>
 
-        <span>Today Shift</span>
+        <span>Jam Kerja</span>
         <span>:</span>
         <span>
           {user.job_position
