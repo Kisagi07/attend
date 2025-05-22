@@ -26,7 +26,8 @@ import getTargetType from "@/utils/getTargetType";
 declare global {
   interface Window {
     AndroidBridge?: {
-      triggerHourlyCoordinate: () => void;
+      triggerHourlyCoordinate: (id:number) => void;
+      stopHourlyCoordinate: () => void;
     }
   }
 }
@@ -164,6 +165,7 @@ const ClockInOut = () => {
     if (syncTimeLeft > 0) {
       setOpenSynchronizeLoading(true);
       setWaitingForSyncroizingToComplete(true);
+      setSending(true);
     } else {
 
       try {
@@ -223,7 +225,7 @@ const ClockInOut = () => {
           return;
         }
         // #endregion //? rejection check
-        // ? next operation
+        // ? next operation        
         if (selectedButtonValue === "sick") {
           await sendSickDay({ type: selectedButtonValue, latitude, longitude });
         } else {
@@ -388,14 +390,22 @@ const ClockInOut = () => {
         body: formData,
       });
       mutateAttendance();
-      setStatus((prev) => ({ ...prev, clockin: true }));
+      if (type === "clock-out") {
+        setStatus((prev) => ({ ...prev, done: true }));
+      } else {
+        setStatus((prev) => ({ ...prev, clockin: true }));
+      }
       setCapturedProof(null);
 
-      // if type is on site work trigger WebViewInterface
+      // #region  if type is on site work trigger WebViewInterface
       if (type === "on_site_work") {        
         try {
           if (window.AndroidBridge) {
-            window.AndroidBridge.triggerHourlyCoordinate();
+            if (user) {                            
+              window.AndroidBridge.triggerHourlyCoordinate(user.id);
+            } else {
+              throw Error("User not found");
+            }
           } else {
             throw Error("Anroid bridge not found");
           }
@@ -404,6 +414,26 @@ const ClockInOut = () => {
           console.warn("Android Bridge not available", error);
         }
       }
+      // #endregion
+
+      // #region if type is clock out then call stop worker from WebViewInterface
+      if (type === "clock-out" && todayAttendance?.type === "on_site_work") {
+        try {
+          if (window.AndroidBridge) {
+            console.log(window.AndroidBridge);
+            if (user) {
+              window.AndroidBridge.stopHourlyCoordinate();
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Android bridge not found")
+          }
+        } catch (error)  {
+          console.warn("Failed stoping hourly coordinate", error);
+        }
+      }
+      // #endregion
 
     } catch (error) {
       console.error(error);
@@ -411,7 +441,7 @@ const ClockInOut = () => {
   };
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {        
+      if (error.code === error.PERMISSION_DENIED) {
         if (onlyNotPermittedReject && !deniedGeolocation.current) {
           toast.error("Location permission denied by user.");
           deniedGeolocation.current = true;
@@ -484,6 +514,7 @@ const ClockInOut = () => {
   const handleLocationFetchPopupCancel = useCallback(() => {
     setWaitingForSyncroizingToComplete(false);
     setOpenSynchronizeLoading(false);
+    setSending(false);
   }, []);
 
   const handleLocationFetchPopupDone = () => {
@@ -500,8 +531,6 @@ const ClockInOut = () => {
   // #endregion
 
   // #region useEffects
-
-  
 
   useEffect(() => {
     if (!isLoading && todayAttendance) {
@@ -543,14 +572,29 @@ const ClockInOut = () => {
   useEffect(() => {
     if (user) {
       const workStart = new Date();
-      const shiftStart = user.job_position?.shift_start ?? "09:00";
-      workStart.setHours(parseInt(shiftStart.split(":")[0]));
+      const shiftStart = user.job_position?.shift_start ?? "09:00";      
+      workStart.setHours(parseInt(shiftStart.split(":")[0]));            
       workStart.setMinutes(parseInt(shiftStart.split(":")[1]));
+      workStart.setSeconds(0);
       if (company?.tolerance_active) {
         workStart.setMinutes(workStart.getMinutes() + company.tolerance_time);
-      }
-      const shiftStartTime = workStart.getTime();
-      if (time > shiftStartTime) {
+      }      
+      
+
+      const shiftStartTime = workStart.getTime();             
+      
+      if (clickedTimeRef.current) {        
+        const clickedTime = new Date();
+        const [hours, minutes, seconds] = clickedTimeRef.current.split(":").map(Number);
+        clickedTime.setHours(hours);
+        clickedTime.setMinutes(minutes);
+        clickedTime.setSeconds(seconds);        
+
+        if (clickedTime.getTime() > shiftStartTime) {
+          setStatus((prev) => ({ ...prev, isLate: true }));          
+        }
+        
+      } else  if (time > shiftStartTime) {        
         setStatus((prev) => ({ ...prev, isLate: true }));
       }
     }
@@ -602,7 +646,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.warn(error);
+          console.log(error);
         }
       }
     };

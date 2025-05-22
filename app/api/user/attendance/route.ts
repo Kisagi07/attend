@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { logs as Log, logs_type } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
 import { storeFile } from "@/app/file";
+import { getDateOnly } from "@/app/helper";
 
 interface PostJson {
   type: logs_type | "clock-out";
@@ -18,6 +19,30 @@ interface PostJson {
   clock_out_latitude: string;
   clock_out_longitude: string;
   isOverTime: boolean;
+}
+
+const userAlreadyCheckIn = async (type: string, date: string, id: number) => {
+
+  if (type !== "clock-out") {
+    const lastLog = await prisma.logs.findFirst({
+      where: {
+        user_id: id,
+      },    
+      orderBy: {
+        created_at: "desc"
+      }
+    })
+
+    console.log(getDateOnly(lastLog!.date!), date);
+
+    if (lastLog && getDateOnly(lastLog.date!) === date) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -46,7 +71,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const proofPath = await storeFile(proof, { storePath: "/upload/log-proof" });
+  if (!date) {
+    return NextResponse.json(
+      { error: "Tanggal tidak ditemukan" },
+      { status: 422 }
+    );
+  }
+
+
 
   // #region //? session authentication
   const session = await auth();
@@ -79,14 +111,15 @@ export async function POST(req: NextRequest) {
       }
     );
   }
+
+  const alreadyCheckIn = await userAlreadyCheckIn(type, date, user.id );
+  if (alreadyCheckIn) {
+    return NextResponse.json(null, {status: 422});
+  }
+
   // #endregion
 
-  if (!date) {
-    return NextResponse.json(
-      { error: "Tanggal tidak ditemukan" },
-      { status: 422 }
-    );
-  }
+  const proofPath = await storeFile(proof, { storePath: "/upload/log-proof" });
 
   let log: Log;
 
