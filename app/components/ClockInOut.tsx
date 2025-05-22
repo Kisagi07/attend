@@ -22,8 +22,6 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 import getTargetType from "@/utils/getTargetType";
-import { getToken } from "next-auth/jwt";
-import { useSession } from "next-auth/react";
 
 declare global {
   interface Window {
@@ -438,7 +436,7 @@ const ClockInOut = () => {
   };
   const handleGeolocationError = useCallback(
     (error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
-      if (error.code === error.PERMISSION_DENIED) {        
+      if (error.code === error.PERMISSION_DENIED) {
         if (onlyNotPermittedReject && !deniedGeolocation.current) {
           toast.error("Location permission denied by user.");
           deniedGeolocation.current = true;
@@ -527,11 +525,6 @@ const ClockInOut = () => {
   // #endregion
 
   // #region useEffects
-
-  const token = useSession()
-  useEffect(() => {
-    console.log(token);
-  },[token])
 
   useEffect(() => {
     if (!isLoading && todayAttendance) {
