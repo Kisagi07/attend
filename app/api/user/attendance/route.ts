@@ -52,9 +52,18 @@ const userAlreadyCheckIn = async (type: string, date: string, id: number) => {
   }
 }
 
+const transformOvertimeType = (type: "work_overtime" | "work_overtime_home") : logs_type => {
+    switch (type) {
+      case "work_overtime":
+        return "work_from_office"
+      case "work_overtime_home":
+        return "work_from_home"
+    }
+}
+
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
-  const type = formData.get("type") as string;
+  let type = formData.get("type") as string;
   const clock_in_time = formData.get("clock_in_time") as string | null;
   const date = formData.get("date") as string | null;
   const clock_in_latitude = formData.get("clock_in_latitude") as string | null;
@@ -71,6 +80,8 @@ export async function POST(req: NextRequest) {
     | null;
   const isOverTime = formData.get("isOverTime") as string | null;
   const proof = formData.get("proof") as File | null;
+
+
   if (!proof) {
     return NextResponse.json(
       { error: "Bukti absen tidak ditemukan, tolong ambil gambar" },
@@ -83,9 +94,7 @@ export async function POST(req: NextRequest) {
       { error: "Tanggal tidak ditemukan" },
       { status: 422 }
     );
-  }
-
-
+  }  
 
   // #region //? session authentication
   const session = await auth();
@@ -234,10 +243,15 @@ export async function POST(req: NextRequest) {
         { status: 422 }
       );
     }
+    // transform type if overtime to proper type
+  if (JSON.parse(isOverTime)) {
+    type = transformOvertimeType(type as "work_overtime" | "work_overtime_home")
+  }
     const [hours, minutes, seconds] = clock_in_time.split(":");
     const clock_in_time_object = new Date(
       `2024-04-21T${hours}:${minutes}:${seconds}Z`
-    );
+    );    
+
     log = await prisma.logs.create({
       data: {
         type: type.replaceAll("-", "_") as logs_type,
@@ -252,7 +266,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (isOverTime) {
+    if (isOverTime === "true") {
       await prisma.timelines.create({
         data: {
           title: `${user.name} are doing overtime today`,
