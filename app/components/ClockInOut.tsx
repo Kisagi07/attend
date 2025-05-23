@@ -88,7 +88,7 @@ const ClockInOut = () => {
           color: "danger",
         },
       };
-    } else if (!isWorkDay || isHoliday) {
+    } else if (!isWorkDay) {
       setSelectedButton(new Set(["work_overtime"]));
       return {
         work_overtime: {
@@ -125,7 +125,7 @@ const ClockInOut = () => {
         },
       };
     }
-  }, [status.clockIn, isWorkDay, isHoliday]);
+  }, [status.clockIn, isWorkDay]);
 
   const closestDistanceLocation = useRef<{
     distance: number;
@@ -170,7 +170,7 @@ const ClockInOut = () => {
         // check if calculated distance match with selected button value
         if (useTarget !== getTargetType(selectedButtonValue, todayAttendance)) {
           distance = getDistanceFromLocation({ latitude, longitude });
-        }        
+        }
 
         // check if user allowed to check in within distance        
         if (

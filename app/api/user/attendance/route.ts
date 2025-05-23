@@ -87,9 +87,7 @@ export async function POST(req: NextRequest) {
       { error: "Tanggal tidak ditemukan" },
       { status: 422 }
     );
-  }
-
-  
+  }  
 
   // #region //? session authentication
   const session = await auth();
