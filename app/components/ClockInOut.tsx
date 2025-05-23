@@ -95,6 +95,10 @@ const ClockInOut = () => {
           label: "Work Overtime",
           color: "primary",
         },
+        work_overtime_home: {
+          label: "Kerja Lembur (Rumah)",
+          color: "secondary"
+        }
       };
     } else {
       setSelectedButton(new Set(["work_from_office"]));
@@ -160,12 +164,15 @@ const ClockInOut = () => {
           return;
         }
 
+
         let { distance, latitude, longitude, useTarget } = closestDistanceLocation.current;
 
+        // check if calculated distance match with selected button value
         if (useTarget !== getTargetType(selectedButtonValue, todayAttendance)) {
           distance = getDistanceFromLocation({ latitude, longitude });
-        }
+        }        
 
+        // check if user allowed to check in within distance        
         if (
           distance > 50 &&
           selectedButtonValue !== "sick" &&
@@ -293,6 +300,7 @@ const ClockInOut = () => {
       todaysWork: todaysWork,
       proof: capturedProof,
     };
+    // assign clock in or clock out attribute depending on type
     if (type === "clock-out") {
       sendData["clock_out_time"] = clickedTimeRef.current!;
       sendData["clock_out_latitude"] = latitude;
@@ -302,9 +310,12 @@ const ClockInOut = () => {
       sendData["clock_in_latitude"] = latitude;
       sendData["clock_in_longitude"] = longitude;
     }
+
+    // if type is special attendance then add pre text in the todays work
     if (type === "special_attendance") {
       sendData["todaysWork"] = ["Reason: " + specialReason, ...sendData["todaysWork"]];
     }
+    // assign pre text of late reason when user is late
     if (status.isLate && type !== "clock-out" && type !== "special_attendance" && type !== "on_site_work") {
       sendData["todaysWork"] = ["Late Reason: " + lateReason, ...sendData["todaysWork"]];
     }
@@ -488,6 +499,7 @@ const ClockInOut = () => {
     }
   }, [time, user, company]);
 
+  // Timer countdown for location fetch
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (syncTimeLeft > 0) {
