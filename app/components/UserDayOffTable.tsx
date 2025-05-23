@@ -1,15 +1,29 @@
 "use client";
 import React from "react";
-import { DayOffRequest } from "@prisma/client";
+import { DayOffStatus, DayOffRequest } from "@prisma/client";
 import clsx from "clsx";
 import useSWR from "swr";
 import { fetcher } from "../helper";
+
 const UserDayOffTable = () => {
   const { data: dayOffRequests, isLoading } = useSWR<DayOffRequest[]>(
     "/api/user/day-off",
     fetcher,
     { refreshInterval: 1000 },
   );
+
+const translateDayOffStatus = (status: DayOffStatus) => {
+    switch (status) {
+      case "pending":
+        return "Menunggu";
+      case "approved":
+        return "Disetujui";
+      case "rejected":
+        return "Ditolak";
+      default:
+        return status;
+    }
+  }
 
   return isLoading ? (
     <div>Loading...</div>
@@ -28,21 +42,21 @@ const UserDayOffTable = () => {
               "bg-slate-200 text-slate-500": dayOffRequest.status === "pending",
             })}
           >
-            {dayOffRequest.status}
+            {translateDayOffStatus(dayOffRequest.status)}
           </h4>
           <p>{dayOffRequest.leaveType}</p>
           <div>
-            <p className="font-medium">Comment :</p>
+            <p className="font-medium">Komen :</p>
             <p className="text-sm text-slate-700">{dayOffRequest.comment}</p>
           </div>
-          <p className="font-medium">Leave Date :</p>
+          <p className="font-medium">Tanggal Cuti :</p>
           <div className="flex items-center gap-4 font-medium">
             <p>{dayOffRequest.leaveStartDate.toString().split("T")[0]}</p>
             <span>-</span>
             <p>{dayOffRequest.leaveEndDate.toString().split("T")[0]}</p>
           </div>
           <p className="text-sm text-slate-400">
-            Requested at {dayOffRequest.requestDate.toString().split("T")[0]}
+            Di ajukan pada {dayOffRequest.requestDate.toString().split("T")[0]}
           </p>
         </article>
       ))}

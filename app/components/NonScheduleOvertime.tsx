@@ -19,13 +19,13 @@ const NonScheduleOvertime = () => {
     const data = Object.fromEntries(formData);
     const errors: Record<string, string> = { };
     if (!data.checkIn) {
-      errors.checkIn = "Check in dibutuhkan";
+      errors.checkIn = "Jam mulai dibutuhkan";
     }
     if (!data.checkOut) {
-      errors.checkOut = "Check out dibutuhkan";
+      errors.checkOut = "Jam selesai dibutuhkan";
     }
     if (!data.work) {
-      errors.work = "Work dibutuhkan";
+      errors.work = "Perkerjaan dibutuhkan";
     }
 
     if (Object.values(errors).length > 0) {
@@ -67,14 +67,14 @@ const NonScheduleOvertime = () => {
       <div className="flex gap-2 w-full">
         <TimeInput
           hourCycle={24}
-          label="Check In"
+          label="Jam mulai"
           name="checkIn"
           isInvalid={!!errors["checkIn"]}
           errorMessage={errors["checkIn"]}
         />
         <TimeInput
           hourCycle={24}
-          label="Check Out"
+          label="Jam selesai"
           name="checkOut"
           isInvalid={!!errors["checkOut"]}
           errorMessage={errors["checkOut"]}
@@ -88,9 +88,9 @@ const NonScheduleOvertime = () => {
         errorMessage={errors["work"]}
       />
       <Button isLoading={submitting} fullWidth className="mt-2" color="primary" type="submit">
-        Send
+        Kirim
       </Button>
-      <Button ref={resetButton} className="invisible absolute z-[-2]" type="reset">Reset</Button>
+      <Button ref={resetButton} className="invisible absolute z-[-2]" type="reset">Atur Ulang</Button>
     </Form>
   );
 };

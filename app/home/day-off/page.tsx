@@ -12,7 +12,7 @@ const Page = () => {
     <main className="mx-auto max-w-xl space-y-4 p-4">
       <section>
         <Button as={Link} href="/home" color="secondary" variant="ghost">
-          Go Back
+          Kembali
         </Button>
       </section>
       <section>
@@ -22,7 +22,7 @@ const Page = () => {
           size="sm"
           onClick={() => setShowRequest(!showRequest)}
         >
-          Request Leave
+          Ajukan Hari Cuti
         </Button>
         <div
           className={clsx("overflow-hidden transition-all duration-500", {

@@ -18,6 +18,24 @@ import Image from "next/image";
 import LocationFetchPopup from "@/app/components/UI/LocationFetchPopup";
 import getTargetType from "@/utils/getTargetType";
 
+declare global {
+  interface Window {
+    AndroidBridge?: {
+      triggerHourlyCoordinate: (id:number) => void;
+      stopHourlyCoordinate: () => void;
+    }
+  }
+}
+
+declare global {
+  interface Window {
+    AndroidBridge?: {
+      triggerHourlyCoordinate: (id:number) => void;
+      stopHourlyCoordinate: () => void;
+    }
+  }
+}
+
 const fetcher: Fetcher<any, string> = (...args) => fetch(...args).then((res) => res.json());
 
 type ButtonOption = Record<
@@ -84,7 +102,7 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["clock-out"]));
       return {
         "clock-out": {
-          label: "Clock Out",
+          label: "Pulang",
           color: "danger",
         },
       };
@@ -92,7 +110,7 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["work_overtime"]));
       return {
         work_overtime: {
-          label: "Work Overtime",
+          label: "Kerja Lembur",
           color: "primary",
         },
         work_overtime_home: {
@@ -104,23 +122,23 @@ const ClockInOut = () => {
       setSelectedButton(new Set(["work_from_office"]));
       return {
         work_from_home: {
-          label: "Work From Home",
+          label: "Kerja dari Rumah",
           color: "success",
         },
         work_from_office: {
-          label: "Work From Office",
+          label: "Kerja dari Kantor",
           color: "secondary",
         },
         special_attendance: {
-          label: "Special Attendance",
+          label: "Absen Special",
           color: "primary",
         },
         sick: {
-          label: "Sick Leave",
+          label: "Sakit",
           color: "danger",
         },
         on_site_work: {
-          label: "On Site Work",
+          label: "Kerja Lapangan",
           color: "secondary",
         },
       };
@@ -180,22 +198,28 @@ const ClockInOut = () => {
           selectedButtonValue !== "on_site_work" &&
           todayAttendance?.type !== "on_site_work"
         ) {
-          toast.error(` You are ${distance - 50} meter too far from location!`);
+          toast.error(`${distance - 50} meter terlalu jauh dari lokasi!`);
           return;
         }
         // if clock out but no work filled then warned user then return
         if (selectedButtonValue === "clock-out" && todaysWork.length === 0) {
-          toast.error("You need to fill today's work in order to clockout");
+          toast.error("Pekerjaan hari ini harus di isi untuk absen pulang");
           return;
         }
         // if work with duty but duty is not filled then warned user then return
         if (selectedButtonValue === "special_attendance" && !specialReason) {
-          toast.error("You need to fill reason in order to clockin");
+          toast.error("Harus mengisi alasan absen special");
           return;
         }
         // if user is late but reason for late is not filled then warned user then return
-        if (status.isLate && !lateReason && (selectedButtonValue === "work_from_home" || selectedButtonValue === "work_from_office") && isWorkDay) {
-          toast.error("You need to fill reason for being late");
+        if (
+          status.isLate &&
+          !lateReason &&
+          (selectedButtonValue === "work_from_home" ||
+            selectedButtonValue === "work_from_office") &&
+          isWorkDay
+        ) {
+          toast.error("Harus mengisi alasan telat");
           return;
         }
         // #endregion //? rejection check
@@ -341,6 +365,45 @@ const ClockInOut = () => {
         setStatus((prev) => ({ ...prev, clockin: true }));
       }
       setCapturedProof(null);
+
+      // #region  if type is on site work trigger WebViewInterface
+      if (type === "on_site_work") {        
+        try {
+          if (window.AndroidBridge) {
+            if (user) {                            
+              window.AndroidBridge.triggerHourlyCoordinate(user.id);
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Anroid bridge not found");
+          }
+          console.log("Called android bridge successfully")
+        } catch (error) {
+          console.warn("Android Bridge not available", error);
+        }
+      }
+      // #endregion
+
+      // #region if type is clock out then call stop worker from WebViewInterface
+      if (type === "clock-out" && todayAttendance?.type === "on_site_work") {
+        try {
+          if (window.AndroidBridge) {
+            console.log(window.AndroidBridge);
+            if (user) {
+              window.AndroidBridge.stopHourlyCoordinate();
+            } else {
+              throw Error("User not found");
+            }
+          } else {
+            throw Error("Android bridge not found")
+          }
+        } catch (error)  {
+          console.warn("Failed stoping hourly coordinate", error);
+        }
+      }
+      // #endregion
+
     } catch (error) {
       console.error(error);
     }
@@ -546,7 +609,7 @@ const ClockInOut = () => {
             }
           }
         } catch (error) {
-          console.error(error);
+          console.log(error);
         }
       }
     };
@@ -567,11 +630,11 @@ const ClockInOut = () => {
         <Skeleton className="h-10 w-full rounded" />
       ) : status.isSick ? (
         <Button color="primary" variant="flat" fullWidth>
-          Rest Well!
+          Semoga Segera Sembuh
         </Button>
       ) : status.done ? (
         <Button color="default" variant="flat" fullWidth>
-          Good Work Today!
+          Kerja Bagus
         </Button>
       ) : (
         <div className="flex flex-col gap-4 items-center">
@@ -605,9 +668,11 @@ const ClockInOut = () => {
               selectedButtonValue !== "special_attendance" &&
               selectedButtonValue !== "on_site_work" && (
                 <>
-                  <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">You are late! hurry up!</div>
+                  <div className="bg-red-500 px-2 py-1 rounded shadow text-center text-sm text-white">
+                    Terlambat
+                  </div>
                   <Input
-                    label="State your reason for coming in late"
+                    label="Tulis alasan telat"
                     color="danger"
                     variant="underlined"
                     name="late-reason"
@@ -618,7 +683,7 @@ const ClockInOut = () => {
               )}
             {status.clockIn && !status.done && <ListInput items={todaysWork} addItem={handleAddItem} removeItem={handleRemoveItem} />}
             {showSpecialReason && (
-              <Input variant="underlined" label="Reason" value={specialReason} onChange={(e) => setSpecialReason(e.currentTarget.value)} />
+              <Input variant="underlined" label="Tulis Alasan" value={specialReason} onChange={(e) => setSpecialReason(e.currentTarget.value)} />
             )}
             <ButtonGroup variant="flat" fullWidth>
               <Button

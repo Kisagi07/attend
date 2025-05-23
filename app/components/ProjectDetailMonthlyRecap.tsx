@@ -29,7 +29,7 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
   const logSpending = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!amount.trim() || Number(amount) <= 0) {
-      toast.error("Amount of spending is needed");
+      toast.error("Nilai pengeluaran dibutuhkan");
       return;
     }
     const formData = new FormData(e.currentTarget);
@@ -41,7 +41,7 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
       });
       setSubmitting(false);
       if (!res.ok) {
-        const error: CustomError = Error("Something went wrong");
+        const error: CustomError = Error("Ada yang salah dengan server");
         error.status = res.status;
         error.info = await res.json();
         throw error;
@@ -53,40 +53,39 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
       if (error.status && error.status === 422) {
         toast.error(error.info.message);
       } else {
-        toast.error("Something went wrong");
+        toast.error("Ada yang salah dengan server");
       }
     }
   };
 
   return (
     <article>
-      <h3 className="text-xl font-bold px-4">Monthly Recap</h3>
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* <ProjectDetailSpendingChart spendings={project?.spendings ?? []} /> */}
+      <h3 className="text-xl font-bold px-4">Rekap Bulanan</h3>
+      <div className="grid gap-4 md:grid-cols-2">        
         <ProjectDetailSpendingProgress project={project} />
       </div>
       <article className="mt-4 space-y-4  px-4 ">
-        <h4 className="text-center font-semibold">Total Spendings</h4>
+        <h4 className="text-center font-semibold">Total Pengeluaran</h4>
         <div className=" grid grid-cols-2 md:grid-cols-4 gap-4">
           <article>
-            <h5 className="font-medium">Food</h5>
+            <h5 className="font-medium">Makanan</h5>
             <p>{formatRupiah(food)}</p>
           </article>
           <article>
-            <h5 className="font-medium">Lodging</h5>
+            <h5 className="font-medium">Penginapan</h5>
             <p>{formatRupiah(lodging)}</p>
           </article>
           <article>
-            <h5 className="font-medium">Transportation</h5>
+            <h5 className="font-medium">Transportasi</h5>
             <p>{formatRupiah(transportation)}</p>
           </article>
           <article>
-            <h5 className="font-medium">Entertainmnet</h5>
+            <h5 className="font-medium">Hiburan</h5>
             <p>{formatRupiah(entertainment)}</p>
           </article>
         </div>
         <Button variant="flat" fullWidth onClick={() => setOpen(!open)}>
-          Log New Spending
+          Tambah Pengeluaran
         </Button>
         <form
           onSubmit={logSpending}
@@ -101,7 +100,7 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
               variant="flat"
               fullWidth
               name="amount"
-              label="Amount Spent"
+              label="Nilai Pengeluaran"
               isRequired
               value={amount}
               onValueChange={setAmount}
@@ -112,24 +111,24 @@ const ProjectDetailMonthlyRecap = ({ project }: Props) => {
               name="type"
               defaultSelectedKeys={new Set(["food"])}
               disallowEmptySelection
-              label="Spending Type"
+              label="Tipe Pengeluaran"
               fullWidth
             >
-              <SelectItem key="food">Food</SelectItem>
-              <SelectItem key="entertainment">Entertainmnet</SelectItem>
-              <SelectItem key="lodging">Lodging</SelectItem>
-              <SelectItem key="transportation">Tranportation</SelectItem>
+              <SelectItem key="food">Makanan</SelectItem>
+              <SelectItem key="entertainment">Hiburan</SelectItem>
+              <SelectItem key="lodging">Penginapan</SelectItem>
+              <SelectItem key="transportation">Transportasi</SelectItem>
             </Select>
             <Input
               variant="flat"
               fullWidth
               name="description"
-              label="Description"
+              label="Deskripsi"
               className="md:col-span-2"
             />
           </div>
           <Button type="submit" isLoading={submitting} fullWidth variant="flat" color="primary">
-            Log Spending
+            Masukkan Pengeluaran
           </Button>
         </form>
       </article>

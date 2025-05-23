@@ -16,7 +16,7 @@ const Logout = ({ className }: CProps) => {
       className={`${className} bg-black hover:bg-slate-900 text-white px-2 py-1 flex items-center gap-2`}
     >
       <IoMdLogOut className="w-5 h-5" />
-      <span>Logout</span>
+      <span>Keluar</span>
     </button>
   );
 };

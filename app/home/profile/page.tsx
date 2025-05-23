@@ -24,7 +24,7 @@ const Page: React.FC = () => {
     setError(null);
     const formData = new FormData(e.currentTarget);
     if (!formData.get("name")) {
-      setError("Name is required");
+      setError("Nama dibutuhkan");
       return;
     }
 
@@ -36,7 +36,7 @@ const Page: React.FC = () => {
       if (!res.ok) {
         throw new Error(await res.text());
       }
-      toast.success("Profile updated");
+      toast.success("Profil terupdate");
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -52,7 +52,7 @@ const Page: React.FC = () => {
     <main className="min-h-screen w-full bg-white p-4 text-slate-700">
       <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="fotn-bold text-2xl">Edit Profile</h1>
+          <h1 className="fotn-bold text-2xl">Edit Profil</h1>
           <Button as={Link} color="default" href="/home">
             <RiArrowGoBackFill />
           </Button>
@@ -90,7 +90,7 @@ const Page: React.FC = () => {
               htmlFor="profile_picture"
               className="flex aspect-square w-1/2 cursor-pointer items-center justify-center rounded-full bg-slate-200 hover:bg-slate-300"
             >
-              <span className="text-slate-500">No Profile Picture</span>
+              <span className="text-slate-500">Tidak Ada Gambar Profil</span>
             </label>
           )}
         </div>
@@ -110,12 +110,12 @@ const Page: React.FC = () => {
           </>
         ) : (
           <>
-            <Input variant="underlined" name="name" label="Name" defaultValue={user?.name!} />
-            <Input ref={pinRef} variant="underlined" name="pin" label="New PIN" type="password" />
+            <Input variant="underlined" name="name" label="Nama" defaultValue={user?.name!} />
+            <Input ref={pinRef} variant="underlined" name="pin" label="PIN Baru" type="password" />
           </>
         )}
         <Button type="submit" color="secondary" className="w-full" isLoading={isSubmitting}>
-          Save
+          Simpan
         </Button>
       </form>
     </main>

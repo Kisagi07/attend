@@ -15,6 +15,9 @@ import { User } from "@heroui/user";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { IoIosOpen } from "react-icons/io";
+import { Priority, ProjectStatus } from "@prisma/client";
+import translateStatus from "@/utils/translateStatus";
+import translatePriority from "@/utils/translatePriority";
 
 interface Projects {
   projectLeading: ProjectWithMembers[];
@@ -22,7 +25,9 @@ interface Projects {
 }
 
 const HomeProjects = () => {
-  const { data, isLoading } = useSWR<Projects>(`/api/user/projects`, fetcher);
+  const { data, isLoading } = useSWR<Projects>(`/api/user/projects`, fetcher); 
+ 
+
   return isLoading ? (
     <div className="flex justify-center w-full">
       <Spinner label="Loadings..." />
@@ -30,14 +35,14 @@ const HomeProjects = () => {
   ) : (
     <section>
       <Tabs aria-label="projects" color="secondary" variant="light">
-        <Tab key="lead-project" title="Project You Lead">
+        <Tab key="lead-project" title="Proyek yang Dipimpin">
           <div className="space-y-4">
             {data?.projectLeading.map((project) => (
               <HomeProjectLeading project={project} key={project.id} />
             ))}
           </div>
         </Tab>
-        <Tab key="memberofproject" title="Member Project">
+        <Tab key="memberofproject" title="Anggota dari Proyek">
           {data?.projectMembersOf.map((project) => (
             <article key={project.id} className="shadow-md p-2 border border-slate-100 space-y-2">
               <div className="flex justify-between">
@@ -54,12 +59,12 @@ const HomeProjects = () => {
                         : "default"
                   }
                 >
-                  {project.status.replace("_", " ")}
+                  {translateStatus(project.status)}
                 </Chip>
               </div>
               <Divider />
               <p>
-                Priority :{" "}
+                Prioritas :{" "}
                 <span
                   className={clsx("font-semibold capitalize", {
                     "text-red-500": project.priority === "urgent",
@@ -68,12 +73,12 @@ const HomeProjects = () => {
                     "text-blue-500": project.priority === "normal",
                   })}
                 >
-                  {project.priority}
+                  {translatePriority(project.priority)}
                 </span>
               </p>
-              <p>Leader:</p>
+              <p>Pemimpin:</p>
               <User name={project.projectLead.name} title={project.projectLead.name!} />
-              <p>Members:</p>
+              <p>Anggota:</p>
               <div className="flex gap-2 flex-wrap">
                 {project.projectMembers.map((member) => (
                   <Tooltip key={member.id} color="primary" content={member.name!}>
@@ -81,7 +86,7 @@ const HomeProjects = () => {
                   </Tooltip>
                 ))}
               </div>
-              <Tooltip content="Open Project" color="primary">
+              <Tooltip content="Buka Proyek" color="primary">
                 <Button
                   className="w-full"
                   as={Link}
