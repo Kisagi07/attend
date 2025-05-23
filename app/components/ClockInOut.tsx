@@ -411,22 +411,22 @@ const ClockInOut = () => {
   const handleGeolocationError = useCallback((error: PositionErrorCallback | any, onlyNotPermittedReject: boolean) => {
     if (error.code === error.PERMISSION_DENIED) {
       if (onlyNotPermittedReject && !deniedGeolocation.current) {
-        toast.error("Location permission denied by user.");
+        toast.error("Izin lokasi ditolak, silahkan aktifkan izin lokasi di pengaturan");
         deniedGeolocation.current = true;
       } else if (!onlyNotPermittedReject) {
-        toast.error("Location permission denied by user.");
+        toast.error("Izin lokasi ditolak, silahkan aktifkan izin lokasi di pengaturan.");
       }
     } else if (error.code === error.POSITION_UNAVAILABLE) {
       if (!onlyNotPermittedReject) {
-        toast.error("Location information is unavailable.");
+        toast.error("Lokasi tidak tersedia.");
       }
     } else if (error.code === error.TIMEOUT) {
       if (!onlyNotPermittedReject) {
-        toast.error("The request to get user location timed out.");
+        toast.error("Permintaan untuk mengambil lokasi pengguna telah habis waktunya, coba lagi.");
       }
     } else {
       if (!onlyNotPermittedReject) {
-        toast.error("An unknown error occurred.");
+        toast.error("Terjadi kesalahan yang tidak diketahui.");
       }
     }
   }, []);
