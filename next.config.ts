@@ -1,7 +1,9 @@
-import NextBundleAnalyzer from "@next/bundle-analyzer";
+import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
+  experimental: {
+    turbo:{}
+  },
   async redirects() {
     return [
       {
@@ -53,13 +55,8 @@ const nextConfig = {
       },
     ];
   },
-  output: "standalone",
+  output: "standalone",  
 };
 
-
-const withAnalyzer = NextBundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
-
-export default withAnalyzer(nextConfig);
+export default nextConfig;
 
