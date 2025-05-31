@@ -5,7 +5,7 @@ import { calculateDistance, getDateOnly, getTimeOnly } from "@/app/helper";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import useSWR, { Fetcher } from "swr";
-import { logs, company, logs_type } from "@prisma/client";
+import { logs, company, logs_type } from "generated/prisma";
 import { IoCameraOutline } from "react-icons/io5";
 import { Input } from "@heroui/input";
 import { UserWithJob } from "../prisma";

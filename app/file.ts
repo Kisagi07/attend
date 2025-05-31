@@ -29,7 +29,7 @@ export async function storeFile(
     let compressedBuffer = buffer;
 
     do {
-      compressedBuffer = await sharp(buffer).toFormat("jpeg", { quality }).toBuffer();
+      compressedBuffer = await sharp(buffer).toFormat("jpeg", { quality }).toBuffer() as Buffer<ArrayBuffer>;
       quality -= 10;
     } while (compressedBuffer.length > maxSizeBytes && quality > 10);
 

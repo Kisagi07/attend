@@ -4,7 +4,7 @@ import ProjectForm from "@/app/components/ProjectForm";
 import { fetcher } from "@/app/helper";
 import { ProjectWithLeadWithJobAndMembers } from "@/app/prisma";
 import { Spinner } from "@heroui/spinner";
-import { users } from "@prisma/client";
+import { users } from "generated/prisma";
 import useSWR from "swr";
 
 interface PageProps {

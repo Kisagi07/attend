@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
-import { users } from "@prisma/client";
+import { users } from "generated/prisma";
 import React from "react";
 import { Key, Selection } from "@react-types/shared";
 import { Button } from "@heroui/button";

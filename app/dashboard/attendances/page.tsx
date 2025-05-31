@@ -3,7 +3,7 @@
 import MonthAttendances from "@/app/components/MonthAttendances";
 import Select from "@/app/components/Select";
 import { fetcher } from "@/app/helper";
-import { company, logs, users } from "@prisma/client";
+import { company, logs, users } from "generated/prisma";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { FaXmark } from "react-icons/fa6";

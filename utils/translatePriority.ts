@@ -1,4 +1,4 @@
-import { Priority } from "@prisma/client";
+import { Priority } from "generated/prisma";
 
  const translatePriority = (priority: Priority) => {
     switch (priority) {

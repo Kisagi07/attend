@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import EmployeeTableSkeleton from "../skeletons/EmployeeTableSkeleton";
 import { UserWithJob } from "../prisma";
-import { users } from "@prisma/client";
+import { users } from "generated/prisma";
 import { Tooltip } from "@heroui/tooltip";
 import { BsPersonFillExclamation } from "react-icons/bs";
 import { Button } from "@heroui/button";

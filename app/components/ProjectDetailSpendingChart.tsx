@@ -11,7 +11,7 @@
 //   Legend,
 // } from "chart.js";
 // import { Line } from "react-chartjs-2";
-// import { ProjectSpending } from "@prisma/client";
+// import { ProjectSpending } from "generated/prisma";
 
 // ChartJS.register(
 //   CategoryScale,

@@ -5,7 +5,7 @@ import clsx from "clsx";
 import InputText from "./InputText";
 import AttendToleranceSkeleton from "../skeletons/AttendToleranceSkeleton";
 import { toast } from "sonner";
-import { company } from "@prisma/client";
+import { company } from "generated/prisma";
 import { Checkbox } from "@heroui/checkbox";
 const AttendTolerance = () => {
   const [toleranceActive, setToleranceActive] = useState<boolean>(false);

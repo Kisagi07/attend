@@ -4,7 +4,7 @@ import Calendar from "@components/Calendar";
 import { parseDate, CalendarDate } from "@internationalized/date";
 import useSWR from "swr";
 import { fetcher } from "@/app/helper";
-import { holidays } from "@prisma/client";
+import { holidays } from "generated/prisma";
 
 const HolidaysCalendar: FC = () => {
   const { data: holidays, isLoading } = useSWR<holidays[]>("/api/holidays", fetcher);

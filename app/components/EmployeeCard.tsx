@@ -8,7 +8,7 @@ import {
   logs,
   DayOffRequest,
   logs_type,
-} from "@prisma/client";
+} from "generated/prisma";
 import useSWR from "swr";
 import { fetcher, monthNumberToWord } from "../helper";
 import totalOvertime from "@helper/totalOvertime";

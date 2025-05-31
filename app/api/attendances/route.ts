@@ -1,7 +1,7 @@
 import { monthNumberToWord } from "@/app/helper";
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { LogWithUser, LogWithUserWithJob } from "@/app/prisma";
-import { logs_type } from "@prisma/client";
+import { logs_type } from "generated/prisma";
 
 function getTodayDate() {
   const today = new Date();

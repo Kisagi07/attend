@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma, { UserResultMany } from "@/app/prisma";
-import { $Enums } from "@prisma/client";
+import { $Enums } from "generated/prisma";
 import {
   endOfMonth,
   getLocalTimeZone,

@@ -1,4 +1,4 @@
-import { ProjectStatus } from "@prisma/client";
+import { ProjectStatus } from "generated/prisma";
 
  const translateStatus = (status: ProjectStatus) => {
     switch (status) {

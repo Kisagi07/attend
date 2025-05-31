@@ -3,7 +3,7 @@ import { use } from "react";
 
 import { fetcher, formatRupiah } from "@/app/helper";
 import { Spinner } from "@heroui/spinner";
-import { DrinkAndFoodCost } from "@prisma/client";
+import { DrinkAndFoodCost } from "generated/prisma";
 import useSWR from "swr";
 import FoodAndDrinkCostForm from "@/app/components/FoodAndDrinkCostForm";
 import { parseAbsolute, parseZonedDateTime } from "@internationalized/date";

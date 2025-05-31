@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { extractNumber, formatRupiah } from "../helper";
 import { now, getLocalTimeZone, ZonedDateTime } from "@internationalized/date";
 import useForm from "@/app/hooks/useForm";
-import { DrinkAndFoodCostCategory } from "@prisma/client";
+import { DrinkAndFoodCostCategory } from "generated/prisma";
 type FoodAndDrinkCostForm = {
   defaultValue?: {
     category: DrinkAndFoodCostCategory;
