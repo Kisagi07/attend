@@ -11,7 +11,8 @@
     "test": "vitest"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} app/seed.ts",
+    "schema": "./prisma"
   },
   "dependencies": {
     "@heroui/avatar": "2.2.7",
@@ -75,7 +76,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "15.1.5",
+    "eslint-config-next": "15.3.3",
     "jsdom": "^26.1.0",
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.5.14",
@@ -104,7 +105,8 @@
       "@prisma/engines",
       "esbuild",
       "prisma",
-      "sharp"
+      "sharp",
+      "unrs-resolver"
     ]
   }
 }
