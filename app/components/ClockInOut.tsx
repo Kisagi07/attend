@@ -106,18 +106,6 @@ const ClockInOut = () => {
           color: "danger",
         },
       };
-    } else if (!isWorkDay) {
-      setSelectedButton(new Set(["work_overtime"]));
-      return {
-        work_overtime: {
-          label: "Kerja Lembur",
-          color: "primary",
-        },
-        work_overtime_home: {
-          label: "Kerja Lembur (Rumah)",
-          color: "secondary"
-        }
-      };
     } else {
       setSelectedButton(new Set(["work_from_office"]));
       return {
@@ -143,7 +131,7 @@ const ClockInOut = () => {
         },
       };
     }
-  }, [status.clockIn, isWorkDay]);
+  }, [status.clockIn]);
 
   const closestDistanceLocation = useRef<{
     distance: number;
@@ -184,7 +172,6 @@ const ClockInOut = () => {
 
 
         let { distance, latitude, longitude, useTarget } = closestDistanceLocation.current;
-
         // check if calculated distance match with selected button value
         if (useTarget !== getTargetType(selectedButtonValue, todayAttendance)) {
           distance = getDistanceFromLocation({ latitude, longitude });
@@ -389,7 +376,6 @@ const ClockInOut = () => {
       if (type === "clock-out" && todayAttendance?.type === "on_site_work") {
         try {
           if (window.AndroidBridge) {
-            console.log(window.AndroidBridge);
             if (user) {
               window.AndroidBridge.stopHourlyCoordinate();
             } else {

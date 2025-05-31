@@ -8,18 +8,6 @@ import { parseTime } from "@internationalized/date";
 import { storeFile } from "@/app/file";
 import { getDateOnly } from "@/app/helper";
 
-interface PostJson {
-  type: logs_type | "clock-out";
-  clock_in_time: string;
-  date: string;
-  clock_in_latitude: string;
-  clock_in_longitude: string;
-  todaysWork: string[];
-  clock_out_time: string;
-  clock_out_latitude: string;
-  clock_out_longitude: string;
-  isOverTime: boolean;
-}
 
 const userAlreadyCheckIn = async (type: string, date: string, id: number) => {
 
@@ -50,15 +38,6 @@ const userAlreadyCheckIn = async (type: string, date: string, id: number) => {
   } else {
     return false;
   }
-}
-
-const transformOvertimeType = (type: "work_overtime" | "work_overtime_home") : logs_type => {
-    switch (type) {
-      case "work_overtime":
-        return "work_from_office"
-      case "work_overtime_home":
-        return "work_from_home"
-    }
 }
 
 export async function POST(req: NextRequest) {
@@ -242,11 +221,7 @@ export async function POST(req: NextRequest) {
         },
         { status: 422 }
       );
-    }
-    // transform type if overtime to proper type
-  if (JSON.parse(isOverTime)) {
-    type = transformOvertimeType(type as "work_overtime" | "work_overtime_home")
-  }
+    }    
     const [hours, minutes, seconds] = clock_in_time.split(":");
     const clock_in_time_object = new Date(
       `2024-04-21T${hours}:${minutes}:${seconds}Z`
