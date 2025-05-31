@@ -55,6 +55,7 @@ const nextConfig: NextConfig = {
     ];
   },
   output: "standalone",  
+  productionBrowserSourceMaps: false
 };
 
 export default nextConfig;
