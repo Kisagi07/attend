@@ -1,0 +1,37 @@
+model users {
+  id               Int               @id @default(autoincrement())
+  name             String?           @db.VarChar(255)
+  password         String?           @db.VarChar(255)
+  work_id          String?           @db.VarChar(255)
+  created_at       DateTime          @default(now()) @db.DateTime(0)
+  updated_at       DateTime          @updatedAt @db.DateTime(0)
+  role             users_role        @default(intern)
+  job_position_id  Int?
+  home_latitude    Decimal?          @db.Decimal(10, 8)
+  home_longitude   Decimal?          @db.Decimal(11, 8)
+  gender           users_gender?     @default(male)
+  profile_picture  String?           @db.VarChar(255)
+  logs             logs[]
+  job_position     job_positions?    @relation(fields: [job_position_id], references: [id], map: "users_job_position_id_foreign_idx")
+  dayOffRequests   DayOffRequest[]
+  projectsLed      Project[]         @relation(name: "Leader")
+  projectsMembered Project[]
+  projectActivity  ProjectActivity[]
+  projectHistories ProjectHistory[]
+  projectSpendings ProjectSpending[]
+
+  @@index([job_position_id], map: "users_job_position_id_foreign_idx")
+}
+
+enum users_role {
+  admin
+  employee
+  intern
+  ex_employee
+  ex_intern
+}
+
+enum users_gender {
+  male
+  female
+}

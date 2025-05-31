@@ -1,0 +1,9 @@
+model company {
+  id               Int      @id @default(autoincrement())
+  latitude         Decimal  @db.Decimal(10, 8)
+  longitude        Decimal  @db.Decimal(11, 8)
+  created_at       DateTime @db.DateTime(0) @default(now())
+  updated_at       DateTime @db.DateTime(0) @updatedAt
+  tolerance_active Boolean? @default(false)
+  tolerance_time   Int      @default(30)
+}
