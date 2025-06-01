@@ -2,8 +2,8 @@ import prisma from "@/app/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth/[...nextauth]/authConfig";
 
-import { Prisma } from "generated/prisma";
-import { logs as Log, logs_type } from "generated/prisma";
+import { Prisma } from "@prisma/client";
+import { logs as Log, logs_type } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
 import { storeFile } from "@/app/file";
 import { getDateOnly } from "@/app/helper";

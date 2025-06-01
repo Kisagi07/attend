@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import useSWR, { Fetcher } from "swr";
 import { debounce } from "../helper";
-import { users } from "generated/prisma";
+import { users } from "@prisma/client";
 import { Spinner } from "@heroui/spinner";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";

@@ -4,7 +4,7 @@ import { fetcher, monthNumberToWord, monthWordToNumber } from "@/app/helper";
 import { UserWithJob } from "../prisma";
 import { EmployeeCard } from "@/app/components";
 import { CardSkeleton } from "@/app/skeletons";
-import { holidays, logs } from "generated/prisma";
+import { holidays, logs } from "@prisma/client";
 import React from "react";
 
 interface Grouped {

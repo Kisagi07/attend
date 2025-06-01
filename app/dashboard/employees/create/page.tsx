@@ -5,7 +5,7 @@ import Select from "@/app/components/Select";
 import { toast } from "sonner";
 import { EmployeeFormSkeleton } from "@/app/skeletons";
 import clsx from "clsx";
-import { job_positions } from "generated/prisma";
+import { job_positions } from "@prisma/client";
 interface Option {
   label: string;
   value: string | number;

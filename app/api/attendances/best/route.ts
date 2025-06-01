@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/prisma";
 import { fromDate, parseDate, parseTime } from "@internationalized/date";
 import calculateLateInLogs from "@/app/helper/calculateLate";
-import { job_positions, logs } from "generated/prisma";
+import { job_positions, logs } from "@prisma/client";
 
 interface Score {
   totalLate: number;

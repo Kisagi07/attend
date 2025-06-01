@@ -3,7 +3,7 @@ import { fetcher } from "../helper";
 import useSWR from "swr";
 import { TimelineSkeleton } from "../skeletons";
 import Timeline from "./Timeline";
-import { timelines } from "generated/prisma";
+import { timelines } from "@prisma/client";
 import { convertNewLine } from "@/app/react-helper";
 
 const ActivityTimeline = () => {

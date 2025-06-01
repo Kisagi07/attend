@@ -1,4 +1,4 @@
-import { logs_type, PrismaClient } from "generated/prisma";
+import { logs_type, PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 const prisma = new PrismaClient();
 

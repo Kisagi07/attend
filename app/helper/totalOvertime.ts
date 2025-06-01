@@ -1,4 +1,4 @@
-import { logs as Log, job_positions as JobPosition } from "generated/prisma";
+import { logs as Log, job_positions as JobPosition } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
 
 const totalOvertime = (logs: Log[], job: JobPosition | null) => {

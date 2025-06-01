@@ -15,7 +15,7 @@ import { User } from "@heroui/user";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { IoIosOpen } from "react-icons/io";
-import { Priority, ProjectStatus } from "generated/prisma";
+import { Priority, ProjectStatus } from "@prisma/client";
 import translateStatus from "@/utils/translateStatus";
 import translatePriority from "@/utils/translatePriority";
 

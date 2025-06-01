@@ -1,4 +1,4 @@
-import { users } from "generated/prisma";
+import { users } from "@prisma/client";
 import React from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Avatar } from "@heroui/avatar";

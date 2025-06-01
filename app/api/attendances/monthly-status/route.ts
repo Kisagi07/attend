@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/prisma";
-import { logs } from "generated/prisma";
+import { logs } from "@prisma/client";
 
 const GET = async (req: NextRequest) => {
   const currentDate = new Date();

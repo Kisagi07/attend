@@ -5,7 +5,7 @@ import { CardSkeleton } from "../skeletons";
 import { fetcher } from "../helper";
 import EmployeeCard from "./EmployeeCard";
 import { UserResultFirst } from "../prisma";
-import { holidays, logs } from "generated/prisma";
+import { holidays, logs } from "@prisma/client";
 
 const TeamIntern = () => {
   const date = new Date();

@@ -1,6 +1,6 @@
 import prisma from "@/app/prisma";
 import { fromDate, parseDate, today } from "@internationalized/date";
-import { JsonArray } from "generated/prisma/runtime/library";
+import { JsonArray } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ReqJson {

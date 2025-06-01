@@ -1,7 +1,7 @@
 import { describe, expect, it, test, vi } from "vitest";
 import getTargetType from "@/utils/getTargetType";
-import { logs } from "generated/prisma";
-import { Decimal } from "generated/prisma/runtime/library";
+import { logs } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 describe("Clock in Out", () => {    
             

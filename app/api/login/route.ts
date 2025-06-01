@@ -1,5 +1,5 @@
 import prisma from "@/app/prisma";
-import { users } from "generated/prisma";
+import { users } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 

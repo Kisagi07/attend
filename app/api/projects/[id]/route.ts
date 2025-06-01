@@ -1,8 +1,8 @@
 import { formatRupiah } from "@/app/helper";
 import prisma, { HistoryWithUser, ProjectResult } from "@/app/prisma";
 import { authorized } from "@/app/serverhelper";
-import { $Enums } from "generated/prisma";
-import { PrismaClientKnownRequestError } from "generated/prisma/runtime/library";
+import { $Enums } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/[...nextauth]/authConfig";
 import "@/initExtension";

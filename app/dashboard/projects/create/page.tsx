@@ -1,7 +1,7 @@
 "use client";
 import ProjectForm from "@/app/components/ProjectForm";
 import { fetcher } from "@/app/helper";
-import { users } from "generated/prisma";
+import { users } from "@prisma/client";
 import React from "react";
 import useSWR from "swr";
 const ProjectCreatePage: React.FC = () => {

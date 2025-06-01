@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Confirmation } from "@/app/components";
 import { toast } from "sonner";
 import { formatRupiah } from "@/app/helper";
-import { job_positions } from "generated/prisma";
+import { job_positions } from "@prisma/client";
 
 const columnHelper = createColumnHelper<job_positions>();
 

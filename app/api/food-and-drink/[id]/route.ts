@@ -1,7 +1,7 @@
 import { extractNumber } from "@/app/helper";
 import prisma from "@/app/prisma";
 import { parseZonedDateTime } from "@internationalized/date";
-import { DrinkAndFoodCostCategory } from "generated/prisma";
+import { DrinkAndFoodCostCategory } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const GET = async (

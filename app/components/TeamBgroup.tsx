@@ -4,7 +4,7 @@ import { fetcher } from "../helper";
 import { CardSkeleton } from "../skeletons";
 import EmployeeCard from "./EmployeeCard";
 import { UserResultMany } from "../prisma";
-import { holidays, logs } from "generated/prisma";
+import { holidays, logs } from "@prisma/client";
 
 const TeamBgroup = () => {
   const date = new Date();

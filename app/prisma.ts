@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, ProjectHistory, users, logs as Log } from "generated/prisma";
+import { Prisma, PrismaClient, ProjectHistory, users, logs as Log } from "@prisma/client";
 import { parseTime } from "@internationalized/date";
 
 const prisma = new PrismaClient({

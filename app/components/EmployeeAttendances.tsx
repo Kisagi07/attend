@@ -8,7 +8,7 @@ import { TableSkeleton } from "../skeletons";
 import MonthAttendances from "./MonthAttendances";
 import { notFound } from "next/navigation";
 import { FaCircleXmark } from "react-icons/fa6";
-import { company, logs } from "generated/prisma";
+import { company, logs } from "@prisma/client";
 import { LogWithUserWithJob } from "../prisma";
 
 const EmployeeAttendances = ({ params }: { params: { work_id: string } }) => {
