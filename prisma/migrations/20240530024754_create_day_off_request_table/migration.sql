@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `DayOffRequest` (
+CREATE TABLE `dayoffrequest` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `request_date` DATETIME(3) NOT NULL,

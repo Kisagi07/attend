@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `project` ADD COLUMN `title` VARCHAR(191) NOT NULL;
+ALTER TABLE `projects` ADD COLUMN `title` VARCHAR(191) NOT NULL;
