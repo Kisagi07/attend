@@ -1,6 +1,6 @@
 {
   "name": "attend",
-  "version": "2.22.8",
+  "version": "2.22.9",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
