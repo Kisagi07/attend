@@ -26,4 +26,4 @@ ALTER TABLE `dayoffrequest` DROP COLUMN `leave_end_date`,
     ADD COLUMN `userId` INTEGER NOT NULL;
 
 -- AddForeignKey
-ALTER TABLE `DayOffRequest` ADD CONSTRAINT `DayOffRequest_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `dayoffrequest` ADD CONSTRAINT `dayoffrequest_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
