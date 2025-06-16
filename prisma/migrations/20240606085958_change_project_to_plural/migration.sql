@@ -5,13 +5,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `_projecttousers` DROP FOREIGN KEY `_ProjectTousers_A_fkey`;
+ALTER TABLE `_ProjectTousers` DROP FOREIGN KEY `_ProjectTousers_A_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `project` DROP FOREIGN KEY `project_projectLeadId_fkey`;
+ALTER TABLE `Project` DROP FOREIGN KEY `project_projectLeadId_fkey`;
 
 -- DropTable
-DROP TABLE `project`;
+DROP TABLE `Project`;
 
 -- CreateTable
 CREATE TABLE `projects` (
