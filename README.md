@@ -196,7 +196,8 @@ Endpoint to send request when admin manually clockout an employee
         "clock_out_time": "16:00:00",
         "clock_out_latitude": null,
         "clock_out_longitude": null,
-        "clock_out_picture": "/upload/log-proof/***"
+        "clock_out_picture": "/upload/log-proof/***",
+        "works": ["work", "work"]
     }
 
 ## Holidays Resource
