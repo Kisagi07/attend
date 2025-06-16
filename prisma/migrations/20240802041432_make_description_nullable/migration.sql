@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `drinkandfoodcost` MODIFY `description` VARCHAR(191) NULL;
+ALTER TABLE `DrinkAndFoodCost` MODIFY `description` VARCHAR(191) NULL;

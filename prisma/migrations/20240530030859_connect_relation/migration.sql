@@ -14,7 +14,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `dayoffrequest` DROP COLUMN `leave_end_date`,
+ALTER TABLE `DayOffRequest` DROP COLUMN `leave_end_date`,
     DROP COLUMN `leave_start_date`,
     DROP COLUMN `leave_type`,
     DROP COLUMN `request_date`,

@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `dayoffrequest` MODIFY `comment` VARCHAR(191) NULL;
+ALTER TABLE `DayOffRequest` MODIFY `comment` VARCHAR(191) NULL;
