@@ -169,6 +169,36 @@ Return the latest 5 days attendances (Weekday only)
     ]
 ```
 
+### Admin Clock Out
+
+#### Endpoint
+
+`POST` `/api/attendance/manual-clock-out`
+
+#### Description
+
+Endpoint to send request when admin manually clockout an employee
+
+#### Request Options
+`Content Type : application/form-data`
+
+#### Required Field
+
+| Field | Type | Example |
+|-------|------|---------|
+| `clock_out_time` | `string` | `09:00:00`|
+| `clock_out_proof`|`File`| |
+| `work[]`|`string[]`|`["work", "work"]`|
+
+#### Success Response
+
+    {
+        "clock_out_time": "16:00:00",
+        "clock_out_latitude": null,
+        "clock_out_longitude": null,
+        "clock_out_picture": "/upload/log-proof/***"
+    }
+
 ## Holidays Resource
 
 ### Endpoint
