@@ -21,8 +21,15 @@ const POST = async (req: NextRequest) => {
     logId = Number(logId);
     if (isNaN(logId)) return NextResponse.json({error: "log_id bukan sebuah angka"}, {status: 422});
 
-    const works = formData.getAll("work[]") as string[] | null;
-    if (!works || works.length === 0) return NextResponse.json({error: "Pekerjaan dibutuhkan"}, {status: 422});
+    let works = formData.get("work") as string | null | string[];
+    if (!works) return NextResponse.json({error: "Pekerjaan dibutuhkan"}, {status: 422});
+    try {
+        works = JSON.parse(works as string) as string[];
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({error: "Pekerjaan harus json_encoded"})
+    }
+    if (works.length === 0) return NextResponse.json({error: "Pekerjaan tidak boleh kosong"}, {status: 422});
 
     const clockOutTime = formData.get("clock_out_time") as string | null;
     if (!clockOutTime) return NextResponse.json({error: "Jam pulang tidak ditemukan"}, {status: 422});
