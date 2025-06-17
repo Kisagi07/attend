@@ -26,6 +26,7 @@ const nextConfig = {
         hostname: "absensi.bgroup.id"
       }
     ],
+    unoptimized: true
   },
   async headers() {
     return [
