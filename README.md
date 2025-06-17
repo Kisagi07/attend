@@ -184,11 +184,11 @@ Endpoint to send request when admin manually clockout an employee
 
 #### Required Field
 
-| Field | Type | Example |
-|-------|------|---------|
-| `clock_out_time` | `string` | `09:00:00`|
-| `clock_out_proof`|`File`| |
-| `work[]`|`string[]`|`["work", "work"]`|
+| Field | Type | Example | Detail |
+|-------|------|---------|--------|
+| `clock_out_time` | `string` | `09:00:00`| |
+| `clock_out_proof`|`File`| | |
+| `work`|`string`|`["work", "work"]`| A json that is stringify or encoded |
 
 #### Success Response
 
@@ -197,7 +197,7 @@ Endpoint to send request when admin manually clockout an employee
         "clock_out_latitude": null,
         "clock_out_longitude": null,
         "clock_out_picture": "/upload/log-proof/***",
-        "works": ["work", "work"]
+        "works": ["work", "work"],
     }
 
 ## Holidays Resource
