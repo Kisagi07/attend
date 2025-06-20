@@ -29,6 +29,9 @@ const NonScheduleOvertime = () => {
     if (!data.work) {
       errors.work = "Perkerjaan dibutuhkan";
     }
+    if (!data.date) {
+      errors.date = "Tanggal dibutuhkan";
+    }
 
     if (Object.values(errors).length > 0) {
       setErrors(errors);
@@ -67,7 +70,7 @@ const NonScheduleOvertime = () => {
   return (
     <Form onSubmit={onSubmit} validationErrors={errors}>
       <I18nProvider locale="id">
-        <DatePicker className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())} maxValue={today(getLocalTimeZone())}  />
+        <DatePicker name="date" className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())} maxValue={today(getLocalTimeZone())} isInvalid={!!errors["date"]} errorMessage={errors["date"]} />
       </I18nProvider>
       <div className="flex gap-2 w-full">
         <TimeInput
