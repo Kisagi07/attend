@@ -5,6 +5,9 @@ import { FormEvent, useRef, useState } from "react";
 import { Form } from "@heroui/form";
 import createNSOvertime from "../libs/createNSOvertime";
 import { toast } from "sonner";
+import { DatePicker } from "@heroui/date-picker";
+import { today, getLocalTimeZone } from "@internationalized/date"
+import { I18nProvider } from "@react-aria/i18n";
 
 const NonScheduleOvertime = () => {  
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,6 +66,9 @@ const NonScheduleOvertime = () => {
 
   return (
     <Form onSubmit={onSubmit} validationErrors={errors}>
+      <I18nProvider locale="id">
+        <DatePicker className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())}  />
+      </I18nProvider>
       <div className="flex gap-2 w-full">
         <TimeInput
           hourCycle={24}
