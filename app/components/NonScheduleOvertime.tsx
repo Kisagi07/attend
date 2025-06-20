@@ -67,7 +67,7 @@ const NonScheduleOvertime = () => {
   return (
     <Form onSubmit={onSubmit} validationErrors={errors}>
       <I18nProvider locale="id">
-        <DatePicker className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())}  />
+        <DatePicker className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())} maxValue={today(getLocalTimeZone())}  />
       </I18nProvider>
       <div className="flex gap-2 w-full">
         <TimeInput
