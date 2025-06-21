@@ -1,11 +1,13 @@
 import { Button } from "@heroui/button";
 import { TimeInput } from "@heroui/date-input";
 import { Input } from "@heroui/input";
-import { Time } from "@internationalized/date";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { Form } from "@heroui/form";
 import createNSOvertime from "../libs/createNSOvertime";
 import { toast } from "sonner";
+import { DatePicker } from "@heroui/date-picker";
+import { today, getLocalTimeZone } from "@internationalized/date"
+import { I18nProvider } from "@react-aria/i18n";
 
 const NonScheduleOvertime = () => {  
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -27,6 +29,9 @@ const NonScheduleOvertime = () => {
     if (!data.work) {
       errors.work = "Perkerjaan dibutuhkan";
     }
+    if (!data.date) {
+      errors.date = "Tanggal dibutuhkan";
+    }
 
     if (Object.values(errors).length > 0) {
       setErrors(errors);
@@ -34,6 +39,7 @@ const NonScheduleOvertime = () => {
     } else {
         setErrors({});
     }
+
     try {
         setSubmitting(true);
         const result = await createNSOvertime(formData);
@@ -64,6 +70,9 @@ const NonScheduleOvertime = () => {
 
   return (
     <Form onSubmit={onSubmit} validationErrors={errors}>
+      <I18nProvider locale="id">
+        <DatePicker name="date" className="w-full" label="Tanggal" defaultValue={today(getLocalTimeZone())} maxValue={today(getLocalTimeZone())} isInvalid={!!errors["date"]} errorMessage={errors["date"]} />
+      </I18nProvider>
       <div className="flex gap-2 w-full">
         <TimeInput
           hourCycle={24}

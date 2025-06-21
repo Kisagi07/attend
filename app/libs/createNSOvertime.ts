@@ -8,6 +8,7 @@ const createNSOvertime = async (formData: FormData) => {
   const checkIn = formData.get("checkIn") as string | null;
   const checkOut = formData.get("checkOut") as string | null;
   const work = formData.get("work") as string | null;
+  const date = formData.get("date") as string | null;
 
   // validations
   const errors: Record<string, string> = {};
@@ -19,6 +20,9 @@ const createNSOvertime = async (formData: FormData) => {
   }
   if (!work) {
     errors.work = "Work dibutuhkan";
+  }
+  if (!date) {
+    errors.date = "Tanggal dibutuhkan";
   }
   if (Object.values(errors).length > 0) {
     return { status: 422, errors };
@@ -47,12 +51,17 @@ const createNSOvertime = async (formData: FormData) => {
   try {
     const [hoursI, minutesI, secondsI] = checkIn!.split(":");
     const checkInTime = new Date(
-      `2024-04-21T${hoursI}:${minutesI}:${secondsI}Z`
+      `${date}T${hoursI}:${minutesI}:${secondsI}Z`
     );
     const [hoursO, minutesO, secondsO] = checkOut!.split(":");
     const checkOutTime = new Date(
-      `2024-04-21T${hoursO}:${minutesO}:${secondsO}Z`
+      `${date}T${hoursO}:${minutesO}:${secondsO}Z`
     );
+
+    const [year, month, day] = date!.split("-").map(Number);
+
+    const generatedDate = new Date(Date.UTC(year, month, day));
+
     await prisma.logs.create({
       data: {
         clock_in_time: checkInTime,
@@ -60,7 +69,7 @@ const createNSOvertime = async (formData: FormData) => {
         work: workA,
         user_id: user.id,
         type: "non_schedule_overtime",
-        date: new Date(),
+        date: generatedDate,
       },
     });
   } catch (error) {
