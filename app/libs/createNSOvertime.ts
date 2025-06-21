@@ -57,6 +57,11 @@ const createNSOvertime = async (formData: FormData) => {
     const checkOutTime = new Date(
       `${date}T${hoursO}:${minutesO}:${secondsO}Z`
     );
+
+    const [year, month, day] = date!.split("-").map(Number);
+
+    const generatedDate = new Date(Date.UTC(year, month, day));
+
     await prisma.logs.create({
       data: {
         clock_in_time: checkInTime,
@@ -64,7 +69,7 @@ const createNSOvertime = async (formData: FormData) => {
         work: workA,
         user_id: user.id,
         type: "non_schedule_overtime",
-        date: new Date(),
+        date: generatedDate,
       },
     });
   } catch (error) {
